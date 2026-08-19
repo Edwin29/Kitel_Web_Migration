@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+	<title xml:lang="ko">캘린더</title>
+	<title xml:lang="en">Calendar</title>
+	<description xml:lang="ko">동아리 일정을 월/주 단위로 보여주는 캘린더 모듈. admin이 일정을 등록하면 전체 방문자가 조회할 수 있습니다.</description>
+	<description xml:lang="en">Displays club events in a month/week calendar. Admin registers events; all visitors can view.</description>
+	<version>1.0</version>
+	<date>2026-08-19</date>
+	<category>service</category>
+
+	<author email_address="dev@kitel.local" link="">
+		<name xml:lang="ko">KITEL</name>
+		<name xml:lang="en">KITEL</name>
+	</author>
+</module>

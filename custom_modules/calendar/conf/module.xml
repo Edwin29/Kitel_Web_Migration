@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+	<grants>
+		<grant name="list" default="guest">
+			<title xml:lang="ko">조회</title>
+			<title xml:lang="en">view</title>
+		</grant>
+		<grant name="manage" default="manager">
+			<title xml:lang="ko">일정 관리(등록/수정/삭제)</title>
+			<title xml:lang="en">manage events</title>
+		</grant>
+	</grants>
+	<actions>
+		<action name="dispCalendarIndex" type="view" permission="list" standalone="false" index="true" />
+
+		<action name="dispCalendarAdminContent" type="view" admin_index="true" menu_name="calendar" menu_index="true" permission="manage" />
+		<action name="dispCalendarAdminForm" type="view" menu_name="calendar" permission="manage" />
+		<action name="dispCalendarAdminGrantInfo" type="view" menu_name="calendar" permission="manage" />
+
+		<action name="procCalendarAdminInsertEvent" type="controller" permission="manage" ruleset="insertEvent" />
+		<action name="procCalendarAdminDeleteEvent" type="controller" permission="manage" />
+	</actions>
+</module>

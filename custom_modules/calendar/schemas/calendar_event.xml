@@ -1,0 +1,12 @@
+<table name="calendar_event">
+	<column name="event_srl" type="number" notnull="notnull" primary_key="primary_key" />
+	<column name="module_srl" type="number" notnull="notnull" index="idx_module_srl" />
+	<column name="title" type="varchar" size="250" notnull="notnull" />
+	<column name="start_date" type="varchar" size="8" notnull="notnull" index="idx_start_date" />
+	<column name="end_date" type="varchar" size="8" notnull="notnull" index="idx_end_date" />
+	<column name="location" type="varchar" size="250" />
+	<column name="category" type="varchar" size="100" />
+	<column name="description" type="text" />
+	<column name="member_srl" type="number" notnull="notnull" />
+	<column name="regdate" type="varchar" size="14" notnull="notnull" />
+</table>

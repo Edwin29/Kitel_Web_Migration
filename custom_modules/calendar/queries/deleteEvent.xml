@@ -1,0 +1,8 @@
+<query id="deleteEvent" action="delete">
+    <tables>
+        <table name="calendar_event" />
+    </tables>
+    <conditions>
+        <condition operation="equal" column="event_srl" var="event_srl" notnull="notnull" />
+    </conditions>
+</query>

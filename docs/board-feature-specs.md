@@ -25,13 +25,20 @@
 - **admin**: 등록/수정/삭제. About 문서에 따르면 "임원진 회의로 일정 확정 → 담당자(admin)가 캘린더에 등록"하는 오프라인 선행 절차가 있음.
 - **전체(비로그인 포함)**: 조회만 (월/주 뷰 전환, 특정 날짜 클릭 시 해당일 이벤트 상세).
 
-### ✅ Rhymix 구현 검증 완료
-로컬 환경에 설치된 Rhymix 2.1.36의 번들 모듈(`board`, `page`, `poll`, `document`, `file` 등)과 위젯 목록을 확인한 결과 **캘린더류 모듈은 없음** — 가설대로 커스텀 모듈 개발이 필요함. Rhymix 모듈은 `conf/module.xml`(액션·권한 정의) + `{name}.model/view/controller.php`(+admin 버전) + `schemas/`(DB 테이블 정의) + `queries/`(SQL) + `skins/` 로 구성되는 정형화된 구조라(`poll` 모듈로 실물 확인), 학습은 필요하지만 패턴 자체는 명확함. `kitel_rental_*`처럼 XE/Rhymix 모듈 시스템 밖에서 독립 PHP 앱으로 만드는 방식(세션만 참조)도 이미 이 프로젝트에서 검증된 대안임.
+### ✅✅ 구현 완료 (2026-08-19)
+`modules/calendar`로 실제 커스텀 모듈을 만들어 로컬 Rhymix에 설치·검증까지 마침 (소스는 [custom_modules/calendar](../custom_modules/calendar)에 보관). 번들 모듈에 캘린더류가 없어 가설대로 커스텀 개발이 필요했고, 표준 모듈 스캐폴드(`conf/module.xml` + `calendar.class/model/view/controller.php`(+admin) + `schemas/` + `queries/` + `skins/default/`)로 구현함.
 
-### 열린 질문
+- **공개 화면**: 월 그리드, 이전/다음 달 이동, 오늘 날짜 강조, 날짜별 이벤트 표시 — 전체공개(비로그인 포함) 조회
+- **관리자 화면**: 일정 목록/등록/수정/삭제, admin 전용
+- **스킨 지원**: `skins/default/skin.xml` + `list.html`로 다른 게시판과 동일한 방식의 스킨 교체 가능 — 디자이너가 새 스킨 폴더만 추가하면 됨
+- **권한 관리**: module.xml에 `list`(조회)/`manage`(등록·수정·삭제) 그랜트를 선언했더니 게시판과 동일한 권한 설정 화면이 자동 생성됨(`getModuleGrantHTML` 공용 로직 재사용) — 나중에 "일정 관리" 권한을 임원진 등 특정 그룹에 위임하는 것도 코드 수정 없이 가능
+
+⚠️ **트러블슈팅 기록**: "메뉴 추가" UI로 신규 모듈 타입의 메뉴를 만들면 `xe_modules` 행과 메뉴만 생성되고 **DB 스키마 설치(`moduleInstall()`)는 자동으로 실행되지 않음** — `module=install&act=procInstallAdminInstall&module_name=calendar` 액션을 별도로 호출해야 `schemas/*.xml`이 실제 테이블로 만들어짐. 새 커스텀 모듈을 추가할 때마다 이 스텝이 필요.
+
+### 남은 질문 (기능 확장 시 고려)
 - 매주 정기모임처럼 **반복 일정**을 지원해야 하나요, 아니면 매번 개별 등록으로 충분한가요?
 - 카테고리별 색상 구분 등 시각적 분류가 필요한가요?
-- 이벤트에 신청/RSVP 같은 상호작용이 앞으로 필요할 가능성이 있나요? (지금 당장은 아니어도 데이터 구조에 여지를 둘지 판단하는 데 필요)
+- 이벤트에 신청/RSVP 같은 상호작용이 앞으로 필요할 가능성이 있나요?
 
 ---
 

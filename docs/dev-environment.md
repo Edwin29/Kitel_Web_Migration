@@ -104,4 +104,42 @@ Study ─ 과제게시판 / 작품전시회 게시판 / 세미나 게시판 / �
 
 ### 확인된 제약 / 후속 과제
 - 메뉴 자체의 노출 권한(`메뉴 편집 > 권한`)은 이번에 건드리지 않음 — 게시판 접근은 막히지만 준회원에게 건의사항 메뉴 링크 자체는 보일 수 있음. 필요시 메뉴 레벨 권한도 맞춰 제한할 것.
-- 작품전시회의 검토중→승인→공개 워크플로우, 과제게시판의 제출현황 대시보드, 캘린더/자료실 커스텀 모듈은 아직 미착수.
+- ~~작품전시회의 검토중→승인→공개 워크플로우, 과제게시판의 제출현황 대시보드, 캘린더/자료실 커스텀 모듈은 아직 미착수.~~ → 캘린더는 아래에서 완료. 나머지는 계속 남은 과제.
+
+## 첫 커스텀 모듈: 캘린더 (2026-08-19)
+
+`modules/calendar`를 처음부터 만들어 About > 일정 메뉴(`mid=schedule`)에 설치·검증까지 완료. 소스는 `D:\rhymix_dev\www\rhymix\modules\calendar`와 이 저장소의 [custom_modules/calendar](../custom_modules/calendar)(git 추적용 사본) 양쪽에 있음 — **로컬 인스턴스를 다시 만들 때는 `custom_modules/calendar`를 `D:\rhymix_dev\www\rhymix\modules\`로 복사해서 사용.**
+
+### 구조
+표준 Rhymix 모듈 스캐폴드를 그대로 따름:
+```
+calendar/
+├── conf/{info.xml, module.xml}     # 모듈 메타정보 + grants(list/manage) + actions 선언
+├── calendar.class.php               # 부모 클래스, moduleInstall() 훅
+├── calendar.model.php                # getEventList / getEvent
+├── calendar.view.php                 # dispCalendarIndex — 월 그리드 뷰 (공개)
+├── calendar.admin.view.php           # dispCalendarAdminContent/Form/GrantInfo (관리자)
+├── calendar.admin.controller.php     # procCalendarAdminInsertEvent/DeleteEvent
+├── schemas/calendar_event.xml        # DB 테이블 정의 (rx_calendar_event)
+├── queries/*.xml                     # getEventList/getEvent/insert/update/delete
+├── skins/default/{skin.xml,list.html}  # 공개 화면 스킨 — 디자이너가 새 스킨 폴더로 교체 가능
+└── tpl/*.html                        # 관리자 화면 템플릿(스킨 대상 아님)
+```
+
+### 모듈 설치 시 필수 스텝 (신규 커스텀 모듈 공통)
+1. 위 파일 구조로 `modules/{module}/` 생성
+2. 메뉴 편집에서 "메뉴 추가"로 붙이면(직접 클릭이든 API 호출이든) `xe_modules` 행과 메뉴 항목은 생기지만 **DB 스키마는 아직 안 만들어짐**
+3. 반드시 아래를 한 번 호출해야 `schemas/*.xml`이 실제 테이블로 생성되고 `moduleInstall()`이 실행됨:
+   ```
+   POST / 
+   module=install
+   act=procInstallAdminInstall
+   module_name={module}
+   _rx_csrf_token={현재 페이지의 CSRF 토큰}
+   ```
+   (admin으로 로그인한 브라우저 세션에서, 페이지 내 `input[name="_rx_csrf_token"]` 값을 그대로 사용)
+
+### 검증 완료
+- 공개 월 그리드 화면: 월 이동, 오늘 날짜 강조, 날짜별 이벤트 표시 정상
+- 관리자 화면: 일정 등록 폼 제출 → `rx_calendar_event`에 저장 → 목록에 반영 → 공개 화면에도 반영, 전 과정 확인
+- 권한 관리 화면: module.xml의 `list`/`manage` grant가 게시판과 동일한 공용 권한 UI로 자동 생성됨 (`getModuleGrantHTML` 재사용)

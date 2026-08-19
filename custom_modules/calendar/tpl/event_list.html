@@ -1,0 +1,33 @@
+<include target="./header.html" />
+
+<div class="x_btn-group" style="margin-bottom:12px">
+	<a class="x_btn x_btn-primary" href="{getUrl('act','dispCalendarAdminForm')}">+ 새 일정 등록</a>
+</div>
+
+<table class="x_table x_table-bordered" width="100%">
+	<thead>
+		<tr>
+			<th>제목</th>
+			<th>기간</th>
+			<th>장소</th>
+			<th>분류</th>
+			<th style="width:120px">관리</th>
+		</tr>
+	</thead>
+	<tbody cond="!$event_list">
+		<tr><td colspan="5" style="text-align:center">등록된 일정이 없습니다.</td></tr>
+	</tbody>
+	<tbody cond="$event_list">
+		<tr loop="$event_list=>$idx,$event">
+			<td>{$event->title}</td>
+			<td>{substr($event->start_date,0,4)}-{substr($event->start_date,4,2)}-{substr($event->start_date,6,2)}<block cond="$event->end_date != $event->start_date"> ~ {substr($event->end_date,0,4)}-{substr($event->end_date,4,2)}-{substr($event->end_date,6,2)}</block></td>
+			<td>{$event->location}</td>
+			<td>{$event->category}</td>
+			<td>
+				<a href="{getUrl('act','dispCalendarAdminForm','event_srl',$event->event_srl)}">수정</a>
+				&nbsp;|&nbsp;
+				<a href="{getUrl('act','procCalendarAdminDeleteEvent','event_srl',$event->event_srl)}" onclick="return confirm('삭제하시겠습니까?')">삭제</a>
+			</td>
+		</tr>
+	</tbody>
+</table>

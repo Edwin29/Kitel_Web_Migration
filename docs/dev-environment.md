@@ -204,3 +204,38 @@ homework/
 
 ### ⚠️ 템플릿 문법 실수 하나 더 발견
 `class="x"|cond="y"`(속성값 조건부 적용) 문법을 **엘리먼트 전체를 조건부로 감추는 용도로 잘못 사용**해서, 마감일 안내 문구 두 줄이 조건과 무관하게 항상 둘 다 렌더링되는 버그가 있었음. 엘리먼트 자체를 조건부로 켜고 끄려면 태그에 `cond="..."`를 직접 붙여야 함(파이프 없이) — 캘린더·자료실 템플릿에서는 이미 올바르게 썼던 패턴인데 이번에 새로 쓰다가 헷갈려서 재발. 실제 화면을 렌더링해보고서야 발견함 — 템플릿 조건문은 코드만 보고 넘어가지 말고 항상 브라우저로 확인 필요.
+
+## 네 번째 커스텀 화면: 작품전시회 (2026-08-19)
+
+과제게시판과 반대로, 이번엔 **board 표준기능(비밀글 상태 + 관리권한)이 실제로 3단계 승인 워크플로우에 맞는지 먼저 검증한 뒤** 문제없음을 확인하고 커스텀 스킨만 얹는 방식으로 진행함. 대상: exhibition 게시판(module_srl=129), 스킨은 [custom_skins/board/kitel_gallery](../custom_skins/board/kitel_gallery)(배포 경로 `modules/board/skins/kitel_gallery`).
+
+### 검증한 가설: board의 비밀글(SECRET) 상태 + 관리권한(manager grant)으로 "정회원 제출 → 기술부 검토 → admin 승인 → 공개" 워크플로우가 되는가
+`document.item.php::isGranted()`를 코드로 먼저 확인(공개 아니면 (a) site admin, (b) 글쓴이 본인, (c) 모듈 manager 권한 + `moderate:document` scope만 접근 가능)한 뒤, 실제로 재현:
+
+1. exhibition 게시판에 `비밀글` 상태 옵션 켜고, 확장변수(`작품 사진` type=file 필수, `제안서` type=file 필수) 추가
+2. 게시판 권한: 열람/목록은 전체공개(guest), 글쓰기는 정회원 이상, **관리(manager)는 기술부(group_srl=112)만**로 설정 — 이게 기술부의 "검토" 권한을 만드는 핵심
+3. 테스트 계정 `testjunior`(정회원, member_srl=154)로 로그인해 `status=SECRET`으로 글+두 파일 제출
+4. **글쓴이 본인**: 자기 글의 내용·첨부파일 정상 열람 확인
+5. **guest(로그아웃 상태)**: 상세 페이지에서 "비밀번호를 입력하세요" 문구만 보이고 내용·첨부는 안 보임 확인. (문서에 password를 애초에 설정한 적이 없어 `password` 컬럼이 NULL인데, `MemberModel::isValidPassword()`가 `!$hashed_password`면 무조건 false를 반환하므로 빈 비밀번호로 우회되는 취약점은 없음 — 코드로 확인함)
+6. **기술부 계정** `testtech`(정회원 아님, group_srl=112에만 배정, member_srl=155)로 로그인 → manager grant를 통해 SECRET 문서의 내용·첨부·수정/삭제 버튼까지 정상 노출 확인 (글쓴이가 아닌데도 접근 가능 = manager 경로가 실제로 작동)
+7. admin으로 로그인해 글쓰기 폼(`dispBoardWrite`)에서 상태 라디오를 `SECRET → PUBLIC`으로 바꿔 제출 → DB에서 `status='PUBLIC'`으로 반영됨 확인 (이게 "승인" 액션)
+
+결론: **board 표준기능만으로 이 워크플로우가 정확히 됨** — 과제게시판과 달리 별도 모듈 전환 불필요.
+
+### 발견한 제약: 게시판 목록은 비밀글 제목을 누구에게나 보여줌
+`document.item.php::getTitle()`은 `isAccessible()` 체크 없이 항상 실제 제목을 반환하고, 기본 list.html 스킨은 이를 그대로 출력함 — 즉 guest도 게시판 목록에서 SECRET 문서의 **제목과 작성자 닉네임**은 볼 수 있음(내용·첨부파일만 막힘). 실제로 로그아웃 상태에서 재현 확인함. 커스텀 갤러리 스킨에서는 `list.html` 자체에서 `$document->isAccessible()`이 false인 문서를 카드 배열에서 아예 제외해서 해결함(제목도 안 보이게).
+
+### kitel_gallery 스킨 구조
+`default` 스킨 전체를 복사한 뒤 `list.html`만 카드 그리드로 교체(글쓰기/상세보기/댓글 등 나머지 화면은 기본 스킨 그대로 재사용 — 과제게시판 노트에 적었던 "목록 스타일만 다르면 된다"는 원래 가설대로).
+
+카드 렌더링 로직(`list.html`):
+- `$document_list`/`$notice_list`를 순회하며 `isAccessible()`인 것만 카드 배열에 담음(guest에게는 심사중 글이 아예 안 보임)
+- 각 카드는 `$document->get('status')==='SECRET'` 여부로 "심사중" 배지 카드 / 일반 카드 두 분기로 나눠 렌더(글쓴이·기술부·admin처럼 `isAccessible()`이 true인 사람에게는 심사중 글도 보이지만, 승인 전인지 구분할 수 있어야 하므로 accessible 여부가 아니라 status로 배지를 결정 — 안 그러면 기술부 눈에도 승인/미승인 구분이 안 됨, 실제로 이 버그를 만들었다가 고침)
+- 썸네일: 확장변수(`작품 사진`)로 올라간 파일은 `upload_target_type='ev:doc'`로 저장되어 `$document->getUploadedFiles()`(본문 삽입 파일만 반환, `upload_target_type='doc'` 전용)로는 안 잡힘 → `FileModel::getFiles($document->document_srl, [], 'file_srl', true, 'ev:doc')`를 템플릿에서 직접 호출해 mime_type이 `image/`로 시작하는 첫 파일을 썸네일로 사용
+- 간단설명: `$document->getContentPlainText(60)` 사용. 단, board 목록 쿼리는 성능상 기본적으로 `content` 컬럼을 안 가져옴(제목·작성자 등 요약 컬럼만) — 게시판 관리자 설정의 "목록 항목"에 `summary`를 추가해야 `content`가 함께 조회됨. 관리자 UI(멀티오더 위젯)를 자동화하기 번거로워 `rx_module_part_config` 테이블의 직렬화된 배열에 `summary` 항목을 직접 추가함.
+
+### 스킨 활성화 시 주의
+게시판의 `skin` 컬럼만 바꿔서는 반영 안 됨 — `is_skin_fix='N'`(사이트 기본 스킨 따라감, 기본값)이면 `skin` 컬럼 값 자체가 무시됨. `is_skin_fix='Y'`로 같이 바꿔야 함. 그리고 `files/cache/module_info`, `files/cache/template_compiled`, `files/cache/store`를 지워야 변경사항이 바로 반영됨(모듈설정 캐시+ 컴파일된 템플릿 캐시).
+
+### 테스트 데이터
+`testjunior`(정회원, 글쓴이 역할), `testtech`(기술부, 검토자 역할) 계정과 테스트 제출물(document_srl=162)은 데모용으로 남겨둠(캘린더의 데모 이벤트와 같은 방침) — 최종 상태는 `status=PUBLIC`(승인 완료)으로 맞춰서 갤러리에 카드 1개가 정상 노출되는 상태로 둠.

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin version="0.2">
+    <title xml:lang="ko">KITEL 작품전시회 갤러리</title>
+    <title xml:lang="en">KITEL Exhibition Gallery</title>
+    <description xml:lang="ko">사진 카드 그리드로 작품을 보여주는 작품전시회 전용 스킨. 목록(list.html)만 커스텀이며 글쓰기/보기/댓글 등은 기본 스킨을 그대로 사용.</description>
+    <version>1.0</version>
+    <date>2026-08-19</date>
+    <author email_address="dev@kitel.local" link="https://kitel.kw.ac.kr">
+        <name xml:lang="ko">KITEL</name>
+    </author>
+    <license>LGPL v2</license>
+    <extra_vars>
+        <var name="title_image" type="image">
+            <title xml:lang="ko">게시판 제목 이미지</title>
+            <description xml:lang="ko">작성하면 화면에 표시 됨</description>
+        </var>
+        <var name="title_alt" type="text">
+            <title xml:lang="ko">게시판 제목 이미지 alt</title>
+        </var>
+    </extra_vars>
+</skin>

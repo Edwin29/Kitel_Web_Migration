@@ -239,3 +239,22 @@ homework/
 
 ### 테스트 데이터
 `testjunior`(정회원, 글쓴이 역할), `testtech`(기술부, 검토자 역할) 계정과 테스트 제출물(document_srl=162)은 데모용으로 남겨둠(캘린더의 데모 이벤트와 같은 방침) — 최종 상태는 `status=PUBLIC`(승인 완료)으로 맞춰서 갤러리에 카드 1개가 정상 노출되는 상태로 둠.
+
+## 첫 번째 위젯: 히어로 배너 (2026-08-19)
+
+`widgets/hero_banner`로 제작, 메인페이지(mid=`index`, module_srl=49, `page` 모듈)에 삽입 완료. 소스는 [custom_widgets/hero_banner](../custom_widgets/hero_banner). 캘린더·자료실·과제게시판·작품전시회는 전부 게시판/모듈 수준이었던 반면, 이건 Rhymix 위젯 시스템을 처음 실제로 다룬 사례라 위젯 특유의 매커니즘을 정리해둠.
+
+### 위젯은 모듈보다 훨씬 가벼움
+스키마(DB 테이블) 없음, `moduleInstall()` 같은 설치 절차 없음 — `widgets/{name}/` 아래에 `conf/info.xml`(제목·설명·`extra_vars`) + `{name}.class.php`(`WidgetHandler`를 상속하는 `proc($args)` 메서드 하나) + `skins/{skin}/{name}.html`만 있으면 즉시 위젯 목록에 나타나고 페이지에 삽입 가능. `extra_vars`도 모듈 grant/skin 설정과 완전히 같은 선언 방식(`<var id type name description>`)이라 관리자 설정 폼이 자동 생성됨 — 여기서도 `type="image"`를 그대로 선언해서 이미지 업로드 필드를 얻음.
+
+### 페이지에 위젯을 넣는 실제 방식
+Rhymix의 `page` 모듈은 콘텐츠를 `rx_modules.content` 컬럼(longtext)에 원본 HTML로 그대로 저장하고, 그 안에 위젯이 있으면 `<img class="zbxe_widget_output" widget="{위젯이름}" {extra_var키}="{값}" ... />` 형태의 특수 `<img>` 태그로 인코딩되어 있음(`widgetController::procWidgetGenerateCode()`가 생성하는 정확한 포맷, 실제 기존 `widgetContent` 위젯 삽입 결과를 DB에서 읽어 포맷을 확인함). 렌더링 시 `WidgetController::transWidgetCode()`가 이 태그를 실제 위젯 출력으로 치환. 관리자 화면 에디터로 위젯을 끌어넣는 것과 동일한 결과이므로, 이번엔 이 태그를 직접 조립해 `content` 컬럼 맨 앞에 붙이는 방식으로 히어로 배너를 배치함(값이 이미 알려진 데모 문구라 에디터 조작보다 빠름).
+
+### 검증: 관리자 화면에서 실제로 편집 가능한지 확인
+admin으로 로그인해 페이지 편집 화면(`dispPageAdminContentModify`)에 들어가 보니 히어로 배너가 CKEditor 안에서 편집 가능한 블록(코너 핸들 + 톱니바퀴/미리보기/삭제 버튼 툴바)으로 인식됨. 톱니바퀴를 누르면 `conf/info.xml`에 선언한 필드(헤드라인/서브 텍스트/배경이미지/버튼 문구/버튼 링크) 그대로, 설명 문구까지 포함해서 자동 생성된 설정 폼이 뜸 — SQL로 심어놓은 게 아니라 실제 관리자 UI로 편집 가능함을 확인함(스크린샷으로 확인, 실제 제출은 하지 않고 빠져나옴 — 중복 삽입 방지).
+
+### 스타일
+캐러셀(자동 전환) 없이 고정 배경 이미지 위에 헤드라인/서브텍스트/CTA 버튼을 얹는 단일 배너. 배경 이미지가 없으면 단색(`#1a1a1a`)으로 대체. 다른 커스텀 화면들과 마찬가지로 임시 인라인 스타일이며 디자이너 스킨 교체 대상.
+
+### 참고: XEDITION 레이아웃 자체의 캐러셀과는 다른 것
+현재 쓰고 있는 XEDITION 테마 레이아웃에는 페이지 콘텐츠와 별개로 상단에 자체 슬라이드 캐러셀("SHARING, PUBLISHING...")이 이미 있어서, 지금 화면엔 레이아웃 캐러셀 + 우리 히어로 배너 위젯이 위아래로 겹쳐 보임. 레이아웃 자체는 디자이너 스킨으로 통째로 교체될 예정이라 신경 쓸 필요 없음 — 그냥 지금 로컬 화면에서 두 개가 같이 보이는 이유를 남겨둠.

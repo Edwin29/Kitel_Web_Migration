@@ -3,9 +3,9 @@
 작성일: 2026-08-19
 목적: 지금까지 나온 모든 문서([xeadmin-site-analysis.md](xeadmin-site-analysis.md) · [new-site-ia.md](new-site-ia.md) · [board-feature-specs.md](board-feature-specs.md) · [frontend-skin-architecture.md](frontend-skin-architecture.md) · [designer-brief.md](designer-brief.md) · [dev-environment.md](dev-environment.md))에 흩어진 "다음 단계" / "열린 질문" / "미착수"를 한 곳에 모음.
 
-## 1. 커스텀 개발 — 아직 안 만든 것
+## 1. 커스텀 개발 — 전부 완료
 
-캘린더([custom_modules/calendar](../custom_modules/calendar)), 자료실([custom_modules/archive](../custom_modules/archive)), 과제게시판(homework, [custom_modules/homework](../custom_modules/homework)) 완성. 같은 패턴으로 만들면 되는 나머지:
+캘린더([custom_modules/calendar](../custom_modules/calendar)), 자료실([custom_modules/archive](../custom_modules/archive)), 과제게시판(homework, [custom_modules/homework](../custom_modules/homework)), 작품전시회 갤러리 스킨([custom_skins/board/kitel_gallery](../custom_skins/board/kitel_gallery)), 히어로 배너·다가오는 일정 위젯([custom_widgets](../custom_widgets)) 전부 완성. 아래는 완료 기록:
 
 | 항목 | 난이도 | 참고 |
 |---|---|---|
@@ -13,7 +13,7 @@
 | ~~과제게시판 제출현황 대시보드~~ | ~~중~~ | **완료** — board-feature-specs.md §4. 기존 board(상담기능) 방식은 준회원이 기술부 공지를 못 보는 결함이 있어 폐기하고, task/submission을 분리한 별도 모듈로 재구축 |
 | ~~작품전시회 갤러리 커스텀 스킨 + 승인 워크플로우~~ | ~~중~~ | **완료** — board-feature-specs.md §5. 과제게시판과 반대로 이번엔 board 표준기능(비밀글 상태+관리권한)이 실제로 승인 워크플로우에 맞음을 4개 역할(작성자/guest/기술부/admin)로 검증 후 커스텀 스킨(카드 그리드)만 제작 — [custom_skins/board/kitel_gallery](../custom_skins/board/kitel_gallery) |
 | ~~메인페이지 — 히어로 배너 위젯~~ | ~~소~~ | **완료** — [custom_widgets/hero_banner](../custom_widgets/hero_banner), board-feature-specs.md §12. 메인페이지(mid=index)에 실제 삽입 + admin 편집 화면에서 편집 가능함을 확인 |
-| 메인페이지 — 다가오는 일정 미리보기 위젯 | 소 | 캘린더 model 재사용, board-feature-specs.md §12 |
+| ~~메인페이지 — 다가오는 일정 미리보기 위젯~~ | ~~소~~ | **완료** — [custom_widgets/upcoming_events](../custom_widgets/upcoming_events), board-feature-specs.md §12. 캘린더 model 재사용, 메인페이지에 실제 삽입 확인 |
 | 메인페이지 — 최신 소식/작품전시회 하이라이트 | **불필요** | Rhymix 기본 "Content 위젯"으로 설정만 하면 됨 |
 
 ## 2. 디자이너 협업
@@ -59,8 +59,8 @@
 ## 우선순위 제안
 
 1. **디자이너 Figma 진행 상황 확인** (병렬 진행 중이므로 블로킹 아님)
-2. ~~자료실~~ → ~~과제 대시보드~~ → ~~작품전시회 갤러리~~ → ~~히어로 배너 위젯~~ 완료. 남은 건 "다가오는 일정 미리보기" 위젯 하나뿐
-3. 위 항목들 개발하면서 걸리는 **§3 열린 질문들을 그때그때 확정**
-4. 커스텀 개발이 어느 정도 끝났으니 **데이터 마이그레이션 스크립트** 설계 착수 가능
+2. ~~커스텀 개발~~ 전부 완료(§1 참고)
+3. **§3 열린 질문들 확정** — 이제 개발이 아니라 순수 기획/운영 결정만 남음
+4. **데이터 마이그레이션 스크립트** 설계 착수
 5. **대여 시스템 인증 연동**은 언제든 독립적으로 진행 가능
-6. **배포 전환 계획**(PHP 버전, 운영 서버 이전)은 개발이 어느 정도 마무리된 시점에 확정
+6. **배포 전환 계획**(PHP 버전, 운영 서버 이전)은 마이그레이션 스크립트와 함께 다음 단계로

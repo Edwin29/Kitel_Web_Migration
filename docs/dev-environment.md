@@ -258,3 +258,15 @@ admin으로 로그인해 페이지 편집 화면(`dispPageAdminContentModify`)�
 
 ### 참고: XEDITION 레이아웃 자체의 캐러셀과는 다른 것
 현재 쓰고 있는 XEDITION 테마 레이아웃에는 페이지 콘텐츠와 별개로 상단에 자체 슬라이드 캐러셀("SHARING, PUBLISHING...")이 이미 있어서, 지금 화면엔 레이아웃 캐러셀 + 우리 히어로 배너 위젯이 위아래로 겹쳐 보임. 레이아웃 자체는 디자이너 스킨으로 통째로 교체될 예정이라 신경 쓸 필요 없음 — 그냥 지금 로컬 화면에서 두 개가 같이 보이는 이유를 남겨둠.
+
+## 두 번째 위젯: 다가오는 일정 (2026-08-19)
+
+`widgets/upcoming_events`로 제작, 히어로 배너 바로 아래에 삽입. 소스는 [custom_widgets/upcoming_events](../custom_widgets/upcoming_events).
+
+### 캘린더 모듈 재사용
+새 쿼리를 안 짜고 [custom_modules/calendar](../custom_modules/calendar)의 `CalendarModel::getEventList($module_srl, $range_start, $range_end)`를 그대로 호출 — 오늘부터 `days_ahead`(기본 90일) 이내로 범위를 잡아 조회한 뒤 `start_date` 기준 정렬 + `event_count`(기본 5개)만큼 자름. 대상 캘린더는 content 위젯의 `module_srls`와 동일한 `<type>module_srl_list</type>` extra_var로 선택(관리자 화면에서 모듈 선택 UI 자동 생성, 값은 쉼표구분 module_srl 문자열로 넘어옴 — content 위젯 소스에서 파싱 방식 확인 후 동일하게 `explode(',', ...)` 처리).
+
+### 검증
+로컬 캘린더(module_srl=141, mid=schedule)에 있는 데모 일정(8/25 신입 부원 환영회)이 미리보기 카드(월/일 배지 + 제목 + 장소)로 정확히 뜨는 것, "전체 일정 보기" 링크가 실제 캘린더 페이지(`/schedule`)로 연결되고 거기서도 같은 일정이 8/25에 표시되는 것까지 확인함. 페이지 편집 화면에서도 히어로 배너와 동일하게 편집 가능한 블록으로 인식됨.
+
+이걸로 board-feature-specs.md §12에서 식별했던 신규 개발 항목(히어로 배너, 다가오는 일정) 2개 모두 완료.

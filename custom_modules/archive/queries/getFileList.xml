@@ -1,0 +1,15 @@
+<query id="getFileList" action="select">
+    <tables>
+        <table name="archive_file" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
+        <condition operation="equal" column="folder_srl" var="folder_srl" notnull="notnull" pipe="and" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="source_filename" order="asc" />
+    </navigation>
+</query>

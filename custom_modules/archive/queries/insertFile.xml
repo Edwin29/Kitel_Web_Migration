@@ -1,0 +1,15 @@
+<query id="insertFile" action="insert">
+    <tables>
+        <table name="archive_file" />
+    </tables>
+    <columns>
+        <column name="file_srl" var="file_srl" filter="number" notnull="notnull" />
+        <column name="module_srl" var="module_srl" filter="number" notnull="notnull" />
+        <column name="folder_srl" var="folder_srl" filter="number" notnull="notnull" />
+        <column name="source_filename" var="source_filename" notnull="notnull" />
+        <column name="stored_filename" var="stored_filename" notnull="notnull" />
+        <column name="filesize" var="filesize" filter="number" notnull="notnull" />
+        <column name="member_srl" var="member_srl" filter="number" notnull="notnull" />
+        <column name="regdate" var="regdate" default="curdate()" />
+    </columns>
+</query>

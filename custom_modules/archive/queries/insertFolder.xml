@@ -1,0 +1,13 @@
+<query id="insertFolder" action="insert">
+    <tables>
+        <table name="archive_folder" />
+    </tables>
+    <columns>
+        <column name="folder_srl" var="folder_srl" filter="number" notnull="notnull" />
+        <column name="module_srl" var="module_srl" filter="number" notnull="notnull" />
+        <column name="parent_folder_srl" var="parent_folder_srl" filter="number" notnull="notnull" />
+        <column name="name" var="name" notnull="notnull" />
+        <column name="member_srl" var="member_srl" filter="number" notnull="notnull" />
+        <column name="regdate" var="regdate" default="curdate()" />
+    </columns>
+</query>

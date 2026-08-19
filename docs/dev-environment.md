@@ -143,3 +143,31 @@ calendar/
 - 공개 월 그리드 화면: 월 이동, 오늘 날짜 강조, 날짜별 이벤트 표시 정상
 - 관리자 화면: 일정 등록 폼 제출 → `rx_calendar_event`에 저장 → 목록에 반영 → 공개 화면에도 반영, 전 과정 확인
 - 권한 관리 화면: module.xml의 `list`/`manage` grant가 게시판과 동일한 공용 권한 UI로 자동 생성됨 (`getModuleGrantHTML` 재사용)
+
+## 두 번째 커스텀 모듈: 자료실 (2026-08-19)
+
+`modules/archive`를 만들어 Study > 자료실 메뉴(`mid=storage`)에 설치·검증 완료. 소스는 `D:\rhymix_dev\www\rhymix\modules\archive`와 [custom_modules/archive](../custom_modules/archive) 양쪽에 있음.
+
+### 구조
+캘린더와 동일한 스캐폴드 + 파일 업로드 처리:
+```
+archive/
+├── conf/{info.xml, module.xml}       # grants(list/manage) + actions
+├── archive.class.php                  # moduleInstall() 훅
+├── archive.model.php                   # getFolderList/getFolder/getFolderPath(브레드크럼)/getFileList/getFile
+├── archive.view.php                    # dispArchiveIndex — 폴더 트리 탐색 화면 (공개)
+├── archive.controller.php              # 폴더 생성/삭제, 파일 업로드/다운로드/삭제
+├── archive.admin.view.php              # dispArchiveAdminGrantInfo (권한 설정만, 콘텐츠 관리는 공개 화면에서)
+├── schemas/{archive_folder.xml, archive_file.xml}  # rx_archive_folder, rx_archive_file
+├── queries/*.xml
+├── skins/default/{skin.xml, list.html}
+└── tpl/*.html
+```
+
+파일은 `files/attach/archive/{module_srl}/{file_srl}_{원본파일명}`에 저장하고, 그 디렉터리에 `.htaccess`(`Require all denied`)를 둬서 URL로 직접 접근하지 못하게 막음 — 다운로드는 반드시 `procArchiveDownloadFile` 컨트롤러를 거쳐야 함(권한 체크 + 다운로드 수 카운트). 이 `.htaccess`는 Apache 전용이라 **PHP 내장 서버(현재 로컬 환경)에서는 실제로 적용되지 않음** — 운영 서버(Apache 기반 Synology)에 배포하면 그때부터 실효.
+
+### ⚠️ 새로 발견한 이슈: GET 링크로 트리거하는 컨트롤러 액션
+"삭제", "다운로드"처럼 `<a href>` 링크로 호출하는 컨트롤러 액션은 기본적으로 GET 요청이 거부됨(`이 요청에 사용할 수 없는 HTTP 메소드입니다`, `ModuleHandler.class.php:378`). module.xml의 해당 `<action>`에 `method="GET|POST"`를 명시해야 함 — Rhymix 코어의 `modules/file/conf/module.xml`도 `procFileDownload`에 동일하게 `method="GET|POST"`를 씀. **캘린더의 `procCalendarAdminDeleteEvent`도 같은 문제가 있어서 함께 고쳤음** (이전엔 삭제 버튼을 실제로 눌러서 검증하지 않아 놓쳤던 부분).
+
+### 검증 완료
+폴더 생성 → 하위 폴더 진입(브레드크럼 확인) → 파일 업로드 → 다운로드(파일명 인코딩·본문 내용 확인) → 파일 삭제(물리 파일+DB 행 모두 제거 확인) → 폴더 삭제(재귀 삭제 확인) → 권한 화면에서 정회원 이상 그룹으로 grants 설정, 전 과정 실제로 테스트함.

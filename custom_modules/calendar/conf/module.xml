@@ -18,6 +18,6 @@
 		<action name="dispCalendarAdminGrantInfo" type="view" menu_name="calendar" permission="manage" />
 
 		<action name="procCalendarAdminInsertEvent" type="controller" permission="manage" ruleset="insertEvent" />
-		<action name="procCalendarAdminDeleteEvent" type="controller" permission="manage" />
+		<action name="procCalendarAdminDeleteEvent" type="controller" permission="manage" method="GET|POST" />
 	</actions>
 </module>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin version="0.2">
+	<title xml:lang="ko">기본 스킨</title>
+	<title xml:lang="en">Default</title>
+	<description xml:lang="ko">자료실 기본 스킨. 폴더 트리 탐색 + 업로드/다운로드를 보여줍니다.</description>
+	<version>1.0</version>
+	<date>2026-08-19</date>
+	<author email_address="dev@kitel.local" link="">
+		<name xml:lang="ko">KITEL</name>
+	</author>
+	<license>MIT</license>
+</skin>

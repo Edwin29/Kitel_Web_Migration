@@ -1,0 +1,48 @@
+<style>
+.hw-view { max-width: 720px; }
+.hw-view .task-desc { white-space: pre-wrap; background:#f7f7f7; padding: 14px; border-radius: 6px; margin: 12px 0; }
+.hw-view .deadline { color:#888; font-size: 0.9em; }
+.hw-view .deadline.past { color:#c0392b; }
+.hw-view form textarea { width:100%; }
+.hw-view table { width:100%; border-collapse: collapse; margin-top: 14px; }
+.hw-view th, .hw-view td { border-bottom: 1px solid #eee; padding: 8px 6px; text-align:left; font-size: 0.92em; }
+</style>
+
+<div class="hw-view">
+	<h2>{$task->title}</h2>
+	<p class="deadline" cond="!$is_past_deadline">마감: {substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}</p>
+	<p class="deadline past" cond="$is_past_deadline">마감: {substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)} (마감 지남)</p>
+	<div class="task-desc">{$task->description}</div>
+
+	<block cond="$is_submitter">
+		<h3>내 제출</h3>
+		<p cond="$my_submission">이전 제출: {substr($my_submission->regdate,0,4)}-{substr($my_submission->regdate,4,2)}-{substr($my_submission->regdate,6,2)} <block cond="$my_submission->is_late=='Y'">(지각)</block> <block cond="$my_submission->source_filename"><a href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$my_submission->submission_srl)}">[첨부파일 다운로드]</a></block></p>
+		<form action="./" method="post" enctype="multipart/form-data" onsubmit="return procFilter(this)">
+			<input type="hidden" name="module" value="homework" />
+			<input type="hidden" name="act" value="procHomeworkSubmit" />
+			<input type="hidden" name="mid" value="{$mid}" />
+			<input type="hidden" name="task_srl" value="{$task->task_srl}" />
+			<textarea name="content" rows="6" placeholder="제출 내용">{$my_submission->content}</textarea>
+			<p>첨부파일<block cond="$my_submission && $my_submission->source_filename"> (기존: {$my_submission->source_filename})</block></p>
+			<input type="file" name="Filedata" />
+			<button type="submit" class="x_btn x_btn-primary"><block cond="!$my_submission">제출하기</block><block cond="$my_submission">다시 제출하기</block></button>
+		</form>
+	</block>
+
+	<block cond="$can_view_all">
+		<h3>전체 제출 현황 ({count($all_submissions)}명)</h3>
+		<table>
+			<thead><tr><th>제출자</th><th>제출일</th><th>지각</th><th>내용</th><th>첨부</th></tr></thead>
+			<tbody cond="!$all_submissions"><tr><td colspan="5" style="text-align:center;color:#999">제출된 내역이 없습니다.</td></tr></tbody>
+			<tbody cond="$all_submissions">
+				<tr loop="$all_submissions=>$idx,$sub">
+					<td>{$sub->nick_name}</td>
+					<td>{substr($sub->regdate,0,4)}-{substr($sub->regdate,4,2)}-{substr($sub->regdate,6,2)}</td>
+					<td><block cond="$sub->is_late=='N'">-</block><block cond="$sub->is_late=='Y'">지각</block></td>
+					<td>{$sub->content}</td>
+					<td><a href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$sub->submission_srl)}" cond="$sub->source_filename">{$sub->source_filename}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</block>
+</div>

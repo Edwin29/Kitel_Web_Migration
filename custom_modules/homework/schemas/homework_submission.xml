@@ -1,0 +1,11 @@
+<table name="homework_submission">
+	<column name="submission_srl" type="number" notnull="notnull" primary_key="primary_key" />
+	<column name="module_srl" type="number" notnull="notnull" index="idx_module_srl" />
+	<column name="task_srl" type="number" notnull="notnull" index="idx_task_srl" />
+	<column name="member_srl" type="number" notnull="notnull" index="idx_member_srl" />
+	<column name="content" type="text" />
+	<column name="source_filename" type="varchar" size="250" />
+	<column name="stored_filename" type="varchar" size="250" />
+	<column name="is_late" type="char" size="1" notnull="notnull" default="N" />
+	<column name="regdate" type="varchar" size="14" notnull="notnull" />
+</table>

@@ -1,0 +1,11 @@
+<query id="getSubmission" action="select">
+    <tables>
+        <table name="homework_submission" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="submission_srl" var="submission_srl" notnull="notnull" />
+    </conditions>
+</query>

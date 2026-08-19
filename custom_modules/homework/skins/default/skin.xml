@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin version="0.2">
+	<title xml:lang="ko">기본 스킨</title>
+	<title xml:lang="en">Default</title>
+	<description xml:lang="ko">과제게시판 기본 스킨.</description>
+	<version>1.0</version>
+	<date>2026-08-19</date>
+	<author email_address="dev@kitel.local" link="">
+		<name xml:lang="ko">KITEL</name>
+	</author>
+	<license>MIT</license>
+</skin>

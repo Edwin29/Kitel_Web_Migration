@@ -171,3 +171,36 @@ archive/
 
 ### 검증 완료
 폴더 생성 → 하위 폴더 진입(브레드크럼 확인) → 파일 업로드 → 다운로드(파일명 인코딩·본문 내용 확인) → 파일 삭제(물리 파일+DB 행 모두 제거 확인) → 폴더 삭제(재귀 삭제 확인) → 권한 화면에서 정회원 이상 그룹으로 grants 설정, 전 과정 실제로 테스트함.
+
+## 세 번째 커스텀 모듈: 과제게시판/homework (2026-08-19)
+
+`modules/homework`를 만들어 Study > 과제게시판 메뉴(`mid=homework`)에 설치·검증 완료. 소스는 [custom_modules/homework](../custom_modules/homework).
+
+### ⚠️ 기존 접근(게시판 상담 기능 재사용)을 실제로 뒤집은 사례
+과제게시판은 원래 board 모듈(mid=`assignment`)에 상담 기능을 켜서 구현했었음(board-feature-specs.md §4 기존 내용). 그런데 실제로 만들어서 확인해보니, **상담 기능은 "본인이 쓴 글만 보이게" 하는 기능이라 기술부가 올린 과제 공지글도 준회원 눈에는 안 보이는 문제**가 있었음 — 이 기능은 건의사항처럼 "모두 비공개, 본인 것만" 상황에는 맞지만, "출제자 공개글 + 제출자 비공개 제출물"처럼 두 종류가 섞인 경우엔 안 맞음. 데이터가 없는 걸 확인하고(0건) 기존 board를 삭제한 뒤, `assignment`와 `submission`을 처음부터 별도 테이블로 분리한 `homework` 모듈로 다시 만듦 — 이게 애초에 board-feature-specs.md가 제시했던 데이터 모델과 일치함.
+
+### 구조
+캘린더·자료실과 같은 스캐폴드 + 대시보드 화면:
+```
+homework/
+├── conf/{info.xml, module.xml}         # grants(list/submit/view_all/create) + actions
+├── homework.class.php
+├── homework.model.php                   # getTaskList/getTask, getSubmission*, getJuniorMembers(준회원 그룹 조회 — 코어의 member.getMemberListWithinGroup 쿼리 재사용)
+├── homework.view.php                    # dispHomeworkIndex(목록), dispHomeworkView(상세+제출)
+├── homework.controller.php              # procHomeworkSubmit(upsert 제출), procHomeworkDownloadSubmission
+├── homework.admin.view.php              # 과제관리/대시보드/권한 (기술부 전용, permission="create")
+├── homework.admin.controller.php        # 과제 등록/수정/삭제
+├── schemas/{homework_task.xml, homework_submission.xml}
+├── queries/*.xml
+├── skins/default/{index.html, view.html}  # 공개 화면, 디자이너 스킨 교체 대상
+└── tpl/*.html                            # 관리자 화면(과제관리·대시보드·권한)
+```
+
+### 대시보드 구현 방식
+`dispHomeworkAdminDashboard`에서 (1) 전체 과제 목록, (2) 준회원 그룹 전원(`member.getMemberListWithinGroup` 재사용), (3) 전체 제출물을 각각 조회한 뒤, 제출물을 `"{task_srl}:{member_srl}"` 키로 매핑해 준회원×과제 매트릭스를 PHP에서 조립. 템플릿은 행(준회원)을 loop, 각 행 안에서 `$row->cells`(과제 순서와 동일하게 정렬된 제출물 배열, 없으면 null)를 loop해서 제출/지각/미제출을 셀 단위로 표시.
+
+### 검증 완료
+과제 출제 → 공개 목록에 노출(+ 준회원 관점 "내 제출 상태" 표시) → 제출(텍스트+첨부파일) → 상세 화면에 "이전 제출" 표시 → **재제출 시 upsert로 덮어써지는 것 확인** → 첨부파일 다운로드(본인/view_all 권한자만 가능하도록 이중 체크) → 대시보드가 준회원 그룹 멤버 기준으로 정확히 매트릭스를 그리는지(테스트용으로 admin을 준회원 그룹에 임시 추가해 확인 후 원상복구) 확인함.
+
+### ⚠️ 템플릿 문법 실수 하나 더 발견
+`class="x"|cond="y"`(속성값 조건부 적용) 문법을 **엘리먼트 전체를 조건부로 감추는 용도로 잘못 사용**해서, 마감일 안내 문구 두 줄이 조건과 무관하게 항상 둘 다 렌더링되는 버그가 있었음. 엘리먼트 자체를 조건부로 켜고 끄려면 태그에 `cond="..."`를 직접 붙여야 함(파이프 없이) — 캘린더·자료실 템플릿에서는 이미 올바르게 썼던 패턴인데 이번에 새로 쓰다가 헷갈려서 재발. 실제 화면을 렌더링해보고서야 발견함 — 템플릿 조건문은 코드만 보고 넘어가지 말고 항상 브라우저로 확인 필요.

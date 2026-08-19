@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+	<title xml:lang="ko">과제게시판</title>
+	<title xml:lang="en">Homework</title>
+	<description xml:lang="ko">기술부가 과제를 출제하고 준회원이 제출하는 게시판. 기술부용 제출현황 대시보드(과제×준회원 매트릭스) 포함.</description>
+	<description xml:lang="en">Assignment board where 기술부 posts tasks and 준회원 submit; includes a submission-status dashboard.</description>
+	<version>1.0</version>
+	<date>2026-08-19</date>
+	<category>service</category>
+
+	<author email_address="dev@kitel.local" link="">
+		<name xml:lang="ko">KITEL</name>
+		<name xml:lang="en">KITEL</name>
+	</author>
+</module>

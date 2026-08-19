@@ -1,0 +1,12 @@
+<query id="getSubmissionByMember" action="select">
+    <tables>
+        <table name="homework_submission" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="task_srl" var="task_srl" notnull="notnull" />
+        <condition operation="equal" column="member_srl" var="member_srl" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

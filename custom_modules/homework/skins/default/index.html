@@ -1,0 +1,33 @@
+<style>
+.hw-list table { width:100%; border-collapse: collapse; }
+.hw-list th, .hw-list td { border-bottom: 1px solid #eee; padding: 8px 6px; text-align:left; }
+.hw-list th { color:#888; font-size:0.8em; }
+.hw-list .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
+.hw-list .badge-done { background:#e6f4ea; color:#2a7a3b; }
+.hw-list .badge-none { background:#f3f3f3; color:#999; }
+</style>
+
+<div class="hw-list">
+	<table>
+		<thead>
+			<tr>
+				<th>과제</th>
+				<th>마감일</th>
+				<th cond="$is_submitter">내 제출 상태</th>
+			</tr>
+		</thead>
+		<tbody cond="!$tasks">
+			<tr><td colspan="3" style="text-align:center;color:#999">출제된 과제가 없습니다.</td></tr>
+		</tbody>
+		<tbody cond="$tasks">
+			<tr loop="$tasks=>$idx,$task">
+				<td><a href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}">{$task->title}</a></td>
+				<td>{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}</td>
+				<td cond="$is_submitter">
+					<span class="badge badge-done" cond="$task->my_status!='미제출'">{$task->my_status}</span>
+					<span class="badge badge-none" cond="$task->my_status=='미제출'">미제출</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

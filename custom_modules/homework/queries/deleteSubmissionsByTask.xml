@@ -1,0 +1,8 @@
+<query id="deleteSubmissionsByTask" action="delete">
+    <tables>
+        <table name="homework_submission" />
+    </tables>
+    <conditions>
+        <condition operation="equal" column="task_srl" var="task_srl" notnull="notnull" />
+    </conditions>
+</query>

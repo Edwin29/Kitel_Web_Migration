@@ -1,0 +1,14 @@
+<query id="getTaskList" action="select">
+    <tables>
+        <table name="homework_task" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="regdate" order="desc" />
+    </navigation>
+</query>

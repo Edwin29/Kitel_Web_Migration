@@ -81,7 +81,7 @@ XE의 메일 발송 경로를 추적한 결과:
 XE Mail.class.php (PHPMailer 래핑) → PHP mail() → sendmail_path(/usr/bin/ssmtp -t) → Gmail SMTP
 ```
 
-`/etc/ssmtp/ssmtp.conf`는 비어있고(2018년부터 0바이트), 실제 설정은 `root` 전용 홈 디렉터리(`/root/.ssmtp/ssmtp.conf`)에 있어 일반 조사 계정으로는 내용을 볼 수 없었음. 하지만 **직접 테스트 발송을 해본 결과** 원인이 명확히 드러남:
+`/etc/ssmtp/ssmtp.conf`는 비어있음(2018년부터 0바이트). 실제 인증 정보가 어디 저장되어 있는지는 `root` 권한(`sudo`)까지 확보해서 뒤져봤지만 끝내 찾지 못함 — `/root/.ssmtp/`, `/root/.msmtprc` 등 통상적인 위치엔 아무것도 없었고, 표준 설정 파일에 일부러 잘못된 값을 넣어봐도 동작이 전혀 바뀌지 않아 **`/usr/bin/ssmtp`가 표준 ssmtp가 아니라 인증 정보를 내부에 다른 방식으로 갖고 있는 커스텀/패치 빌드**로 판단됨(정확한 저장 위치는 결국 특정하지 못함). 다만 **직접 테스트 발송을 해본 결과** 원인 자체는 명확히 드러남:
 
 ```
 [<-] 220 smtp.gmail.com ESMTP ...
@@ -104,7 +104,8 @@ ssmtp: Authorization failed
 2. 같은 경로에 **새 릴레이**를 설치: `/usr/bin/ssmtp`(얇은 쉘 shim) → `/usr/local/bin/kitel-sendmail.py`(Python3, `smtplib`로 Gmail SMTP에 STARTTLS+앱 비밀번호 인증). `sendmail_path`(`/usr/bin/ssmtp -t`) 자체는 그대로 두고 그 경로가 가리키는 실행 파일만 교체 — `php.ini` 등 다른 설정은 손댈 필요 없었음
 3. **curl로 시도했으나 이 NAS의 curl 빌드가 HTTP/HTTPS만 지원**(SMTP 프로토콜 자체가 빠져 있음)하는 걸 확인하고 Python3으로 전환
 4. 소유권/권한을 `root:http 750`으로 설정 — PHP-FPM이 `http` 사용자로 실행되므로 그 계정만 실행 가능, 비밀번호가 담긴 스크립트를 다른 로컬 계정이 읽지 못하게 제한
-5. 실제 사이트가 호출하는 것과 동일한 방식(`sudo -u http /usr/bin/ssmtp -t`, 메시지를 stdin으로 파이프)으로 테스트 발송 → **처음엔 제공받은 비밀번호가 15자(한 글자 누락)라 Google이 거부**(535 Bad Credentials), 재발급받은 16자 앱 비밀번호로 재시도 → **성공(exit 0)**. 실제 수신함 확인은 사용자가 진행.
+5. 실제 사이트가 호출하는 것과 동일한 방식(`sudo -u http /usr/bin/ssmtp -t`, 메시지를 stdin으로 파이프)으로 테스트 발송 → **처음엔 제공받은 비밀번호가 15자(한 글자 누락)라 Google이 거부**(535 Bad Credentials), 재발급받은 16자 앱 비밀번호로 재시도 → **성공(exit 0)**
+6. **수신 확인 완료** — 실제 수신함(woncheol0803@gmail.com)에서 테스트 메일 수신을 사용자가 직접 확인함(2026-09-07). 발송 성공(exit 0)뿐 아니라 실제 도착까지 검증되어 이 건은 완전히 종결됨.
 
 ### 남은 참고사항
 - 여전히 "개인 Gmail 계정에 사이트 메일 발송을 의존"하는 구조 자체는 유지됨 — 인수인계 관점에서는 동아리 전용 메일 서비스(Google Workspace, SendGrid, Mailgun 등)로 넘기는 게 더 안전하나, 당장 급한 불은 껐음

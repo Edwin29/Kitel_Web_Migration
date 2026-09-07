@@ -3,6 +3,8 @@
 작성일: 2026-08-19
 목적: 지금까지 나온 모든 문서([xeadmin-site-analysis.md](xeadmin-site-analysis.md) · [new-site-ia.md](new-site-ia.md) · [board-feature-specs.md](board-feature-specs.md) · [frontend-skin-architecture.md](frontend-skin-architecture.md) · [designer-brief.md](designer-brief.md) · [dev-environment.md](dev-environment.md))에 흩어진 "다음 단계" / "열린 질문" / "미착수"를 한 곳에 모음.
 
+> 게시판/기능별 상세 현황과 우선순위는 [roadmap.md](roadmap.md)에 더 체계적으로 정리되어 있음 — 이 문서는 항목별 세부 메모 위주, roadmap.md는 전체 그림 파악용.
+
 ## 1. 커스텀 개발 — 전부 완료
 
 캘린더([custom_modules/calendar](../custom_modules/calendar)), 자료실([custom_modules/archive](../custom_modules/archive)), 과제게시판(homework, [custom_modules/homework](../custom_modules/homework)), 작품전시회 갤러리 스킨([custom_skins/board/kitel_gallery](../custom_skins/board/kitel_gallery)), 히어로 배너·다가오는 일정 위젯([custom_widgets](../custom_widgets)) 전부 완성. 아래는 완료 기록:
@@ -52,7 +54,7 @@
 
 ## 7. 배포/운영 전환 (아직 논의 안 됨)
 
-- **PHP 버전 확인 필요**: 로컬 개발은 PHP 8.2.33 기준으로 진행했는데, 기존 NAS 운영 서버는 PHP 7.4였음(DSM Web Station 설정 기준, [xeadmin-site-analysis.md](xeadmin-site-analysis.md) 참고). Rhymix는 "PHP 7.4 이상"만 요구하지만, 실제 운영 서버에 배포할 때 PHP 버전을 올릴지(권장) 그대로 7.4로 맞출지 결정 필요.
+- ~~PHP 버전 확인 필요~~ → **해소됨**(2026-09-07 NAS 실사). DSM Web Station 설정만 보고 "PHP 7.4"로 추정했던 게 틀렸음 — 실제 SSH 접속해 `php -v`로 확인한 결과 운영 서버는 **PHP 8.1.9**. 로컬 개발(8.2.33)과 큰 차이 없어 버전 문제 없음. 상세는 [roadmap.md §2-1](roadmap.md) 참고.
 - 로컬 개발 환경(`D:\rhymix_dev`, PHP 내장 서버 + MariaDB)을 실제 Synology NAS 운영 환경으로 옮기는 절차는 아직 설계 안 됨.
 - Google Analytics(UA 코드) → GA4 교체 여부 (기존 사이트 분석에서 발견된 항목).
 - 콘텐츠 문구 정리: About 하위 정적 페이지(키텔소개/연혁/활동/연구분야/회칙 등)의 실제 텍스트는 아직 플레이스홀더 상태.

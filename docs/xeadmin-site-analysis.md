@@ -147,13 +147,16 @@ Rhymix에서도 최소 "관리자 / 임원진 / 정회원 / 준회원 / 졸업�
 
 ## 6. 커스텀 확장: 기자재 대여 시스템 (`xe/rental_dev`)
 
-XE 코어와 완전히 분리된 **독립 PHP 앱**으로 이미 상당히 완성되어 있음.
+XE 코어와 완전히 분리된 **독립 PHP 앱**으로 이미 상당히 완성되어 있고, 지금도 계속 개발되는 중.
 
 - 전용 테이블(`kitel_rental_*`)만 사용, XE 회원/코어 테이블은 건드리지 않음. 인증만 XE 로그인 세션(`Context::get('logged_info')`, `xe_member_group_member`)에 의존.
 - 기능: 기자재/카테고리 관리, 대여·반납, QR 라벨 생성(SVG, `qrencode`), 관리자 대시보드, 대여 이력/연체 관리, CSV 가져오기/내보내기, 권한 그룹 기반 접근 제어.
+- **2026-09-07 NAS 실사로 추가 확인**: 최초 분석 이후 **묶음(bundle) 관리·묶음 QR**(`app/bundles.php`, `public/admin/bundle_qr.php`, `run_bundle_migration.php`), **카테고리별 추적·카테고리 QR**(`app/categories.php`, `category_qr.php`, DB 마이그레이션 `2026_07_add_category_tracking.sql`), **품목 표시순서**(`2026_08_add_item_display_no.sql`) 기능이 새로 추가됨. 즉 기자재를 개별이 아니라 묶음/카테고리 단위로도 관리·QR 발급할 수 있게 확장된 상태.
 - 로컬 개발 모드(JSON 파일 기반 fake DB)와 운영 모드(PDO/MySQL)가 분리되어 있고, 운영 배치 경로(`/rental`)와 개발 경로(`/rental_dev`)를 환경변수로 구분.
-- **Rhymix 마이그레이션과 무관하게 별도로 유지/이식해야 하는 자산.** 인증 어댑터만 Rhymix 세션 체계에 맞게 교체하면 재사용 가능해 보임.
+- **Rhymix 마이그레이션과 무관하게 별도로 유지/이식해야 하는 자산.** 인증 어댑터만 Rhymix 세션 체계에 맞게 교체하면 재사용 가능해 보임. 운영 경로(`/rental`)에 있는 `check_xe_groups_k2026.php`/`check_db_k2026.php`/`check_xe_login_k2026.php`/`check_cookies_k2026.php`는 이 인증 어댑터 교체를 위해 XE 세션·DB 연결을 미리 조사해둔 진단 스크립트(2026-09-07 확인, 개발자 본인 작성) — 착수 시 바로 참고 가능한 사전 조사 자료임.
 - README에 명시된 "임원진 `group_srl=40508`" 참조가 4번 항목의 실제 임원진 그룹과 정확히 일치함 — 대여 시스템 관리자 권한을 임원진 그룹과 연동할 계획이었던 것으로 보임(현재는 기본 관리자 권한에 미포함 상태).
+
+> 상세 진행 현황은 [roadmap.md §2-3](roadmap.md)에도 정리되어 있음.
 
 ## 7. 회원(Member) 커스텀 필드
 

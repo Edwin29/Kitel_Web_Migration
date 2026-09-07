@@ -18,6 +18,7 @@
 | [designer-brief.md](docs/designer-brief.md) | 디자이너 전달용 브리프 |
 | [dev-environment.md](docs/dev-environment.md) | 로컬 개발 환경 구축 기록, 커스텀 모듈/위젯 구현 노트 |
 | [data-migration-plan.md](docs/data-migration-plan.md) | 데이터 마이그레이션 스크립트 설계 |
+| [nas-incident-investigation.md](docs/nas-incident-investigation.md) | 운영 NAS 장애 조사(CPU 과부하, 권한 구조, 메일 미전송) |
 | [remaining-work.md](docs/remaining-work.md) | 항목별 세부 미착수/열린 질문 메모 |
 
 ## 저장소 구성

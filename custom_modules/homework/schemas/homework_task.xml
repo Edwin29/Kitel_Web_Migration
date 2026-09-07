@@ -1,0 +1,9 @@
+<table name="homework_task">
+	<column name="task_srl" type="number" notnull="notnull" primary_key="primary_key" />
+	<column name="module_srl" type="number" notnull="notnull" index="idx_module_srl" />
+	<column name="title" type="varchar" size="250" notnull="notnull" />
+	<column name="description" type="text" />
+	<column name="deadline" type="varchar" size="14" />
+	<column name="member_srl" type="number" notnull="notnull" />
+	<column name="regdate" type="varchar" size="14" notnull="notnull" />
+</table>

@@ -1,0 +1,8 @@
+# 기존 XEadmin(XpressEngine) 레거시 자산.
+# 실제 웹 서비스 문서 루트(DSM Web Station 기준)는 kitel_web/xe 이므로 그 하위 소스만 추적하고,
+# 나머지(DB 백업, 최상위 config/env/cache 잔재, 개인정보 포함 파일 등)는 계속 제외한다.
+/kitel_web/*
+!/kitel_web/xe/
+
+# xe/ 안에서도 업로드·캐시·대용량 바이너리 데이터는 제외 (첨부파일 attach/ ~10GB 포함, 개인정보 포함 가능)
+/kitel_web/xe/files/

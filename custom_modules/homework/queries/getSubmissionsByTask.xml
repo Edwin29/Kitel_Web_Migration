@@ -1,0 +1,14 @@
+<query id="getSubmissionsByTask" action="select">
+    <tables>
+        <table name="homework_submission" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="task_srl" var="task_srl" notnull="notnull" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="regdate" order="asc" />
+    </navigation>
+</query>

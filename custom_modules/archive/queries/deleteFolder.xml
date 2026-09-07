@@ -1,0 +1,8 @@
+<query id="deleteFolder" action="delete">
+    <tables>
+        <table name="archive_folder" />
+    </tables>
+    <conditions>
+        <condition operation="equal" column="folder_srl" var="folder_srl" notnull="notnull" />
+    </conditions>
+</query>

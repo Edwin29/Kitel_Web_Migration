@@ -1,0 +1,13 @@
+<query id="updateTask" action="update">
+    <tables>
+        <table name="homework_task" />
+    </tables>
+    <columns>
+        <column name="title" var="title" notnull="notnull" />
+        <column name="description" var="description" />
+        <column name="deadline" var="deadline" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="task_srl" var="task_srl" notnull="notnull" />
+    </conditions>
+</query>

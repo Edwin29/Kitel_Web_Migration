@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+	<grants>
+		<grant name="list" default="member">
+			<title xml:lang="ko">과제 목록/상세 열람</title>
+			<title xml:lang="en">view tasks</title>
+		</grant>
+		<grant name="submit" default="member">
+			<title xml:lang="ko">과제 제출</title>
+			<title xml:lang="en">submit</title>
+		</grant>
+		<grant name="view_all" default="manager">
+			<title xml:lang="ko">전체 제출물 열람</title>
+			<title xml:lang="en">view all submissions</title>
+		</grant>
+		<grant name="create" default="manager">
+			<title xml:lang="ko">과제 출제·관리(대시보드 포함)</title>
+			<title xml:lang="en">create/manage tasks</title>
+		</grant>
+	</grants>
+	<actions>
+		<action name="dispHomeworkIndex" type="view" permission="list" standalone="false" index="true" />
+		<action name="dispHomeworkView" type="view" permission="list" standalone="false" />
+		<action name="procHomeworkSubmit" type="controller" permission="submit" />
+		<action name="procHomeworkDownloadSubmission" type="controller" permission="list" method="GET|POST" />
+
+		<action name="dispHomeworkAdminContent" type="view" admin_index="true" menu_name="homework" menu_index="true" permission="create" />
+		<action name="dispHomeworkAdminForm" type="view" menu_name="homework" permission="create" />
+		<action name="dispHomeworkAdminDashboard" type="view" menu_name="homework" permission="create" />
+		<action name="dispHomeworkAdminGrantInfo" type="view" menu_name="homework" permission="create" />
+
+		<action name="procHomeworkAdminInsertTask" type="controller" permission="create" />
+		<action name="procHomeworkAdminDeleteTask" type="controller" permission="create" method="GET|POST" />
+	</actions>
+</module>

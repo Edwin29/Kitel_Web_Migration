@@ -1,0 +1,11 @@
+<query id="getEvent" action="select">
+    <tables>
+        <table name="calendar_event" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="event_srl" var="event_srl" notnull="notnull" />
+    </conditions>
+</query>

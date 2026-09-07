@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+	<title xml:lang="ko">자료실</title>
+	<title xml:lang="en">Archive</title>
+	<description xml:lang="ko">정회원이 자유롭게 폴더를 만들고 파일을 공유하는 자료실. NAS Drive의 팀 폴더 방식을 이어받음.</description>
+	<description xml:lang="en">Free-form folder-based file archive for full members.</description>
+	<version>1.0</version>
+	<date>2026-08-19</date>
+	<category>service</category>
+
+	<author email_address="dev@kitel.local" link="">
+		<name xml:lang="ko">KITEL</name>
+		<name xml:lang="en">KITEL</name>
+	</author>
+</module>

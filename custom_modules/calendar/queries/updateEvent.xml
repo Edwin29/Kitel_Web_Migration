@@ -1,0 +1,16 @@
+<query id="updateEvent" action="update">
+    <tables>
+        <table name="calendar_event" />
+    </tables>
+    <columns>
+        <column name="title" var="title" notnull="notnull" />
+        <column name="start_date" var="start_date" notnull="notnull" />
+        <column name="end_date" var="end_date" notnull="notnull" />
+        <column name="location" var="location" />
+        <column name="category" var="category" />
+        <column name="description" var="description" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="event_srl" var="event_srl" notnull="notnull" />
+    </conditions>
+</query>

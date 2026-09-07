@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget version="0.2">
+    <title xml:lang="ko">KITEL 히어로 배너</title>
+    <title xml:lang="en">KITEL Hero Banner</title>
+    <description xml:lang="ko">메인페이지 상단 히어로 배너. 자동 전환(캐러셀) 없는 고정형 배너이며, 관리자가 헤드라인/서브텍스트/배경이미지/버튼을 직접 편집할 수 있습니다.</description>
+    <version>1.0</version>
+    <date>2026-08-19</date>
+    <author email_address="dev@kitel.local" link="https://kitel.kw.ac.kr">
+        <name xml:lang="ko">KITEL</name>
+    </author>
+    <extra_vars>
+        <group>
+            <title xml:lang="ko">배너 내용</title>
+            <var id="headline" type="text">
+                <name xml:lang="ko">헤드라인</name>
+                <description xml:lang="ko">배너에 크게 표시될 제목 문구</description>
+            </var>
+            <var id="subtext" type="textarea">
+                <name xml:lang="ko">서브 텍스트</name>
+                <description xml:lang="ko">헤드라인 아래 보조 설명 문구</description>
+            </var>
+            <var id="bg_image" type="image">
+                <name xml:lang="ko">배경 이미지</name>
+                <description xml:lang="ko">배너 배경으로 쓰일 이미지 (비워두면 단색 배경)</description>
+            </var>
+            <var id="cta_text" type="text">
+                <name xml:lang="ko">버튼 문구</name>
+                <description xml:lang="ko">비워두면 버튼이 표시되지 않습니다</description>
+            </var>
+            <var id="cta_url" type="text">
+                <name xml:lang="ko">버튼 링크</name>
+                <description xml:lang="ko">버튼 클릭 시 이동할 주소</description>
+            </var>
+        </group>
+    </extra_vars>
+</widget>

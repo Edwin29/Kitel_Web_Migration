@@ -1,0 +1,50 @@
+<style>
+.kitel-cal { max-width: 960px; margin: 0 auto; font-family: inherit; }
+.kitel-cal .cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
+.kitel-cal .cal-head h2 { margin:0; font-size: 1.3em; }
+.kitel-cal .cal-head a { text-decoration:none; padding: 4px 10px; border:1px solid #ccc; border-radius:4px; color:#333; }
+.kitel-cal table { width:100%; border-collapse: collapse; table-layout: fixed; }
+.kitel-cal th, .kitel-cal td { border:1px solid #e0e0e0; vertical-align: top; padding: 4px; }
+.kitel-cal thead th { background:#f5f5f5; text-align:center; padding:6px; }
+.kitel-cal td { height: 90px; }
+.kitel-cal td.empty { background:#fafafa; }
+.kitel-cal td.today { background:#fff8e1; }
+.kitel-cal .day-num { font-size: 0.85em; color:#666; }
+.kitel-cal .cal-event { display:block; margin-top:2px; padding:1px 4px; background:#3E6E5E; color:#fff; border-radius:3px; font-size: 0.75em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kitel-cal .cal-admin-link { margin-bottom: 10px; text-align:right; }
+</style>
+
+<div class="kitel-cal">
+	<div class="cal-admin-link" cond="$is_manager">
+		<a href="{getUrl('module','admin','act','dispCalendarAdminContent','mid',$mid)}">+ 일정 관리</a>
+	</div>
+	<div class="cal-head">
+		<a href="{getUrl('act','dispCalendarIndex','y',$prev_year,'m',$prev_month)}">&laquo; 이전 달</a>
+		<h2>{$month_title}</h2>
+		<a href="{getUrl('act','dispCalendarIndex','y',$next_year,'m',$next_month)}">다음 달 &raquo;</a>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th loop="$weekday_names=>$wname">{$wname}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<block loop="$weeks=>$widx,$week">
+			<tr>
+				<block loop="$week=>$didx,$day">
+				<td class="empty" cond="!$day">&nbsp;</td>
+				<td class="today" cond="$day && $day->is_today">
+					<div class="day-num">{$day->day}</div>
+					<a class="cal-event" href="#" title="{$event->title}" loop="$day->events=>$eidx,$event">{$event->title}</a>
+				</td>
+				<td cond="$day && !$day->is_today">
+					<div class="day-num">{$day->day}</div>
+					<a class="cal-event" href="#" title="{$event->title}" loop="$day->events=>$eidx,$event">{$event->title}</a>
+				</td>
+				</block>
+			</tr>
+			</block>
+		</tbody>
+	</table>
+</div>

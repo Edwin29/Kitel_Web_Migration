@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+	<grants>
+		<grant name="list" default="member">
+			<title xml:lang="ko">조회/다운로드</title>
+			<title xml:lang="en">view/download</title>
+		</grant>
+		<grant name="manage" default="member">
+			<title xml:lang="ko">폴더 생성·파일 업로드·삭제</title>
+			<title xml:lang="en">manage folders/files</title>
+		</grant>
+	</grants>
+	<actions>
+		<action name="dispArchiveIndex" type="view" permission="list" standalone="false" index="true" />
+		<action name="procArchiveDownloadFile" type="controller" permission="list" method="GET|POST" />
+
+		<action name="procArchiveInsertFolder" type="controller" permission="manage" />
+		<action name="procArchiveDeleteFolder" type="controller" permission="manage" method="GET|POST" />
+		<action name="procArchiveUploadFile" type="controller" permission="manage" />
+		<action name="procArchiveDeleteFile" type="controller" permission="manage" method="GET|POST" />
+
+		<action name="dispArchiveAdminGrantInfo" type="view" admin_index="true" menu_name="archive" menu_index="true" />
+	</actions>
+</module>

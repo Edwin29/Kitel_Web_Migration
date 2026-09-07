@@ -1,0 +1,28 @@
+<include target="./header.html" />
+
+<form action="./" method="post" onsubmit="return procFilter(this)">
+	<input type="hidden" name="module" value="admin" />
+	<input type="hidden" name="act" value="procHomeworkAdminInsertTask" />
+	<input type="hidden" name="mid" value="{$mid}" />
+	<input type="hidden" name="task_srl" value="{$task->task_srl}"|cond="$task" />
+
+	<table class="x_table x_table-bordered" width="100%">
+		<tr>
+			<th style="width:140px">제목</th>
+			<td><input type="text" name="title" value="{$task->title}" style="width:100%" required /></td>
+		</tr>
+		<tr>
+			<th>마감일</th>
+			<td><input type="date" name="deadline" value="{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}"|cond="$task && $task->deadline" /></td>
+		</tr>
+		<tr>
+			<th>설명 / 제출 양식 안내</th>
+			<td><textarea name="description" rows="8" style="width:100%">{$task->description}</textarea></td>
+		</tr>
+	</table>
+
+	<div style="margin-top:12px">
+		<button type="submit" class="x_btn x_btn-primary">저장</button>
+		<a class="x_btn" href="{getUrl('act','dispHomeworkAdminContent')}">취소</a>
+	</div>
+</form>

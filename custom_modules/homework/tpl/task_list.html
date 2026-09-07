@@ -1,0 +1,31 @@
+<include target="./header.html" />
+
+<div class="x_btn-group" style="margin-bottom:12px">
+	<a class="x_btn x_btn-primary" href="{getUrl('act','dispHomeworkAdminForm')}">+ 새 과제 출제</a>
+</div>
+
+<table class="x_table x_table-bordered" width="100%">
+	<thead>
+		<tr>
+			<th>제목</th>
+			<th>마감일</th>
+			<th>출제일</th>
+			<th style="width:140px">관리</th>
+		</tr>
+	</thead>
+	<tbody cond="!$tasks">
+		<tr><td colspan="4" style="text-align:center">출제된 과제가 없습니다.</td></tr>
+	</tbody>
+	<tbody cond="$tasks">
+		<tr loop="$tasks=>$idx,$task">
+			<td>{$task->title}</td>
+			<td>{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}</td>
+			<td>{substr($task->regdate,0,4)}-{substr($task->regdate,4,2)}-{substr($task->regdate,6,2)}</td>
+			<td>
+				<a href="{getUrl('act','dispHomeworkAdminForm','task_srl',$task->task_srl)}">수정</a>
+				&nbsp;|&nbsp;
+				<a href="{getUrl('act','procHomeworkAdminDeleteTask','task_srl',$task->task_srl)}" onclick="return confirm('이 과제와 모든 제출물을 삭제하시겠습니까?')">삭제</a>
+			</td>
+		</tr>
+	</tbody>
+</table>

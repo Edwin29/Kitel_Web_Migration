@@ -1,0 +1,43 @@
+<include target="./header.html" />
+
+<form action="./" method="post" onsubmit="return procFilter(this)">
+	<input type="hidden" name="module" value="admin" />
+	<input type="hidden" name="act" value="procCalendarAdminInsertEvent" />
+	<input type="hidden" name="mid" value="{$mid}" />
+	<input type="hidden" name="event_srl" value="{$event->event_srl}"|cond="$event" />
+
+	<table class="x_table x_table-bordered" width="100%">
+		<tr>
+			<th style="width:140px">제목</th>
+			<td><input type="text" name="title" value="{$event->title}" style="width:100%" required /></td>
+		</tr>
+		<tr>
+			<th>시작일</th>
+			<td><input type="date" name="start_date" value="{substr($event->start_date,0,4)}-{substr($event->start_date,4,2)}-{substr($event->start_date,6,2)}"|cond="$event" required /></td>
+		</tr>
+		<tr>
+			<th>종료일</th>
+			<td>
+				<input type="date" name="end_date" value="{substr($event->end_date,0,4)}-{substr($event->end_date,4,2)}-{substr($event->end_date,6,2)}"|cond="$event" />
+				<p class="x_help-block">비워두면 시작일과 같은 하루짜리 일정으로 등록됩니다.</p>
+			</td>
+		</tr>
+		<tr>
+			<th>장소</th>
+			<td><input type="text" name="location" value="{$event->location}" style="width:100%" /></td>
+		</tr>
+		<tr>
+			<th>분류</th>
+			<td><input type="text" name="category" value="{$event->category}" placeholder="세미나 / 행사 / 방문 등" /></td>
+		</tr>
+		<tr>
+			<th>상세 설명</th>
+			<td><textarea name="description" rows="5" style="width:100%">{$event->description}</textarea></td>
+		</tr>
+	</table>
+
+	<div style="margin-top:12px">
+		<button type="submit" class="x_btn x_btn-primary">저장</button>
+		<a class="x_btn" href="{getUrl('act','dispCalendarAdminContent')}">취소</a>
+	</div>
+</form>

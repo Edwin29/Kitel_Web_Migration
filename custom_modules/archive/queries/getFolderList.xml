@@ -1,0 +1,15 @@
+<query id="getFolderList" action="select">
+    <tables>
+        <table name="archive_folder" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
+        <condition operation="equal" column="parent_folder_srl" var="parent_folder_srl" notnull="notnull" pipe="and" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="name" order="asc" />
+    </navigation>
+</query>

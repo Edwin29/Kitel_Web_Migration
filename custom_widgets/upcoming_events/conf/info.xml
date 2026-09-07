@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget version="0.2">
+    <title xml:lang="ko">KITEL 다가오는 일정</title>
+    <title xml:lang="en">KITEL Upcoming Events</title>
+    <description xml:lang="ko">캘린더 모듈(custom_modules/calendar)에서 오늘 이후의 일정을 가져와 미리보기 목록으로 보여줍니다.</description>
+    <version>1.0</version>
+    <date>2026-08-19</date>
+    <author email_address="dev@kitel.local" link="https://kitel.kw.ac.kr">
+        <name xml:lang="ko">KITEL</name>
+    </author>
+    <extra_vars>
+        <group>
+            <title xml:lang="ko">대상 및 표시 옵션</title>
+            <var id="calendar_module_srl">
+                <type>module_srl_list</type>
+                <name xml:lang="ko">대상 캘린더</name>
+                <description xml:lang="ko">일정을 가져올 캘린더 모듈을 선택합니다.</description>
+            </var>
+            <var id="event_count" type="text" default="5">
+                <name xml:lang="ko">표시 개수</name>
+                <description xml:lang="ko">미리보기에 표시할 최대 일정 수 (기본 5개)</description>
+            </var>
+            <var id="days_ahead" type="text" default="90">
+                <name xml:lang="ko">검색 범위 (일)</name>
+                <description xml:lang="ko">오늘부터 며칠 이내의 일정까지 검색할지 (기본 90일)</description>
+            </var>
+        </group>
+    </extra_vars>
+</widget>

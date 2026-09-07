@@ -1,0 +1,16 @@
+<query id="getEventList" action="select">
+    <tables>
+        <table name="calendar_event" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
+        <condition operation="lte" column="start_date" var="range_end" pipe="and" />
+        <condition operation="gte" column="end_date" var="range_start" pipe="and" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="start_date" order="asc" />
+    </navigation>
+</query>

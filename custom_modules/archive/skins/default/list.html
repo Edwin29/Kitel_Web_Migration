@@ -1,0 +1,80 @@
+<style>
+.kitel-archive { max-width: 900px; margin: 0 auto; }
+.kitel-archive .crumb { margin-bottom: 14px; font-size: 0.9em; color: #666; }
+.kitel-archive .crumb a { color: #3E6E5E; text-decoration: none; }
+.kitel-archive .crumb .sep { margin: 0 4px; }
+.kitel-archive table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.kitel-archive th, .kitel-archive td { border-bottom: 1px solid #eee; padding: 8px 6px; text-align: left; font-size: 0.92em; }
+.kitel-archive th { color: #888; font-weight: 600; font-size: 0.8em; }
+.kitel-archive .icon { display:inline-block; width: 1.2em; }
+.kitel-archive .meta { color: #999; font-size: 0.85em; }
+.kitel-archive .del { color: #b33; text-decoration: none; margin-left: 8px; font-size: 0.85em; }
+.kitel-archive .empty-row td { text-align:center; color:#aaa; padding: 20px; }
+.kitel-archive .toolbar { display:flex; gap: 24px; margin: 20px 0; padding: 16px; background:#f7f7f7; border-radius: 6px; flex-wrap: wrap; }
+.kitel-archive .toolbar form { display:flex; gap: 6px; align-items:center; }
+.kitel-archive .toolbar input[type="text"] { padding: 6px 8px; }
+.kitel-archive .toolbar button { padding: 6px 14px; cursor:pointer; }
+</style>
+
+<div class="kitel-archive">
+	<div class="crumb">
+		<a href="{getUrl('act','dispArchiveIndex','folder_srl','0')}">전체</a>
+		<block loop="$breadcrumb=>$bidx,$bcrumb">
+			<span class="sep">/</span>
+			<a href="{getUrl('act','dispArchiveIndex','folder_srl',$bcrumb->folder_srl)}">{$bcrumb->name}</a>
+		</block>
+	</div>
+
+	<table>
+		<thead>
+			<tr><th style="width:50%">이름</th><th>크기</th><th>등록일</th><th></th></tr>
+		</thead>
+		<tbody cond="!$folders && !$files">
+			<tr class="empty-row"><td colspan="4">비어 있는 폴더입니다.</td></tr>
+		</tbody>
+		<tbody cond="$folders || $files">
+			<tr loop="$folders=>$fidx,$folder">
+				<td>
+					<span class="icon">📁</span>
+					<a href="{getUrl('act','dispArchiveIndex','folder_srl',$folder->folder_srl)}">{$folder->name}</a>
+				</td>
+				<td class="meta">-</td>
+				<td class="meta">{substr($folder->regdate,0,4)}-{substr($folder->regdate,4,2)}-{substr($folder->regdate,6,2)}</td>
+				<td>
+					<a class="del" cond="$is_manager" href="{getUrl('act','procArchiveDeleteFolder','folder_srl',$folder->folder_srl)}" onclick="return confirm('이 폴더와 안의 모든 파일을 삭제하시겠습니까?')">삭제</a>
+				</td>
+			</tr>
+			<tr loop="$files=>$idx,$file">
+				<td>
+					<span class="icon">📄</span>
+					<a href="{getUrl('act','procArchiveDownloadFile','file_srl',$file->file_srl)}">{$file->source_filename}</a>
+				</td>
+				<td class="meta">{$file->size_label}</td>
+				<td class="meta">{substr($file->regdate,0,4)}-{substr($file->regdate,4,2)}-{substr($file->regdate,6,2)}</td>
+				<td>
+					<a class="del" cond="$is_manager" href="{getUrl('act','procArchiveDeleteFile','file_srl',$file->file_srl)}" onclick="return confirm('삭제하시겠습니까?')">삭제</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="toolbar" cond="$is_manager">
+		<form action="./" method="post" onsubmit="return procFilter(this)">
+			<input type="hidden" name="module" value="archive" />
+			<input type="hidden" name="act" value="procArchiveInsertFolder" />
+			<input type="hidden" name="mid" value="{$mid}" />
+			<input type="hidden" name="folder_srl" value="{$cur_folder_srl}" />
+			<input type="text" name="name" placeholder="새 폴더 이름" required />
+			<button type="submit">폴더 만들기</button>
+		</form>
+
+		<form action="./" method="post" enctype="multipart/form-data" onsubmit="return procFilter(this)">
+			<input type="hidden" name="module" value="archive" />
+			<input type="hidden" name="act" value="procArchiveUploadFile" />
+			<input type="hidden" name="mid" value="{$mid}" />
+			<input type="hidden" name="folder_srl" value="{$cur_folder_srl}" />
+			<input type="file" name="Filedata" required />
+			<button type="submit">파일 업로드</button>
+		</form>
+	</div>
+</div>

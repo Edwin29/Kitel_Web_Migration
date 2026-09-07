@@ -1,0 +1,16 @@
+<query id="insertSubmission" action="insert">
+    <tables>
+        <table name="homework_submission" />
+    </tables>
+    <columns>
+        <column name="submission_srl" var="submission_srl" filter="number" notnull="notnull" />
+        <column name="module_srl" var="module_srl" filter="number" notnull="notnull" />
+        <column name="task_srl" var="task_srl" filter="number" notnull="notnull" />
+        <column name="member_srl" var="member_srl" filter="number" notnull="notnull" />
+        <column name="content" var="content" />
+        <column name="source_filename" var="source_filename" />
+        <column name="stored_filename" var="stored_filename" />
+        <column name="is_late" var="is_late" notnull="notnull" />
+        <column name="regdate" var="regdate" default="curdate()" />
+    </columns>
+</query>

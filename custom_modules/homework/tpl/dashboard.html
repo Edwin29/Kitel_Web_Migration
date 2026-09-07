@@ -1,0 +1,35 @@
+<include target="./header.html" />
+
+<style>
+.hw-dash { overflow-x: auto; }
+.hw-dash table { border-collapse: collapse; white-space: nowrap; }
+.hw-dash th, .hw-dash td { border: 1px solid #ddd; padding: 6px 10px; text-align: center; }
+.hw-dash th.member-col, .hw-dash td.member-col { text-align: left; position: sticky; left: 0; background: #fff; }
+.hw-dash .status-ok { color: #2a7a3b; font-weight: 600; }
+.hw-dash .status-late { color: #c07a00; font-weight: 600; }
+.hw-dash .status-none { color: #bbb; }
+</style>
+
+<p cond="!$tasks">출제된 과제가 없습니다.</p>
+<p cond="$tasks && !$rows">준회원 그룹에 속한 회원이 없습니다.</p>
+
+<div class="hw-dash" cond="$tasks && $rows">
+	<table>
+		<thead>
+			<tr>
+				<th class="member-col">준회원</th>
+				<th loop="$tasks=>$tidx,$task">{$task->title}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr loop="$rows=>$ridx,$row">
+				<td class="member-col">{$row->member->nick_name}</td>
+				<block loop="$row->cells=>$cidx,$cell">
+				<td cond="!$cell" class="status-none">미제출</td>
+				<td cond="$cell && $cell->is_late=='N'" class="status-ok">제출<br>{substr($cell->regdate,4,2)}/{substr($cell->regdate,6,2)}</td>
+				<td cond="$cell && $cell->is_late=='Y'" class="status-late">지각<br>{substr($cell->regdate,4,2)}/{substr($cell->regdate,6,2)}</td>
+				</block>
+			</tr>
+		</tbody>
+	</table>
+</div>

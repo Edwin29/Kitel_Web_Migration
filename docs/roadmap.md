@@ -63,8 +63,10 @@
 
 **합계 약 311GB** — xe 첨부파일(11G)의 30배 규모. 이전에 이 규모를 몰랐던 채로 "자료실에 전부 이관"이라고 방침만 정해뒀던 것 → **범위 재검토가 필요함**: 이 전부를 새 Rhymix 자료실 모듈에 넣을지(폴더/파일 UI로), 아니면 임원단·photo처럼 성격이 다른 것들은 계속 별도 NAS Drive/Synology Photos로 두고 자료실에는 교육자료·document 위주로만 옮길지 결정 필요. `임원단` 폴더는 개인 학번이 노출된 계정으로 소유돼 있어 다루는 사람 확인 및 개인정보 취급 주의가 필요함.
 
-### 2-5. CPU 99%/서버 다운 — 원인 진단 (2026-09-07)
-1.8GB RAM짜리 기기(DS218)에 SynoFinder(Elasticsearch 인덱서)·Synology Photos(AI 얼굴인식/클러스터링+전용 PostgreSQL)·Synology Drive(자체 Redis)·LDAP·백업·백신 등이 전부 동시 설치되어 상시 구동 중. 접속 시점 실측 결과 **스왑을 상시 45%(894MB/2GB) 사용** — 평상시에도 물리 메모리를 넘어서 돌아가는 상태이고, 트래픽·사진 인덱싱·백업 등이 겹치는 순간 스왑 폭증 → 리소스 모니터에 CPU 99%로 나타나는 것으로 진단됨(실제로는 메모리 부족). 소프트웨어적으로 부분 완화 가능(불필요 인덱싱/AI 기능 정리)하나 근본적으로는 하드웨어 한계. 상세는 [nas-incident-investigation.md §1](nas-incident-investigation.md).
+### 2-5. CPU 99%/서버 다운 — 원인 진단 및 부분 조치 (2026-09-07~08)
+1.8GB RAM짜리 기기(DS218)에 SynoFinder(Elasticsearch 인덱서)·Synology Photos(AI 얼굴인식/클러스터링+전용 PostgreSQL)·Synology Drive(자체 Redis)·LDAP·백업·백신 등이 전부 동시 설치되어 상시 구동 중. 접속 시점 실측 결과 **스왑을 상시 45%(894MB/2GB) 사용** — 평상시에도 물리 메모리를 넘어서 돌아가는 상태이고, 트래픽·사진 인덱싱·백업 등이 겹치는 순간 스왑 폭증 → 리소스 모니터에 CPU 99%로 나타나는 것으로 진단됨(실제로는 메모리 부족).
+
+**부분 조치 완료(2026-09-08)**: 사용자가 안 쓴다고 확인한 Synology Photos AI 기능(얼굴인식/인물클러스터링)을 DB 설정(`enable_person=false`)으로 비활성화하고 패키지 정상 재시작으로 반영. 검색 기능(SynoFinder, 족보 파일 찾기 용도)은 그대로 유지. 조치 직후 실제로 다른 원인(홈페이지 트래픽 폭주로 php-fpm 워커 9개 동시 가동)으로 load average가 9~11까지 치솟는 걸 목격 — 진단했던 "PHP 워커 몰림이 4코어를 다 채운다"는 근본 문제를 실시간으로 재확인함. 나머지 완화책(SynoFinder 축소, php-fpm 워커 제한 등)은 아직 미조치. 상세는 [nas-incident-investigation.md §1](nas-incident-investigation.md).
 
 ### 2-6. NAS Drive/Photos/DSM/홈페이지 권한 구조 — 3개의 분리된 신원 체계 확인 (2026-09-07)
 DSM 로컬 계정, LDAP 디렉터리(정회원/임원단/졸업생/administrators 그룹, 파일 서비스가 이걸 참조), 홈페이지 XE(`xe_member`, 완전 독립) — 셋이 서로 동기화되지 않음. 핵심 공유폴더 ACL을 직접 열어보니 LDAP 그룹·로컬 계정·패키지 자동생성 서비스 계정(Chat/office/PDFViewer/SynologyDrive)이 뒤섞여 있어, DSM의 단순해 보이는 권한 토글 하나가 여러 서비스의 ACL을 한꺼번에 재작성하는 구조임을 확인 — "한쪽을 바꾸면 다른 쪽이 조용히 마비"되는 현상과 정확히 들어맞음. 상세는 [nas-incident-investigation.md §2](nas-incident-investigation.md).

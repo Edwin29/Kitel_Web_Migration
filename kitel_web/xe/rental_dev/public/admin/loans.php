@@ -10,6 +10,12 @@ if (is_post()) {
         $loanIds = array((int)$_POST['loan_id']);
     }
     $itemStatus = isset($_POST['item_status']) ? $_POST['item_status'] : 'available';
+    // 개수 관리 묶음은 일부만 회수되는 경우가 흔하다(5개 중 2개만 돌아옴).
+    // 개수를 지정하면 그 묶음에서 앞의 N건만 반납 처리한다.
+    $returnCount = isset($_POST['return_count']) ? (int)$_POST['return_count'] : 0;
+    if ($returnCount > 0 && $returnCount < count($loanIds)) {
+        $loanIds = array_slice($loanIds, 0, $returnCount);
+    }
     if ($memo === '') {
         flash('강제 반납 사유가 필요합니다.');
     } elseif (!$loanIds) {
@@ -79,6 +85,12 @@ admin_nav();
           <?php foreach ($loan['loan_ids'] as $loanId): ?>
             <input type="hidden" name="loan_ids[]" value="<?php echo e($loanId); ?>">
           <?php endforeach; ?>
+          <?php if ($loan['count'] > 1): ?>
+            <input class="qty-input" type="number" name="return_count" min="1"
+                   max="<?php echo (int)$loan['count']; ?>" value="<?php echo (int)$loan['count']; ?>"
+                   title="반납 처리할 개수 (총 <?php echo (int)$loan['count']; ?>개)">
+            <span class="muted">/ <?php echo (int)$loan['count']; ?>개</span>
+          <?php endif; ?>
           <input name="memo" placeholder="강제 반납 사유" required>
           <select name="item_status" title="반납 후 기자재 상태">
             <option value="available">반납 후 대여 가능</option>
@@ -86,7 +98,7 @@ admin_nav();
             <option value="unavailable">반납 후 대여 불가</option>
             <option value="lost">반납 후 분실</option>
           </select>
-          <button class="danger" type="submit">강제 반납<?php echo $loan['count'] > 1 ? ' (' . $loan['count'] . '개 전체)' : ''; ?></button>
+          <button class="danger" type="submit">강제 반납</button>
         </form>
       <?php endif; ?>
       </td>

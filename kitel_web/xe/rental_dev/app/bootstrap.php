@@ -16,4 +16,5 @@ require_once __DIR__ . '/categories.php';
 require_once __DIR__ . '/bundles.php';
 require_once __DIR__ . '/items.php';
 require_once __DIR__ . '/loans.php';
+require_once __DIR__ . '/import.php';
 require_once __DIR__ . '/export.php';

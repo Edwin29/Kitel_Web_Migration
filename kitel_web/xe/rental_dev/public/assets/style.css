@@ -1023,3 +1023,111 @@ button,
     display: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   목록 페이지 이동 (조회 계층 도입으로 목록이 페이지 단위가 되면서 추가)
+   --------------------------------------------------------------------------- */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.pager-summary {
+  font-size: 0.86rem;
+}
+p.pager-summary {
+  margin: 12px 0 0;
+}
+.pager-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pager-links .button {
+  padding: 5px 10px;
+  font-size: 0.86rem;
+}
+.pager-current {
+  min-width: 30px;
+  padding: 5px 10px;
+  text-align: center;
+  border-radius: 7px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.86rem;
+}
+
+/* 개수 관리 카테고리의 상태별 내역 */
+.status-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* 카테고리명 인라인 수정 — 값이 바뀐 폼만 저장/취소 버튼을 드러낸다 */
+.inline-rename {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.inline-rename.is-dirty input[name="name"] {
+  border-color: var(--brand);
+  background: #f5f8ff;
+}
+.rename-save,
+.rename-cancel {
+  padding: 4px 9px;
+  font-size: 0.82rem;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+}
+.rename-save {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+/* CSV 가져오기 — 모드 선택과 미리보기 */
+.import-mode {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.import-mode legend {
+  padding: 0 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.import-mode label.inline {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+.import-mode label.inline input {
+  margin-top: 4px;
+  flex: none;
+}
+.import-mode-help {
+  margin: 2px 0 2px 26px;
+  font-size: 0.86rem;
+}
+.import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.danger-head {
+  color: var(--danger);
+}

@@ -9,6 +9,10 @@ $state = rental_load();
 $filters = log_filters_from_request();
 $result = log_query($state, $filters, rental_page_param(), 100);
 $actions = log_actions($state);
+
+// 이 페이지에 등장하는 처리자 이름을 한 번에 모아 온다 (행마다 조회하지 않도록).
+prefetch_member_names(array_map(function ($log) { return $log['actor_member_srl']; }, $result['rows']));
+
 render_header('처리 로그', true);
 admin_nav();
 ?>
@@ -24,7 +28,7 @@ admin_nav();
       <option value="<?php echo e($action); ?>" <?php echo $filters['action'] === $action ? 'selected' : ''; ?>><?php echo e($action); ?></option>
     <?php endforeach; ?>
   </select>
-  <input name="actor" value="<?php echo e($filters['actor']); ?>" placeholder="처리자 member_srl">
+  <input name="actor" value="<?php echo e($filters['actor']); ?>" placeholder="처리자 이름 또는 번호">
   <input type="date" name="from" value="<?php echo e($filters['from']); ?>">
   <input type="date" name="to" value="<?php echo e($filters['to']); ?>">
   <button type="submit">필터</button>
@@ -32,11 +36,35 @@ admin_nav();
 <section class="card table-wrap">
   <table><thead><tr><th>시간</th><th>처리자</th><th>액션</th><th>대상</th><th>상태</th><th>메모</th></tr></thead><tbody>
   <?php foreach ($result['rows'] as $log): ?>
+    <?php
+      $item = $log['item_id'] ? find_item($state, $log['item_id']) : null;
+      $actorSrl = (int)$log['actor_member_srl'];
+      $actorName = actor_display_name($actorSrl);
+    ?>
     <tr>
       <td><?php echo e($log['created_at']); ?></td>
-      <td><?php echo e($log['actor_member_srl']); ?></td>
+      <td>
+        <?php if ($actorSrl > 0): ?>
+          <a href="<?php echo e(app_url('admin/member_history.php?member_srl=' . $actorSrl)); ?>"><?php echo e($actorName !== '' ? $actorName : '#' . $actorSrl); ?></a>
+          <?php if ($actorName !== ''): ?><br><span class="muted">#<?php echo (int)$actorSrl; ?></span><?php endif; ?>
+        <?php else: ?>
+          <span class="muted">시스템</span>
+        <?php endif; ?>
+      </td>
       <td><?php echo e($log['action']); ?></td>
-      <td>item <?php echo e($log['item_id']); ?><br>loan <?php echo e($log['loan_id']); ?></td>
+      <td>
+        <?php if ($item): ?>
+          <a href="<?php echo e(app_url('admin/item_history.php?item_id=' . (int)$log['item_id'])); ?>"><?php echo e($item['label']); ?></a>
+          <?php if ((int)$item['is_active'] !== 1): ?><span class="muted"> (폐기)</span><?php endif; ?>
+        <?php elseif ($log['item_id']): ?>
+          <span class="muted">item #<?php echo e($log['item_id']); ?> (삭제됨)</span>
+        <?php else: ?>
+          <span class="muted">-</span>
+        <?php endif; ?>
+        <?php if ($log['loan_id']): ?>
+          <br><span class="muted">대여 #<?php echo e($log['loan_id']); ?></span>
+        <?php endif; ?>
+      </td>
       <td><?php echo e($log['before_status']); ?> → <?php echo e($log['after_status']); ?></td>
       <td><?php echo e($log['memo']); ?></td>
     </tr>

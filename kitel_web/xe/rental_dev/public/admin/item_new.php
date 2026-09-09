@@ -84,11 +84,45 @@ admin_nav();
   <p id="csv-import-status" class="import-status"></p>
   <form class="form" method="post" action="<?php echo e(app_url('admin/import.php')); ?>">
     <?php echo csrf_input(); ?>
-    <label>CSV 내용 (파일을 불러오면 자동으로 채워집니다. 가져오기 전에 한 번 확인해 주세요)
+    <label>CSV 내용 (파일을 불러오면 자동으로 채워집니다)
       <textarea name="csv_text" id="csv_text" rows="12" required><?php echo e($csvSample); ?></textarea>
     </label>
-    <button class="primary" type="submit">가져오기</button>
+
+    <fieldset class="import-mode">
+      <legend>수량을 어떻게 볼지</legend>
+      <label class="inline">
+        <input type="radio" name="mode" value="add" checked>
+        <span><strong>추가</strong> — 적힌 수량만큼 <em>새로</em> 만듭니다. 신규 입고용.</span>
+      </label>
+      <label class="inline">
+        <input type="radio" name="mode" value="sync">
+        <span><strong>맞추기</strong> — 적힌 수량을 <em>목표 총 개수</em>로 봅니다. 물품현황표를 갱신해 다시 넣을 때 이쪽을 쓰세요.</span>
+      </label>
+      <p class="muted import-mode-help">
+        같은 시트를 "추가"로 두 번 넣으면 개수가 두 배가 됩니다. 시트가 현재 보유 현황을 나타낸다면 <strong>맞추기</strong>가 맞습니다.
+      </p>
+      <label class="inline">
+        <input type="checkbox" name="allow_retire" value="1">
+        <span>맞추기일 때 <strong>줄어든 만큼 폐기 처리</strong>까지 반영 (체크하지 않으면 폐기 후보만 보여줍니다)</span>
+      </label>
+    </fieldset>
+
+    <button class="primary" type="submit">미리보기</button>
+    <p class="muted">바로 반영되지 않습니다. 무엇이 추가·수정·폐기되는지 먼저 보여드립니다.</p>
   </form>
+</section>
+
+<section class="card">
+  <h2>내보내기 → 편집 → 가져오기</h2>
+  <p class="muted">
+    <a href="<?php echo e(app_url('admin/export.php?type=items')); ?>">기자재 CSV 내보내기</a>로 받은 파일은
+    그대로 다시 가져올 수 있습니다. <code>item_id</code> 열이 있는 행은 <strong>수정</strong>(위치·특이사항),
+    <code>item_id</code>가 빈 행은 <strong>신규 추가</strong>로 처리됩니다.
+  </p>
+  <p class="muted">
+    <code>item_id</code> 열은 지우거나 바꾸지 마세요 — 어떤 기자재인지 식별하는 유일한 기준입니다.
+    카테고리와 상태는 CSV로 변경되지 않습니다(무시되며 미리보기에 표시됩니다).
+  </p>
 </section>
 <?php // SheetJS 0.18.5 — jsQR과 마찬가지로 저장소에 함께 두고 로컬에서 불러온다.
       // 예전에는 cdnjs에서 무결성 해시(SRI) 없이 직접 받아왔다. 관리자 화면이 외부

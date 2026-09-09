@@ -85,11 +85,16 @@ function render_category_node($state, $category)
     ?>
     <li class="explorer-item category-node" draggable="true" data-category-id="<?php echo (int)$category['category_id']; ?>">
       <input type="checkbox" class="category-select" value="<?php echo (int)$category['category_id']; ?>" aria-label="<?php echo e($category['name']); ?> 선택">
-      <form method="post" class="inline-rename category-rename">
+      <?php // 저장 버튼이 없으면 실수로 글자를 건드리고 Enter 만 눌러도 즉시 반영된다.
+            // 값이 실제로 바뀌었을 때만 버튼이 나타나고, 제출 전에 한 번 확인한다.
+            // 카테고리명을 바꾸면 그 카테고리 기자재의 라벨도 함께 다시 만들어진다. ?>
+      <form method="post" class="inline-rename category-rename" data-original="<?php echo e($category['name']); ?>">
         <?php echo csrf_input(); ?>
         <input type="hidden" name="action" value="rename_category">
         <input type="hidden" name="category_id" value="<?php echo (int)$category['category_id']; ?>">
-        <input name="name" value="<?php echo e($category['name']); ?>" aria-label="카테고리명">
+        <input name="name" value="<?php echo e($category['name']); ?>" aria-label="카테고리명" autocomplete="off">
+        <button type="submit" class="rename-save" hidden>이름 저장</button>
+        <button type="button" class="rename-cancel" hidden>취소</button>
       </form>
       <span class="badge <?php echo $mode === 'bulk' ? 'available' : ''; ?>"><?php echo $mode === 'bulk' ? '개수' : '개별'; ?></span>
       <span class="muted count-text"><?php echo (int)$counts['total']; ?>개</span>
@@ -395,6 +400,42 @@ admin_nav();
   });
 
   updateSelectedLabel();
+
+  // 카테고리명 인라인 수정: 값이 실제로 바뀐 폼에만 저장/취소 버튼을 띄우고,
+  // 제출 전에 확인을 받는다. Enter 만으로 조용히 반영되던 동작을 막는다.
+  document.querySelectorAll('form.category-rename').forEach(function (form) {
+    var input = form.querySelector('input[name="name"]');
+    var save = form.querySelector('.rename-save');
+    var cancel = form.querySelector('.rename-cancel');
+    if (!input || !save || !cancel) { return; }
+    var original = form.getAttribute('data-original') || '';
+
+    function sync() {
+      var changed = input.value !== original;
+      save.hidden = !changed;
+      cancel.hidden = !changed;
+      form.classList.toggle('is-dirty', changed);
+    }
+
+    input.addEventListener('input', sync);
+    cancel.addEventListener('click', function () {
+      input.value = original;
+      sync();
+    });
+    form.addEventListener('submit', function (e) {
+      var next = input.value.trim();
+      if (next === '' || next === original) {
+        e.preventDefault();
+        input.value = original;
+        sync();
+        return;
+      }
+      if (!confirm('카테고리명을 "' + original + '" → "' + next + '" 으로 바꿉니다.\n\n이 카테고리에 속한 기자재의 라벨도 모두 새 이름으로 다시 만들어집니다. 계속할까요?')) {
+        e.preventDefault();
+      }
+    });
+    sync();
+  });
 })();
 </script>
 <?php render_footer(); ?>

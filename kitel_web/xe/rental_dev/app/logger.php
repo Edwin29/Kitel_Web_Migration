@@ -67,9 +67,13 @@ function log_filter_sql(array $filters)
         $where[] = 'action = ?';
         $args[] = $filters['action'];
     }
+    // 처리자 칸에는 member_srl 숫자뿐 아니라 이름/아이디도 넣을 수 있다.
     if ($filters['actor'] !== '') {
-        $where[] = 'actor_member_srl = ?';
-        $args[] = (int)$filters['actor'];
+        $srls = resolve_actor_filter($filters['actor']);
+        $where[] = 'actor_member_srl IN (' . implode(',', array_fill(0, count($srls), '?')) . ')';
+        foreach ($srls as $srl) {
+            $args[] = $srl;
+        }
     }
     if ($filters['from'] !== '') {
         $where[] = 'DATE(created_at) >= ?';
@@ -103,7 +107,7 @@ function log_matches_filters($log, array $filters)
     if ($filters['action'] !== '' && $log['action'] !== $filters['action']) {
         return false;
     }
-    if ($filters['actor'] !== '' && (string)$log['actor_member_srl'] !== (string)$filters['actor']) {
+    if ($filters['actor'] !== '' && !in_array((int)$log['actor_member_srl'], resolve_actor_filter($filters['actor']), true)) {
         return false;
     }
     if ($filters['from'] !== '' && date_only($log['created_at']) < $filters['from']) {

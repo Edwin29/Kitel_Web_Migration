@@ -40,10 +40,11 @@ if (is_post()) {
             if ($quantity <= 0) {
                 flash('수량을 입력해 주세요.');
             } elseif ($action === 'category_status') {
-                $result = bulk_adjust_category_status($state, $categoryId, $quantity, isset($_POST['status']) ? $_POST['status'] : '', $memo, $user);
+                $fromStatus = isset($_POST['from_status']) ? $_POST['from_status'] : 'available';
+                $result = bulk_adjust_category_status($state, $categoryId, $quantity, isset($_POST['status']) ? $_POST['status'] : '', $memo, $user, $fromStatus);
                 $message = $result['updated'] . '개 상태를 변경했습니다.';
                 if ($result['updated'] < $result['requested']) {
-                    $message .= ' (재고 부족으로 ' . ($result['requested'] - $result['updated']) . '개는 처리하지 못함)';
+                    $message .= ' (' . status_label($fromStatus) . ' 상태인 것이 부족해 ' . ($result['requested'] - $result['updated']) . '개는 처리하지 못함)';
                 }
                 flash($message);
             } else {
@@ -135,22 +136,36 @@ admin_nav();
 <section class="card table-wrap">
   <h2>개수 관리 카테고리</h2>
   <p class="muted">라벨을 붙일 수 없는 부품은 개별 항목 대신 개수로만 관리합니다.</p>
-  <table class="bulk-category-table"><thead><tr><th>이름</th><th>총 개수</th><th>가용</th><th>대여 중</th><th>관리</th></tr></thead><tbody>
-  <?php foreach ($bulkCategoryRows as $category): $counts = category_item_counts($state, $category['category_id']); $maxQty = max(1, $counts['available']); ?>
+  <table class="bulk-category-table"><thead><tr><th>이름</th><th>총 개수</th><th>상태별</th><th>관리</th></tr></thead><tbody>
+  <?php foreach ($bulkCategoryRows as $category): $counts = category_status_counts($state, $category['category_id']); ?>
     <tr>
       <td><strong><?php echo e($category['name']); ?></strong></td>
       <td><?php echo (int)$counts['total']; ?></td>
-      <td><?php echo (int)$counts['available']; ?></td>
-      <td><?php echo (int)$counts['borrowed']; ?></td>
+      <td class="status-breakdown">
+        <?php foreach (array('available', 'borrowed', 'unavailable', 'broken', 'lost') as $s): ?>
+          <?php if ($counts[$s] > 0): ?>
+            <span class="badge <?php echo e($s); ?>"><?php echo e(status_label($s)); ?> <?php echo (int)$counts[$s]; ?></span>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </td>
       <td class="actions">
         <a class="button" href="<?php echo e(app_url('admin/item_new.php?category_id=' . $category['category_id'])); ?>">재고 추가</a>
         <a class="button" href="<?php echo e(app_url('admin/category_qr.php?category_id=' . $category['category_id'])); ?>">QR</a>
+        <?php // 어떤 상태의 것을 → 어떤 상태로 바꿀지 둘 다 고른다.
+              // 그래야 "고장 3개를 고쳐서 대여 가능으로" 같은 복구가 가능하다. ?>
         <form method="post">
           <?php echo csrf_input(); ?>
           <input type="hidden" name="action" value="category_status">
           <input type="hidden" name="category_id" value="<?php echo e($category['category_id']); ?>">
-          <input class="qty-input" type="number" name="quantity" min="1" max="<?php echo $maxQty; ?>" placeholder="개수">
-          <select name="status">
+          <select name="from_status" title="바꿀 대상의 현재 상태">
+            <?php foreach (array('available', 'broken', 'unavailable', 'lost') as $s): ?>
+              <option value="<?php echo e($s); ?>"><?php echo e(status_label($s)); ?> (<?php echo (int)$counts[$s]; ?>)</option>
+            <?php endforeach; ?>
+          </select>
+          <input class="qty-input" type="number" name="quantity" min="1" placeholder="개수" required>
+          <span class="muted">개를</span>
+          <select name="status" title="바꿀 상태">
+            <option value="available">대여 가능</option>
             <option value="unavailable">대여 불가</option>
             <option value="broken">고장</option>
             <option value="lost">분실</option>
@@ -162,7 +177,7 @@ admin_nav();
           <?php echo csrf_input(); ?>
           <input type="hidden" name="action" value="category_retire">
           <input type="hidden" name="category_id" value="<?php echo e($category['category_id']); ?>">
-          <input class="qty-input" type="number" name="quantity" min="1" max="<?php echo $maxQty; ?>" placeholder="개수">
+          <input class="qty-input" type="number" name="quantity" min="1" max="<?php echo (int)$counts['available']; ?>" placeholder="개수" required>
           <input name="memo" placeholder="폐기 사유" required>
           <button class="danger" type="submit">폐기</button>
         </form>

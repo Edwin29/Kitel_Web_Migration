@@ -19,7 +19,7 @@ function export_definition($type)
         ),
         'logs' => array(
             'filename' => 'kitel-rental-logs',
-            'header' => array('log_id', 'created_at', 'actor_member_srl', 'action', 'item_id', 'loan_id', 'before_status', 'after_status', 'memo'),
+            'header' => array('log_id', 'created_at', 'actor_member_srl', 'actor_name', 'action', 'item_id', 'item_label', 'loan_id', 'before_status', 'after_status', 'memo'),
         ),
     );
     return isset($definitions[$type]) ? $definitions[$type] : null;
@@ -83,13 +83,16 @@ function export_each_row($state, $type, array $filters, callable $emit)
     }
 
     if ($type === 'logs') {
-        log_each_filtered($state, $filters, function ($log) use ($emit) {
+        log_each_filtered($state, $filters, function ($log) use ($state, $emit) {
+            $item = $log['item_id'] ? find_item($state, $log['item_id']) : null;
             $emit(array(
                 $log['log_id'],
                 $log['created_at'],
                 $log['actor_member_srl'],
+                actor_display_name($log['actor_member_srl']),
                 $log['action'],
                 $log['item_id'],
+                $item ? $item['label'] : '',
                 $log['loan_id'],
                 $log['before_status'],
                 $log['after_status'],

@@ -12,6 +12,7 @@ $category = item_category($state, $item);
 // 둘 다 조회 계층에서 최신순 + 페이지 단위로 가져온다.
 $loans = item_all_loans($state, $itemId, rental_page_param('lpage'), 50);
 $logs = logs_for_item($state, $itemId, rental_page_param('gpage'), 100);
+prefetch_member_names(array_map(function ($log) { return $log['actor_member_srl']; }, $logs['rows']));
 render_header('기자재 이력', true);
 admin_nav();
 ?>
@@ -57,7 +58,7 @@ admin_nav();
     <?php foreach ($logs['rows'] as $log): ?>
       <tr>
         <td><?php echo e($log['created_at']); ?></td>
-        <td><?php echo e($log['actor_member_srl']); ?></td>
+        <td><?php echo e(actor_label($log['actor_member_srl'])); ?></td>
         <td><?php echo e($log['action']); ?></td>
         <td><?php echo e($log['before_status']); ?> → <?php echo e($log['after_status']); ?></td>
         <td><?php echo e($log['memo']); ?></td>

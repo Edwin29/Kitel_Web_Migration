@@ -18,6 +18,7 @@ $required = array(
     'app/bundles.php',
     'app/items.php',
     'app/loans.php',
+    'app/import.php',
     'app/export.php',
     'app/layout.php',
     'public/_bootstrap.php',

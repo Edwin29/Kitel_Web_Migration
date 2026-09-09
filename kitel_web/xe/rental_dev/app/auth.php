@@ -99,6 +99,110 @@ function find_xe_member($memberSrl)
     return $row;
 }
 
+// ---------------------------------------------------------------------------
+// 처리자(member_srl) 이름 표시
+//
+// 로그 화면은 예전에 actor_member_srl 숫자를 그대로 찍었다. find_xe_member()가
+// 이미 있는데도 안 썼던 것. 다만 한 페이지에 100건이면 100번 조회할 수는 없어서,
+// 페이지에 등장하는 member_srl을 한 번에 모아 오는 프리페치를 둔다.
+// ---------------------------------------------------------------------------
+
+function member_name_cache(&$store = null)
+{
+    static $cache = array();
+    if ($store !== null) {
+        $cache = $store + $cache;
+    }
+    return $cache;
+}
+
+// 한 번의 쿼리로 여러 member_srl의 이름을 미리 채운다.
+function prefetch_member_names(array $memberSrls)
+{
+    $ids = array();
+    foreach ($memberSrls as $srl) {
+        $id = (int)$srl;
+        if ($id > 0) {
+            $ids[$id] = true;
+        }
+    }
+    $cache = member_name_cache();
+    $missing = array_values(array_diff(array_keys($ids), array_keys($cache)));
+    if (!$missing) {
+        return;
+    }
+
+    $found = array();
+    if (config('mode') === 'local') {
+        foreach ($missing as $id) {
+            $m = find_xe_member($id);
+            $found[$id] = $m ? $m['nick_name'] : '';
+        }
+    } else {
+        $pdo = db_connect();
+        $placeholders = implode(',', array_fill(0, count($missing), '?'));
+        $stmt = $pdo->prepare('SELECT member_srl, user_id, nick_name FROM ' . xe_table('member') . ' WHERE member_srl IN (' . $placeholders . ')');
+        $stmt->execute($missing);
+        foreach ($stmt->fetchAll() as $row) {
+            $name = trim((string)$row['nick_name']);
+            $found[(int)$row['member_srl']] = $name !== '' ? $name : (string)$row['user_id'];
+        }
+        // 탈퇴 등으로 못 찾은 것도 캐시에 남겨 재조회를 막는다.
+        foreach ($missing as $id) {
+            if (!isset($found[$id])) {
+                $found[$id] = '';
+            }
+        }
+    }
+    member_name_cache($found);
+}
+
+// 화면에 표시할 처리자 이름. 못 찾으면 빈 문자열.
+function actor_display_name($memberSrl)
+{
+    $id = (int)$memberSrl;
+    if ($id <= 0) {
+        return '';
+    }
+    $cache = member_name_cache();
+    if (!array_key_exists($id, $cache)) {
+        prefetch_member_names(array($id));
+        $cache = member_name_cache();
+    }
+    return isset($cache[$id]) ? $cache[$id] : '';
+}
+
+// "이름 · #srl" 형태. 이름을 못 찾으면 번호만.
+function actor_label($memberSrl)
+{
+    $id = (int)$memberSrl;
+    if ($id <= 0) {
+        return '시스템';
+    }
+    $name = actor_display_name($id);
+    return $name !== '' ? $name . ' · #' . $id : '#' . $id;
+}
+
+// 로그 필터의 "처리자" 칸에 숫자 대신 이름을 넣을 수 있게 한다.
+// 숫자면 그대로 member_srl로, 아니면 이름/아이디로 회원을 찾아 srl 목록을 돌려준다.
+function resolve_actor_filter($input)
+{
+    $input = trim((string)$input);
+    if ($input === '') {
+        return array();
+    }
+    if (ctype_digit($input)) {
+        return array((int)$input);
+    }
+    $srls = array();
+    foreach (search_xe_members($input, 50) as $member) {
+        $srls[] = (int)$member['member_srl'];
+    }
+    // 검색 결과가 없으면 -1을 넣어 "아무것도 일치하지 않음"이 되게 한다
+    // (빈 배열을 돌려주면 필터가 통째로 무시되어 전체가 나온다).
+    return $srls ? $srls : array(-1);
+}
+
 function search_xe_members($query, $limit = 20)
 {
     $query = trim($query);

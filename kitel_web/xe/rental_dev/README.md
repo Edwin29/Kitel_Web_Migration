@@ -10,6 +10,11 @@
 - 현재 라이브 경로: **`https://kitel.kw.ac.kr/rental_dev/public/`**
   (`/rental`은 안정화 후 전환할 최종 경로. 지금은 인증 사전조사 스크립트만 있습니다.)
 
+> **소스·변경 이력:** 이 코드와 문서는 GitHub에서 관리합니다 →
+> [`Edwin29/Kitel_Web_Migration` · `kitel_web/xe/rental_dev`](https://github.com/Edwin29/Kitel_Web_Migration/tree/main/kitel_web/xe/rental_dev)
+> NAS(`/volume1/kitel_web/xe/rental_dev`)에 있는 이 파일은 **배포 산출물**입니다. 수정은 저장소에서 하고 §9의 배포 절차로 반영하세요.
+> 편입·진단 수정 PR: [#3](https://github.com/Edwin29/Kitel_Web_Migration/pull/3)
+
 ---
 
 ## 1. 동작 모드

@@ -3,8 +3,8 @@ function rental_seed_state()
 {
     $now = now_text();
     $categories = array(
-        array('category_id' => 1, 'name' => '니퍼', 'slug' => 'nipper', 'next_serial' => 3, 'description' => '공구류', 'tracking_mode' => 'unique', 'max_per_user' => null, 'is_active' => 1, 'created_at' => $now, 'updated_at' => $now),
-        array('category_id' => 2, 'name' => '오실로스코프', 'slug' => 'oscilloscope', 'next_serial' => 2, 'description' => '계측 장비', 'tracking_mode' => 'unique', 'max_per_user' => null, 'is_active' => 1, 'created_at' => $now, 'updated_at' => $now),
+        array('category_id' => 1, 'name' => '니퍼', 'slug' => 'nipper', 'next_serial' => 3, 'description' => '공구류', 'tracking_mode' => 'unique', 'max_per_user' => null, 'due_days' => null, 'is_active' => 1, 'created_at' => $now, 'updated_at' => $now),
+        array('category_id' => 2, 'name' => '오실로스코프', 'slug' => 'oscilloscope', 'next_serial' => 2, 'description' => '계측 장비', 'tracking_mode' => 'unique', 'max_per_user' => null, 'due_days' => null, 'is_active' => 1, 'created_at' => $now, 'updated_at' => $now),
     );
     return array(
         'next_ids' => array('category_id' => 3, 'item_id' => 4, 'loan_id' => 1, 'log_id' => 1, 'bundle_id' => 1),

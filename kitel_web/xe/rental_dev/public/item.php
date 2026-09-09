@@ -33,6 +33,7 @@ render_header($item['label']);
     <p><strong>카테고리</strong><br><?php echo e($category ? $category['name'] : '-'); ?></p>
     <p><strong>현재 상태</strong><br><span class="badge <?php echo e($item['status']); ?>"><?php echo e(status_label($item['status'])); ?></span></p>
     <p><strong>보관 위치</strong><br><?php echo e($item['location']); ?></p>
+    <p><strong>대여 기간</strong><br><?php echo (int)effective_due_days($state, $item['category_id']); ?>일 (지금 빌리면 <?php echo e(item_due_date($state, $item)); ?>까지)</p>
     <p><strong>특이사항</strong><br><?php echo nl2br(e($item['condition_note'])); ?></p>
   </section>
 

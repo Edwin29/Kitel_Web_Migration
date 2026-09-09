@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS kitel_rental_categories (
   description TEXT NULL,
   tracking_mode VARCHAR(10) NOT NULL DEFAULT 'unique',
   max_per_user INT UNSIGNED NULL,
+  -- 카테고리별 대여 기간(일). NULL이면 app/config.php 의 default_due_days 를 쓴다.
+  due_days INT UNSIGNED NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_by_member_srl BIGINT NULL,
   created_at DATETIME NOT NULL,

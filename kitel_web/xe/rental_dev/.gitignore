@@ -1,2 +1,4 @@
 # 로컬 개발 모드에서 자동 생성되는 파일 기반 fake DB (운영에서는 만들어지지 않음)
 database/local_data.json
+# 화면 렌더 검증 스크립트가 만드는 임시 id 목록
+database/_test_ids.json

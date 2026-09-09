@@ -6,7 +6,8 @@ $state = rental_load();
 $categoryId = isset($_POST['category_id']) ? (int)$_POST['category_id'] : 0;
 require_trusted_network_or_redirect('category.php?id=' . $categoryId);
 $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-$dueDate = isset($_POST['due_date']) ? $_POST['due_date'] : default_due_date();
+// 반납 예정일은 서버가 카테고리 설정으로 계산한다 (POST 값을 신뢰하지 않는다).
+$dueDate = category_due_date($state, $categoryId);
 try {
     $result = create_bulk_loan(
         $state,

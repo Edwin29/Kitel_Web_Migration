@@ -52,13 +52,24 @@ if (is_post()) {
             if (!$ids) {
                 throw new RuntimeException('선택된 카테고리가 없습니다.');
             }
-            $count = bulk_update_category_tracking(
-                $state,
-                $ids,
-                isset($_POST['tracking_mode']) ? $_POST['tracking_mode'] : 'unique',
-                isset($_POST['max_per_user']) ? $_POST['max_per_user'] : '',
-                $user
-            );
+            // 입력한 항목만 변경한다. 비워 둔 칸은 건드리지 않는다.
+            $changes = array();
+            $mode = isset($_POST['tracking_mode']) ? $_POST['tracking_mode'] : '';
+            if ($mode === 'unique' || $mode === 'bulk') {
+                $changes['tracking_mode'] = $mode;
+            }
+            list($hasLimit, $limit) = parse_optional_number_change(isset($_POST['max_per_user']) ? $_POST['max_per_user'] : '');
+            if ($hasLimit) {
+                $changes['max_per_user'] = $limit;
+            }
+            list($hasDue, $dueDays) = parse_optional_number_change(isset($_POST['due_days']) ? $_POST['due_days'] : '');
+            if ($hasDue) {
+                $changes['due_days'] = $dueDays;
+            }
+            if (!$changes) {
+                throw new RuntimeException('변경할 항목을 하나 이상 입력해 주세요.');
+            }
+            $count = bulk_update_category_options($state, $ids, $changes, $user);
             flash($count . '개 카테고리의 관리 옵션을 변경했습니다.');
         } elseif ($action === 'bulk_delete') {
             $ids = posted_category_ids();
@@ -98,6 +109,17 @@ function render_category_node($state, $category)
       </form>
       <span class="badge <?php echo $mode === 'bulk' ? 'available' : ''; ?>"><?php echo $mode === 'bulk' ? '개수' : '개별'; ?></span>
       <span class="muted count-text"><?php echo (int)$counts['total']; ?>개</span>
+      <?php $dueDays = category_due_days($category); $limit = category_max_per_user($category); ?>
+      <span class="muted count-text" title="대여 기간">
+        <?php if ($dueDays > 0): ?>
+          <strong><?php echo $dueDays; ?>일</strong>
+        <?php else: ?>
+          기본 <?php echo (int)config('default_due_days'); ?>일
+        <?php endif; ?>
+      </span>
+      <?php if ($limit > 0): ?>
+        <span class="muted count-text" title="1인당 대여 제한">1인 <?php echo $limit; ?>개</span>
+      <?php endif; ?>
     </li>
     <?php
 }
@@ -124,15 +146,23 @@ admin_nav();
     </select>
     <button type="submit">선택 항목 이동</button>
   </form>
+  <?php // 비워 둔 칸은 건드리지 않는다. 0을 넣으면 그 설정을 해제한다.
+        // 예전에는 관리 방식이 항상 함께 덮어써져서, 1인당 제한만 바꾸려 해도
+        // 개별/개수 관리가 같이 바뀌었다. ?>
   <form id="category-tracking-form" class="bulk-inline" method="post">
     <?php echo csrf_input(); ?>
     <input type="hidden" name="action" value="bulk_tracking">
-    <select name="tracking_mode">
-      <option value="unique">개별 관리</option>
-      <option value="bulk">개수 관리</option>
+    <select name="tracking_mode" title="관리 방식">
+      <option value="">관리 방식: 변경 안 함</option>
+      <option value="unique">개별 관리로</option>
+      <option value="bulk">개수 관리로</option>
     </select>
-    <input type="number" name="max_per_user" min="0" placeholder="1인당 제한">
-    <button type="submit">관리 옵션 변경</button>
+    <input class="qty-input" type="number" name="max_per_user" min="0" placeholder="1인당 제한"
+           title="1인당 대여 제한(개). 비우면 변경 안 함, 0이면 제한 해제">
+    <input class="qty-input" type="number" name="due_days" min="0" placeholder="대여 기간(일)"
+           title="대여 기간(일). 비우면 변경 안 함, 0이면 기본값(<?php echo (int)config('default_due_days'); ?>일) 사용">
+    <button type="submit">선택 항목에 적용</button>
+    <span class="muted bulk-hint">비운 칸은 그대로 두고, <strong>0</strong>을 넣으면 해제됩니다</span>
   </form>
   <form id="category-delete-form" class="bulk-inline" method="post" onsubmit="return confirm('선택한 카테고리를 영구 삭제할까요? 대여 중인 기자재가 있으면 삭제되지 않습니다.');">
     <?php echo csrf_input(); ?>

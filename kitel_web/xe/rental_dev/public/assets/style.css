@@ -1131,3 +1131,9 @@ p.pager-summary {
 .danger-head {
   color: var(--danger);
 }
+
+/* 카테고리 일괄 적용 바의 안내 문구 */
+.bulk-hint {
+  font-size: 0.82rem;
+  align-self: center;
+}

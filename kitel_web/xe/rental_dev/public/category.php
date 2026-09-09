@@ -46,6 +46,7 @@ render_header($category['name']);
     <?php if ($maxPerUser > 0): ?>
       <p class="muted">1인당 최대 <?php echo $maxPerUser; ?>개 · 현재 내가 대여 중: <?php echo $myCount; ?>개</p>
     <?php endif; ?>
+    <p class="muted">대여 기간 <strong><?php echo (int)effective_due_days($state, $categoryId); ?>일</strong> · 지금 빌리면 반납 예정일은 <strong><?php echo e(category_due_date($state, $categoryId)); ?></strong></p>
   </section>
 
   <section class="card">

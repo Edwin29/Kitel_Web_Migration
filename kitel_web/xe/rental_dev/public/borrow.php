@@ -7,7 +7,10 @@ $itemId = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
 $item = find_item($state, $itemId);
 $backTo = $item ? 'item.php?code=' . rawurlencode($item['public_code']) : '';
 require_trusted_network_or_redirect($backTo);
-$dueDate = isset($_POST['due_date']) ? $_POST['due_date'] : default_due_date();
+// 반납 예정일은 서버가 그 기자재의 카테고리 설정으로 계산한다.
+// 예전에는 POST 로 받은 due_date 를 그대로 썼기 때문에, 사용자가 임의로 긴
+// 기간을 보낼 수 있었다.
+$dueDate = item_due_date($state, $item);
 try {
     create_loan(
         $state,

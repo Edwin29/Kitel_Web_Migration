@@ -122,6 +122,7 @@ admin_nav();
       </label>
       <label>반납 예정일
         <input type="date" name="due_date" value="<?php echo e(default_due_date()); ?>" required>
+          <span class="muted">카테고리에 설정된 대여 기간 대신 이 날짜가 적용됩니다.</span>
       </label>
       <label>등록 사유/비고
         <textarea name="note" rows="3" required>관리자 대여 등록</textarea>
@@ -159,6 +160,7 @@ admin_nav();
         </label>
         <label>반납 예정일
           <input type="date" name="due_date" value="<?php echo e(default_due_date()); ?>" required>
+          <span class="muted">카테고리에 설정된 대여 기간 대신 이 날짜가 적용됩니다.</span>
         </label>
         <label>등록 사유/비고
           <textarea name="note" rows="3" required>관리자 대여 등록</textarea>

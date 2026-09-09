@@ -20,6 +20,35 @@ function category_max_per_user($category)
         : 0;
 }
 
+// 카테고리에 따로 지정된 대여 기간(일). 지정 안 했으면 0.
+// 0이면 config('default_due_days')를 쓴다 — effective_due_days() 참고.
+function category_due_days($category)
+{
+    return (isset($category['due_days']) && $category['due_days'] !== null && $category['due_days'] !== '')
+        ? (int)$category['due_days']
+        : 0;
+}
+
+// 이 카테고리에 실제로 적용되는 대여 기간(일).
+function effective_due_days($state, $categoryId)
+{
+    $category = find_category($state, $categoryId);
+    $days = $category ? category_due_days($category) : 0;
+    return $days > 0 ? $days : (int)config('default_due_days');
+}
+
+// 이 카테고리로 지금 대여하면 반납 예정일이 언제가 되는지 (Y-m-d).
+function category_due_date($state, $categoryId)
+{
+    return date('Y-m-d', strtotime('+' . effective_due_days($state, $categoryId) . ' days'));
+}
+
+// 기자재 하나의 반납 예정일. 그 기자재가 속한 카테고리 기준.
+function item_due_date($state, $item)
+{
+    return $item ? category_due_date($state, $item['category_id']) : default_due_date();
+}
+
 function create_category(&$state, $name, $description, $actor)
 {
     $name = trim($name);
@@ -46,6 +75,7 @@ function create_category(&$state, $name, $description, $actor)
             'description' => $description,
             'tracking_mode' => 'unique',
             'max_per_user' => null,
+            'due_days' => null,
             'is_active' => 1,
             'created_by_member_srl' => $actor['member_srl'],
             'created_at' => $now,
@@ -63,6 +93,7 @@ function create_category(&$state, $name, $description, $actor)
         'description' => $description,
         'tracking_mode' => 'unique',
         'max_per_user' => null,
+        'due_days' => null,
         'is_active' => 1,
         'created_by_member_srl' => $actor['member_srl'],
         'created_at' => $now,
@@ -288,13 +319,49 @@ function update_category(&$state, $categoryId, $name, $description, $nextSerial,
 
 // 개별 관리(unique) / 개수 관리(bulk) 전환과 1인당 대여 제한 설정.
 // 자주 쓰는 기능이 아니라 관리자 화면 한 켠에 조용히 두는 것을 전제로 만든 함수.
-function update_category_tracking(&$state, $categoryId, $trackingMode, $maxPerUser, $actor)
+// 화면의 "변경 안 함 / 해제 / 값 지정" 3가지 입력을 하나의 변경 지시로 해석한다.
+//   ''(빈 문자열) → 이 항목은 건드리지 않음 (배열에 키를 넣지 않음)
+//   '0'           → 설정 해제 (NULL)
+//   양의 정수     → 그 값으로 설정
+function parse_optional_number_change($raw)
 {
-    $trackingMode = ($trackingMode === 'bulk') ? 'bulk' : 'unique';
-    $maxPerUser = trim((string)$maxPerUser) === '' ? null : max(0, (int)$maxPerUser);
-    if ($maxPerUser === 0) {
-        $maxPerUser = null;
+    $raw = trim((string)$raw);
+    if ($raw === '') {
+        return array(false, null);      // 변경 안 함
     }
+    $value = max(0, (int)$raw);
+    return array(true, $value > 0 ? $value : null);
+}
+
+// 카테고리 관리 옵션(관리 방식 / 1인당 제한 / 대여 기간)을 바꾼다.
+//
+// $changes 에 들어 있는 키만 반영한다. 예전에는 tracking_mode 를 항상 함께
+// 덮어써서, 1인당 제한만 바꾸려 해도 관리 방식이 같이 바뀌었다.
+//   tracking_mode : 'unique' | 'bulk'
+//   max_per_user  : int | null   (null = 제한 없음)
+//   due_days      : int | null   (null = 기본 대여 기간 사용)
+function update_category_options(&$state, $categoryId, array $changes, $actor)
+{
+    $fields = array();
+    $memo = array();
+
+    if (array_key_exists('tracking_mode', $changes)) {
+        $fields['tracking_mode'] = ($changes['tracking_mode'] === 'bulk') ? 'bulk' : 'unique';
+        $memo[] = '관리 방식 → ' . ($fields['tracking_mode'] === 'bulk' ? '개수 관리' : '개별 관리');
+    }
+    if (array_key_exists('max_per_user', $changes)) {
+        $fields['max_per_user'] = $changes['max_per_user'] === null ? null : max(1, (int)$changes['max_per_user']);
+        $memo[] = '1인당 제한 → ' . ($fields['max_per_user'] === null ? '없음' : $fields['max_per_user'] . '개');
+    }
+    if (array_key_exists('due_days', $changes)) {
+        $fields['due_days'] = $changes['due_days'] === null ? null : max(1, (int)$changes['due_days']);
+        $memo[] = '대여 기간 → ' . ($fields['due_days'] === null ? '기본값(' . (int)config('default_due_days') . '일)' : $fields['due_days'] . '일');
+    }
+
+    if (!$fields) {
+        return false;   // 바꿀 것이 없음
+    }
+    $memoText = implode(', ', $memo);
 
     if (config('mode') !== 'local') {
         $pdo = db_connect();
@@ -306,26 +373,65 @@ function update_category_tracking(&$state, $categoryId, $trackingMode, $maxPerUs
             if (!$before) {
                 throw new RuntimeException('카테고리를 찾을 수 없습니다.');
             }
-            $update = $pdo->prepare('UPDATE kitel_rental_categories SET tracking_mode = ?, max_per_user = ?, updated_at = ? WHERE category_id = ?');
-            $update->execute(array($trackingMode, $maxPerUser, db_now(), $categoryId));
-            add_log($state, 'category.tracking', null, null, $before['tracking_mode'], $trackingMode, $before['name'] . ' 관리 방식 변경', $actor);
+            $sets = array();
+            $args = array();
+            foreach ($fields as $column => $value) {
+                $sets[] = $column . ' = ?';
+                $args[] = $value;
+            }
+            $sets[] = 'updated_at = ?';
+            $args[] = db_now();
+            $args[] = $categoryId;
+            $update = $pdo->prepare('UPDATE kitel_rental_categories SET ' . implode(', ', $sets) . ' WHERE category_id = ?');
+            $update->execute($args);
+            add_log(
+                $state,
+                'category.tracking',
+                null, null,
+                $before['tracking_mode'],
+                isset($fields['tracking_mode']) ? $fields['tracking_mode'] : $before['tracking_mode'],
+                $before['name'] . ': ' . $memoText,
+                $actor
+            );
             db_commit($txOwned);
-            return;
+            return true;
         } catch (Exception $e) {
             db_rollback($txOwned);
             throw $e;
         }
     }
 
+    $done = false;
     foreach ($state['categories'] as &$category) {
         if ((int)$category['category_id'] === (int)$categoryId) {
-            $before = category_tracking_mode($category);
-            $category['tracking_mode'] = $trackingMode;
-            $category['max_per_user'] = $maxPerUser;
+            $beforeMode = category_tracking_mode($category);
+            foreach ($fields as $column => $value) {
+                $category[$column] = $value;
+            }
             $category['updated_at'] = now_text();
-            add_log($state, 'category.tracking', null, null, $before, $trackingMode, $category['name'] . ' 관리 방식 변경', $actor);
+            add_log(
+                $state,
+                'category.tracking',
+                null, null,
+                $beforeMode,
+                isset($fields['tracking_mode']) ? $fields['tracking_mode'] : $beforeMode,
+                $category['name'] . ': ' . $memoText,
+                $actor
+            );
+            $done = true;
             break;
         }
     }
     unset($category);
+    return $done;
+}
+
+// 예전 진입점 — 관리 방식과 1인당 제한을 항상 함께 지정하는 형태.
+function update_category_tracking(&$state, $categoryId, $trackingMode, $maxPerUser, $actor)
+{
+    $maxPerUser = trim((string)$maxPerUser) === '' ? null : max(0, (int)$maxPerUser);
+    return update_category_options($state, $categoryId, array(
+        'tracking_mode' => $trackingMode,
+        'max_per_user' => $maxPerUser === 0 ? null : $maxPerUser,
+    ), $actor);
 }

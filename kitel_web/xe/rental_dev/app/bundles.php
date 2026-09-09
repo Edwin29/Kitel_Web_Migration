@@ -334,6 +334,25 @@ function bulk_update_category_tracking(&$state, array $categoryIds, $trackingMod
     });
 }
 
+// 선택한 카테고리들에 관리 옵션을 한 번에 적용한다.
+// $changes 에 들어 있는 키만 반영하므로, 대여 기간만 바꾸거나 1인당 제한만
+// 바꾸는 것이 가능하다. 전체가 하나의 트랜잭션이다.
+function bulk_update_category_options(&$state, array $categoryIds, array $changes, $actor)
+{
+    if (!$changes) {
+        return 0;
+    }
+    return db_run_atomically(function () use (&$state, $categoryIds, $changes, $actor) {
+        $updated = 0;
+        foreach (array_unique(array_map('intval', $categoryIds)) as $categoryId) {
+            if (update_category_options($state, $categoryId, $changes, $actor)) {
+                $updated++;
+            }
+        }
+        return $updated;
+    });
+}
+
 function bulk_delete_categories(&$state, array $categoryIds, $actor)
 {
     $ids = array_unique(array_map('intval', $categoryIds));

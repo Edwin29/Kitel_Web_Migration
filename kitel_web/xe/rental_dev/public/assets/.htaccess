@@ -1,0 +1,6 @@
+# 상위 public/.htaccess 가 기본 거부이므로 정적 자산을 다시 열어준다.
+# PHP는 여기서 실행될 일이 없으므로 확장자를 명시적으로 제한한다.
+
+<FilesMatch "\.(css|js|map|png|jpe?g|gif|svg|ico|webp|woff2?|ttf)$">
+  Require all granted
+</FilesMatch>

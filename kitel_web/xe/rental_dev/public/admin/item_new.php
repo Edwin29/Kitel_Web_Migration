@@ -90,7 +90,11 @@ admin_nav();
     <button class="primary" type="submit">가져오기</button>
   </form>
 </section>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<?php // SheetJS 0.18.5 — jsQR과 마찬가지로 저장소에 함께 두고 로컬에서 불러온다.
+      // 예전에는 cdnjs에서 무결성 해시(SRI) 없이 직접 받아왔다. 관리자 화면이 외부
+      // 스크립트를 신뢰하는 구조였고, 동방 네트워크가 막히면 드래그앤드롭이 조용히
+      // 죽으면서 "파일을 분석하지 못했습니다"만 남았다. ?>
+<script src="<?php echo e(app_url('assets/xlsx.full.min.js')); ?>"></script>
 <script>
 (function () {
   var dropzone = document.getElementById('csv-dropzone');

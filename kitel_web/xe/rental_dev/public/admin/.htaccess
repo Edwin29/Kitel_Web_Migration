@@ -1,0 +1,10 @@
+# 상위 public/.htaccess 가 기본 거부이므로 관리자 화면을 다시 열어준다.
+# 실제 권한 검사는 각 파일 첫 줄의 require_admin() 이 담당한다 — 여기서 여는 것은
+# "이 URL이 존재한다"까지다.
+#
+# 1회성 도구(run_*_migration.php)와 진단 스크립트는 목록에 없다. 다시 필요해지면
+# 파일을 되살리는 것만으로는 열리지 않고, 이 목록에도 명시해야 한다.
+
+<FilesMatch "^(index|items|item_new|item_edit|item_detail|item_history|categories|loans|loan_new|logs|import|export|member_history|permissions|qr|qr_print|bundle_qr|category_qr|network_check)\.php$">
+  Require all granted
+</FilesMatch>

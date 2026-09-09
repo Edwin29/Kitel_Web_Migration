@@ -141,9 +141,52 @@ function status_label($status)
     return isset($labels[$status]) ? $labels[$status] : $status;
 }
 
+// 접속자 IP.
+//
+// 운영 서버는 Apache(php-fpm) 앞에 프록시가 놓일 수 있는 구성이라, 그 경우
+// REMOTE_ADDR이 프록시 주소로 고정되어 동방 와이파이 판별이 항상 실패한다.
+// 그렇다고 X-Forwarded-For를 무조건 믿으면 헤더만 위조해서 IP 제한을 우회할 수 있다.
+//
+// 그래서 "REMOTE_ADDR이 신뢰하는 프록시일 때만" XFF를 본다.
+// trusted_proxies 기본값은 비어 있고, 그 상태에서는 예전과 완전히 동일하게
+// REMOTE_ADDR만 쓴다 — 실측 전까지 동작이 바뀌지 않는다.
+// 실측 결과 프록시를 거치는 게 확인되면 KITEL_RENTAL_TRUSTED_PROXIES 에 그 주소를
+// 넣어야 XFF가 반영된다. 관리자 화면의 "네트워크 점검"에서 실제 값을 볼 수 있다.
 function client_ip()
 {
-    return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+    $remote = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+    $trustedProxies = config('trusted_proxies');
+    if (!$trustedProxies || $remote === '') {
+        return $remote;
+    }
+
+    $isTrusted = function ($ip) use ($trustedProxies) {
+        foreach ($trustedProxies as $cidr) {
+            if ($cidr !== '' && ip_in_cidr($ip, $cidr)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (!$isTrusted($remote)) {
+        return $remote;
+    }
+
+    $forwarded = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+    if ($forwarded === '') {
+        return $remote;
+    }
+
+    // XFF는 "클라이언트, 프록시1, 프록시2" 순. 오른쪽부터 훑어서 신뢰 프록시가
+    // 아닌 첫 주소가 실제 접속자다. 그 왼쪽은 클라이언트가 위조할 수 있으므로 믿지 않는다.
+    $hops = array_reverse(array_map('trim', explode(',', $forwarded)));
+    foreach ($hops as $hop) {
+        if ($hop !== '' && !$isTrusted($hop)) {
+            return $hop;
+        }
+    }
+    return $remote;
 }
 
 // 카메라 스캔은 모바일에서만 의미가 있어서, User-Agent로 대략 판별한다.

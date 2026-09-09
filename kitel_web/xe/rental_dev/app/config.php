@@ -12,6 +12,11 @@ return array(
     //'require_trusted_network_for_rental' => false,
     // 콤마로 여러 대역 지정 가능. 환경변수를 못 넣는 환경이면 이 기본값을 직접 수정한다.
     'trusted_network_cidrs' => array_values(array_filter(array_map('trim', explode(',', getenv('KITEL_RENTAL_TRUSTED_CIDRS') ?: '192.168.1.0/24')))),
+    // 앞단 프록시(nginx 등)를 거치는 구성이면 여기에 그 주소/대역을 넣어야
+    // X-Forwarded-For가 반영된다. 비어 있으면 REMOTE_ADDR만 사용한다(기본).
+    // 관리자 > 네트워크 점검 화면에서 실제 값을 확인한 뒤에 설정할 것.
+    // 예: '127.0.0.1,::1'
+    'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', getenv('KITEL_RENTAL_TRUSTED_PROXIES') ?: '')))),
     'base_url' => getenv('KITEL_RENTAL_BASE_URL') ?: '/rental_dev/public',
     'canonical_base_url' => getenv('KITEL_RENTAL_CANONICAL_URL') ?: 'https://kitel.kw.ac.kr/rental_dev/public',
     'xe_root' => getenv('KITEL_XE_ROOT') ?: '/volume1/kitel_web/xe',

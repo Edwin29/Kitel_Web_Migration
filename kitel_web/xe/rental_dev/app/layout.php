@@ -119,6 +119,7 @@ function admin_nav_settings_groups()
     return array(
         '설정' => array(
             array('permissions.php', '권한 그룹'),
+            array('network_check.php', '네트워크 점검'),
         ),
     );
 }

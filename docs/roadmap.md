@@ -28,7 +28,12 @@
 기존 문서들이 가정하거나 추정만 하고 있던 부분을 실제 운영 NAS에 접속해 직접 확인함. 아래는 기존 문서 내용을 정정하거나 보강하는 내용.
 
 ### 2-1. 운영 서버 스펙 정정
-- **PHP는 7.4가 아니라 8.1.9**임을 실측으로 확인(`php -v`). 기존 문서([xeadmin-site-analysis.md](xeadmin-site-analysis.md), [remaining-work.md](remaining-work.md))에 적힌 "운영 서버 PHP 7.4" 추정은 **틀렸음** — DSM Web Station 설정만 보고 실제 CLI 버전은 확인 안 했던 게 원인으로 보임. 로컬 dev(PHP 8.2.33)와 큰 차이 없어 **배포 시 PHP 버전 문제는 사실상 해소됨**.
+- ~~**PHP는 7.4가 아니라 8.1.9**임을 실측으로 확인(`php -v`)~~ → **이 정정 자체가 틀렸음. 운영 웹 PHP는 7.4가 맞다**(2026-09-09 재확인). `php -v`가 가리키는 `/usr/bin/php`(8.1.9)는 DSM의 범용 CLI 바이너리일 뿐 웹을 서비스하지 않는다 — **pdo_mysql조차 없어서** 이 바이너리로는 DB에 붙지도 못한다. 실제 서비스 경로는 다음과 같다:
+  - `kitel.kw.ac.kr` vhost(`/usr/local/etc/apache24/sites-available/server.975b1603-….conf`, DocumentRoot `/volume1/kitel_web/xe`) → php-fpm 소켓 `php-5589cbe0-….sock`
+  - 그 소켓은 Web Station PHP 프로필 `5589cbe0-…`, `"backend": 8` → **PHP 7.4.33**
+  - (backend 대응: 3=5.6, 4=7.0, 5=7.1, 6=7.2, 8=7.4. 설치된 FPM은 7.4/8.0/8.2뿐이고 8.1은 아예 없다.)
+- 따라서 **배포 코드는 PHP 7.4 호환을 유지해야 한다**(rental_dev README의 "PHP 7.4 호환" 전제가 여전히 유효). CLI에서 DB 작업이 필요하면 `/usr/bin/php`가 아니라 **`/usr/local/bin/php74`**를 써야 한다.
+- vhost에 `AllowOverride All`이 걸려 있어 `.htaccess`가 실제로 적용된다(rental_dev의 접근 차단이 유효한 근거).
 - MariaDB 10.11.11 (Synology MariaDB10 패키지, `/var/packages/MariaDB10/`), DSM 7.2.2, 기종 Synology DS218(aarch64, 저전력 NAS).
 - 디스크: volume1 890G(214G 여유), volume2 2.7T(1.2T 여유) — 신규 사이트+레거시 아카이브+NAS Drive 자료 전부 동시 보관해도 공간은 충분함.
 - 웹서버: nginx + Apache(php-fpm), 실제로 지금도 활발히 트래픽 처리 중(php-fpm 워커 다수 가동).

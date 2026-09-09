@@ -2,8 +2,11 @@
 require_once __DIR__ . '/_bootstrap.php';
 $user = require_borrow_permission();
 $state = rental_load();
-$activeLoans = user_active_loans($state, $user['member_srl']);
-$overdueCount = count(array_filter($activeLoans, 'loan_is_overdue'));
+// user_active_loans()는 rows/total/page/... 형태의 페이지 결과를 돌려준다.
+// 배열 자체를 대여 목록처럼 다루면 키 개수(5)가 대여 건수로 잡히므로 rows/total을 명시적으로 쓴다.
+$loanPage = user_active_loans($state, $user['member_srl'], 1, 200);
+$activeLoans = $loanPage['rows'];
+$overdueCount = loan_query($state, array('member_srl' => $user['member_srl'], 'status' => 'overdue'), 1, 1)['total'];
 render_header('기자재 대여');
 ?>
 <h1>KITEL 기자재 대여</h1>
@@ -18,7 +21,7 @@ render_header('기자재 대여');
   </a>
   <a class="card metric" href="<?php echo e(app_url('my.php')); ?>">
     <span>내 대여</span>
-    <strong><?php echo count($activeLoans); ?>개<?php echo $overdueCount > 0 ? ' (연체 ' . $overdueCount . ')' : ''; ?></strong>
+    <strong><?php echo (int)$loanPage['total']; ?>개<?php echo $overdueCount > 0 ? ' (연체 ' . $overdueCount . ')' : ''; ?></strong>
   </a>
   <a class="card metric" href="<?php echo e(app_url('catalog.php')); ?>">
     <span>기자재 현황</span>

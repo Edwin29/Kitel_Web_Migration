@@ -6,8 +6,8 @@ $memberQuery = isset($_GET['q']) ? trim($_GET['q']) : '';
 $memberSrl = isset($_GET['member_srl']) ? (int)$_GET['member_srl'] : 0;
 $memberResults = search_xe_members($memberQuery);
 $member = $memberSrl > 0 ? find_xe_member($memberSrl) : null;
-$loans = $member ? user_all_loans($state, $member['member_srl']) : array();
-$activeLoans = $member ? user_active_loans($state, $member['member_srl']) : array();
+$loans = $member ? user_all_loans($state, $member['member_srl'], rental_page_param(), 50) : rental_page(array(), 0, 1, 50);
+$activeLoans = $member ? user_active_loans($state, $member['member_srl'], 1, 200) : rental_page(array(), 0, 1, 200);
 render_header('사용자별 대여 기록', true);
 admin_nav();
 ?>
@@ -43,7 +43,7 @@ admin_nav();
   <section class="card">
     <h2><?php echo e($member['nick_name']); ?></h2>
     <p class="muted"><?php echo e($member['user_id']); ?> · member_srl <?php echo e($member['member_srl']); ?> · <?php echo e($member['email_address']); ?></p>
-    <p>현재 대여 <?php echo count($activeLoans); ?>건 · 전체 기록 <?php echo count($loans); ?>건</p>
+    <p>현재 대여 <?php echo (int)$activeLoans['total']; ?>건 · 전체 기록 <?php echo (int)$loans['total']; ?>건</p>
   </section>
 
   <section class="card table-wrap">
@@ -51,7 +51,7 @@ admin_nav();
     <table>
       <thead><tr><th>기자재</th><th>실사용자</th><th>대여일</th><th>반납 예정일</th><th>상태</th><th>관리</th></tr></thead>
       <tbody>
-      <?php foreach (group_loans_for_display($state, array_reverse($activeLoans)) as $loan): ?>
+      <?php foreach (group_loans_for_display($state, $activeLoans['rows']) as $loan): ?>
         <tr>
           <td><?php echo e($loan['label']); ?><?php echo $loan['count'] > 1 ? ' (' . $loan['count'] . '개)' : ''; ?></td>
           <td><?php echo e($loan['actual_user_name']); ?><br><span class="muted"><?php echo e($loan['actual_user_contact']); ?></span></td>
@@ -61,7 +61,7 @@ admin_nav();
           <td><?php if (isset($loan['item_id'])): ?><a class="button" href="<?php echo e(app_url('admin/item_history.php?item_id=' . $loan['item_id'])); ?>">기자재 이력</a><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
-      <?php if (!$activeLoans): ?><tr><td colspan="6">현재 대여 중인 기자재가 없습니다.</td></tr><?php endif; ?>
+      <?php if (!$activeLoans['rows']): ?><tr><td colspan="6">현재 대여 중인 기자재가 없습니다.</td></tr><?php endif; ?>
       </tbody>
     </table>
   </section>
@@ -71,7 +71,7 @@ admin_nav();
     <table>
       <thead><tr><th>기자재</th><th>대여일</th><th>반납 예정일</th><th>반납일</th><th>상태</th><th>비고</th></tr></thead>
       <tbody>
-      <?php foreach (group_loans_for_display($state, array_reverse($loans)) as $loan): ?>
+      <?php foreach (group_loans_for_display($state, $loans['rows']) as $loan): ?>
         <tr>
           <td><?php echo e($loan['label']); ?><?php echo $loan['count'] > 1 ? ' (' . $loan['count'] . '개)' : ''; ?></td>
           <td><?php echo e(date_only($loan['borrowed_at'])); ?></td>
@@ -81,9 +81,10 @@ admin_nav();
           <td><?php echo e($loan['admin_note']); ?></td>
         </tr>
       <?php endforeach; ?>
-      <?php if (!$loans): ?><tr><td colspan="6">대여 기록이 없습니다.</td></tr><?php endif; ?>
+      <?php if (!$loans['rows']): ?><tr><td colspan="6">대여 기록이 없습니다.</td></tr><?php endif; ?>
       </tbody>
     </table>
+    <?php render_pagination($loans, 'admin/member_history.php'); ?>
   </section>
 <?php elseif ($memberSrl > 0): ?>
   <section class="card">회원을 찾을 수 없습니다.</section>

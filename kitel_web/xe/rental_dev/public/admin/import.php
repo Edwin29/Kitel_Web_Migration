@@ -6,12 +6,21 @@ $sample = "category,quantity,location,condition_note\n니퍼,3,동방 공구함,
 if (is_post()) {
     require_post();
     $csv = isset($_POST['csv_text']) ? $_POST['csv_text'] : '';
+    // 가져오기 전체가 하나의 트랜잭션이다. 제약 위반 등으로 실패하면 created=0으로
+    // 돌아오고 DB에는 아무것도 반영되지 않는다 (예전에는 예외 처리가 없어서
+    // 일부 행만 반영된 채 치명적 오류 화면으로 끝났다).
     $result = import_items_from_csv($state, $csv, $user);
     $_SESSION['last_added_item_ids'] = isset($result['created_ids']) ? $result['created_ids'] : array();
     rental_save($state);
-    $message = $result['created'] . '개의 기자재를 가져왔습니다.';
-    if ($result['errors']) {
-        $message .= ' 일부 행은 건너뛰었습니다: ' . implode(' / ', $result['errors']);
+    if ($result['created'] > 0) {
+        $message = $result['created'] . '개의 기자재를 가져왔습니다.';
+        if ($result['errors']) {
+            $message .= ' 일부 행은 건너뛰었습니다: ' . implode(' / ', $result['errors']);
+        }
+    } elseif ($result['errors']) {
+        $message = '가져오지 못했습니다: ' . implode(' / ', $result['errors']);
+    } else {
+        $message = '가져올 행이 없습니다.';
     }
     flash($message);
     redirect_to('admin/item_new.php?tab=csv');

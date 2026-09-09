@@ -14,13 +14,7 @@ if ($loanIds) {
     }
     $returned = 0;
     foreach ($loanIds as $loanId) {
-        $loan = null;
-        foreach ($state['loans'] as $row) {
-            if ((int)$row['loan_id'] === $loanId) {
-                $loan = $row;
-                break;
-            }
-        }
+        $loan = loan_find($state, $loanId);
         if (!$loan || ((int)$loan['borrower_member_srl'] !== (int)$user['member_srl'] && !user_is_admin($user))) {
             continue;
         }
@@ -39,13 +33,7 @@ if ($loanIds) {
 
 $loanId = isset($_POST['loan_id']) ? (int)$_POST['loan_id'] : 0;
 $returnCode = isset($_POST['item_code']) ? trim($_POST['item_code']) : '';
-$loan = null;
-foreach ($state['loans'] as $row) {
-    if ((int)$row['loan_id'] === $loanId) {
-        $loan = $row;
-        break;
-    }
-}
+$loan = loan_find($state, $loanId);
 if (!$loan || ((int)$loan['borrower_member_srl'] !== (int)$user['member_srl'] && !user_is_admin($user))) {
     flash('반납할 수 없는 대여 건입니다.');
     redirect_to('my.php');

@@ -27,6 +27,84 @@ function item_category($state, $item)
     return find_category($state, $item['category_id']);
 }
 
+// 정렬 기준은 active_items()와 같다. 다만 폐기(is_active=0) 항목까지 포함한다.
+function sort_items($state, array $items)
+{
+    usort($items, function ($a, $b) use ($state) {
+        $categoryA = item_category($state, $a);
+        $categoryB = item_category($state, $b);
+        $nameA = $categoryA ? $categoryA['name'] : $a['label'];
+        $nameB = $categoryB ? $categoryB['name'] : $b['label'];
+        $nameOrder = strnatcasecmp($nameA, $nameB);
+        if ($nameOrder !== 0) {
+            return $nameOrder;
+        }
+        $numberOrder = item_display_no($a) <=> item_display_no($b);
+        if ($numberOrder !== 0) {
+            return $numberOrder;
+        }
+        return (int)$a['item_id'] <=> (int)$b['item_id'];
+    });
+    return $items;
+}
+
+function item_filters_from_request()
+{
+    return array(
+        'q' => isset($_GET['q']) ? trim($_GET['q']) : '',
+        'status' => isset($_GET['status']) ? trim($_GET['status']) : '',
+        'category_id' => isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0,
+    );
+}
+
+function item_filters_defaults(array $filters = array())
+{
+    return $filters + array('q' => '', 'status' => '', 'category_id' => 0);
+}
+
+// 기자재 목록 필터. 상태 필터로 'retired'를 고르면 폐기 항목을 보여준다.
+//
+// 예전에는 목록을 active_items()(is_active=1)로만 만들면서 상태 드롭다운에는
+// 'retired'가 선택지로 들어 있었다. 폐기 항목은 정의상 is_active=0이라
+// 그 옵션은 항상 빈 결과만 냈다.
+function item_rows_filtered($state, array $filters, $includeBulkCategories = true)
+{
+    $filters = item_filters_defaults($filters);
+    $wantsRetired = ($filters['status'] === 'retired');
+
+    $rows = array();
+    foreach ($state['items'] as $item) {
+        $isActive = ((int)$item['is_active'] === 1);
+        if ($wantsRetired) {
+            if ($isActive) {
+                continue;
+            }
+        } elseif (!$isActive) {
+            continue;
+        }
+
+        $category = item_category($state, $item);
+        if (!$includeBulkCategories && $category && category_tracking_mode($category) === 'bulk') {
+            continue;
+        }
+        if ($filters['category_id'] > 0 && (int)$item['category_id'] !== $filters['category_id']) {
+            continue;
+        }
+        if ($filters['status'] !== '' && !$wantsRetired && $item['status'] !== $filters['status']) {
+            continue;
+        }
+        if ($filters['q'] !== '') {
+            $haystack = $item['label'] . ' ' . $item['location'] . ' ' . $item['public_code'];
+            if (stripos($haystack, $filters['q']) === false) {
+                continue;
+            }
+        }
+        $rows[] = $item;
+    }
+
+    return sort_items($state, $rows);
+}
+
 function item_display_no($item)
 {
     return (isset($item['display_no']) && (int)$item['display_no'] > 0)
@@ -114,30 +192,11 @@ function sync_category_next_serial(&$state, $categoryId)
     return $nextSerial;
 }
 
-function item_has_loan_history($state, $itemId)
-{
-    if (config('mode') !== 'local') {
-        $pdo = db_connect();
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM kitel_rental_loans WHERE item_id = ?');
-        $stmt->execute(array($itemId));
-        return (int)$stmt->fetchColumn() > 0;
-    }
-
-    foreach ($state['loans'] as $loan) {
-        if ((int)$loan['item_id'] === (int)$itemId) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function add_items_to_category(&$state, $categoryId, $quantity, $location, $note, $actor)
 {
     if (config('mode') !== 'local') {
-        $pdo = db_connect();
-        $created = array();
-        $pdo->beginTransaction();
-        try {
+        return db_transaction(function ($pdo) use (&$state, $categoryId, $quantity, $location, $note, $actor) {
+            $created = array();
             $stmt = $pdo->prepare('SELECT * FROM kitel_rental_categories WHERE category_id = ? AND is_active = 1 FOR UPDATE');
             $stmt->execute(array($categoryId));
             $category = $stmt->fetch();
@@ -191,12 +250,8 @@ function add_items_to_category(&$state, $categoryId, $quantity, $location, $note
             $next = $nextSerials[0];
             $update = $pdo->prepare('UPDATE kitel_rental_categories SET next_serial = ?, updated_at = ? WHERE category_id = ?');
             $update->execute(array($next, db_now(), $categoryId));
-            $pdo->commit();
             return $created;
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            throw $e;
-        }
+        });
     }
     $created = array();
     foreach ($state['categories'] as &$category) {
@@ -284,9 +339,7 @@ function update_item_status(&$state, $itemId, $status, $memo, $actor)
         throw new RuntimeException('변경할 수 없는 상태입니다.');
     }
     if (config('mode') !== 'local') {
-        $pdo = db_connect();
-        $pdo->beginTransaction();
-        try {
+        db_transaction(function ($pdo) use (&$state, $itemId, $status, $memo, $actor) {
             $stmt = $pdo->prepare('SELECT category_id, status FROM kitel_rental_items WHERE item_id = ? FOR UPDATE');
             $stmt->execute(array($itemId));
             $row = $stmt->fetch();
@@ -300,12 +353,8 @@ function update_item_status(&$state, $itemId, $status, $memo, $actor)
             $update = $pdo->prepare('UPDATE kitel_rental_items SET status = ?, updated_at = ? WHERE item_id = ?');
             $update->execute(array($status, db_now(), $itemId));
             add_log($state, 'item.status', $itemId, null, $before, $status, $memo, $actor);
-            $pdo->commit();
-            return;
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            throw $e;
-        }
+        });
+        return;
     }
     foreach ($state['items'] as &$item) {
         if ((int)$item['item_id'] === (int)$itemId) {
@@ -325,9 +374,7 @@ function update_item_status(&$state, $itemId, $status, $memo, $actor)
 function update_item_details(&$state, $itemId, $location, $conditionNote, $adminMemo, $actor)
 {
     if (config('mode') !== 'local') {
-        $pdo = db_connect();
-        $pdo->beginTransaction();
-        try {
+        db_transaction(function ($pdo) use (&$state, $itemId, $location, $conditionNote, $adminMemo, $actor) {
             $stmt = $pdo->prepare('SELECT location, condition_note, admin_memo FROM kitel_rental_items WHERE item_id = ? FOR UPDATE');
             $stmt->execute(array($itemId));
             $before = $stmt->fetch();
@@ -341,12 +388,8 @@ function update_item_details(&$state, $itemId, $location, $conditionNote, $admin
             ');
             $update->execute(array(trim($location), trim($conditionNote), trim($adminMemo), db_now(), $itemId));
             add_log($state, 'item.update', $itemId, null, null, null, '기자재 정보 수정', $actor);
-            $pdo->commit();
-            return;
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            throw $e;
-        }
+        });
+        return;
     }
     foreach ($state['items'] as &$item) {
         if ((int)$item['item_id'] === (int)$itemId) {
@@ -405,8 +448,21 @@ function find_available_item_in_category($state, $categoryId)
     return null;
 }
 
-function pick_available_items_in_category($state, $categoryId, $limit)
+// 상태를 바꿀 후보를 고른다. 개수 관리 카테고리에서 "N개 고장" 같은 조작을 할 때 쓴다.
+// $pdo가 넘어오면 이미 열린 트랜잭션 안에서 FOR UPDATE로 잠그고 고른다.
+function pick_available_items_in_category($state, $categoryId, $limit, $pdo = null)
 {
+    if (config('mode') !== 'local') {
+        $pdo = $pdo ?: db_connect();
+        $stmt = $pdo->prepare('
+            SELECT item_id FROM kitel_rental_items
+            WHERE category_id = ? AND status = "available" AND is_active = 1
+            ORDER BY item_id
+            LIMIT ' . max(0, (int)$limit) . ($pdo->inTransaction() ? ' FOR UPDATE' : '')
+        );
+        $stmt->execute(array((int)$categoryId));
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
     $picked = array();
     foreach ($state['items'] as $item) {
         if ((int)$item['category_id'] === (int)$categoryId && $item['status'] === 'available' && (int)$item['is_active'] === 1) {
@@ -419,64 +475,155 @@ function pick_available_items_in_category($state, $categoryId, $limit)
     return $picked;
 }
 
-// 카테고리 단위로 "N개 상태 변경" — 실제로는 available 상태인 아이템을 N개 골라
-// 기존 bulk_update_item_status()에 그대로 넘긴다.
+// 카테고리 단위 일괄 처리. 대상 선정과 처리를 같은 트랜잭션 안에서 한다
+// (예전에는 요청 시작 시점의 $state에서 골라서 동시 작업 시 경합했다).
+function bulk_apply_in_category(&$state, $categoryId, $quantity, callable $apply)
+{
+    $quantity = max(0, (int)$quantity);
+
+    $run = function ($pdo) use (&$state, $categoryId, $quantity, $apply) {
+        $ids = pick_available_items_in_category($state, $categoryId, $quantity, $pdo);
+        $done = 0;
+        $skipped = 0;
+        foreach ($ids as $itemId) {
+            try {
+                $apply($state, $itemId);
+                $done++;
+            } catch (RuntimeException $e) {
+                $skipped++;
+            }
+        }
+        return array($done, $skipped);
+    };
+
+    if (config('mode') !== 'local') {
+        return db_transaction($run);
+    }
+    return $run(null);
+}
+
+// 카테고리 단위로 "N개 상태 변경"
 function bulk_adjust_category_status(&$state, $categoryId, $quantity, $status, $memo, $actor)
 {
-    $ids = pick_available_items_in_category($state, $categoryId, (int)$quantity);
-    $result = bulk_update_item_status($state, $ids, $status, $memo, $actor);
-    $result['requested'] = (int)$quantity;
-    return $result;
+    list($updated, $skipped) = bulk_apply_in_category($state, $categoryId, $quantity, function (&$state, $itemId) use ($status, $memo, $actor) {
+        update_item_status($state, $itemId, $status, $memo, $actor);
+    });
+    return array('updated' => $updated, 'skipped' => $skipped, 'requested' => (int)$quantity);
 }
 
 // 카테고리 단위로 "N개 폐기"
 function bulk_retire_in_category(&$state, $categoryId, $quantity, $memo, $actor)
 {
-    $ids = pick_available_items_in_category($state, $categoryId, (int)$quantity);
-    $result = bulk_retire_items($state, $ids, $memo, $actor);
-    $result['requested'] = (int)$quantity;
-    return $result;
+    list($retired, $skipped) = bulk_apply_in_category($state, $categoryId, $quantity, function (&$state, $itemId) use ($memo, $actor) {
+        retire_item($state, $itemId, $memo, $actor);
+    });
+    return array('retired' => $retired, 'skipped' => $skipped, 'requested' => (int)$quantity);
 }
 
-function import_items_from_csv(&$state, $csvText, $actor)
+// CSV 텍스트를 (행번호, 카테고리명, 수량, 위치, 비고) 목록으로 해석한다.
+// 실제 생성은 하지 않으므로 미리보기에도 쓸 수 있다.
+function parse_items_csv($csvText)
 {
     $lines = preg_split('/\r\n|\r|\n/', trim($csvText));
-    $created = 0;
-    $createdIds = array();
+    $rows = array();
     $errors = array();
+    $headerSeen = false;
+
     foreach ($lines as $index => $line) {
+        $lineNo = $index + 1;
         if (trim($line) === '') {
             continue;
         }
-        $row = str_getcsv($line);
-        if ($index === 0 && isset($row[0]) && trim($row[0]) === 'category') {
-            continue;
-        }
-        $categoryName = isset($row[0]) ? trim($row[0]) : '';
+        $cols = str_getcsv($line);
+        $categoryName = isset($cols[0]) ? trim($cols[0]) : '';
         $categoryName = preg_replace('/^\xEF\xBB\xBF/', '', $categoryName);
-        $quantity = isset($row[1]) ? max(1, (int)$row[1]) : 1;
-        $location = isset($row[2]) ? $row[2] : '';
-        $note = isset($row[3]) ? $row[3] : '';
-        if ($categoryName === '') {
-            $errors[] = ($index + 1) . '행: 카테고리명이 비어 있습니다.';
+
+        // 헤더 행은 위치가 아니라 내용으로 판별한다. 앞에 빈 줄이 있어도 걸러진다.
+        if (!$headerSeen && strtolower($categoryName) === 'category') {
+            $headerSeen = true;
             continue;
         }
-        $category = find_category_by_name($state, $categoryName);
-        if (!$category) {
-            $category = create_category($state, $categoryName, 'CSV 가져오기', $actor);
-            if (config('mode') !== 'local') {
-                $state = rental_load();
+        if ($categoryName === '') {
+            $errors[] = $lineNo . '행: 카테고리명이 비어 있습니다.';
+            continue;
+        }
+        $quantity = isset($cols[1]) ? (int)$cols[1] : 1;
+        if ($quantity < 1) {
+            $errors[] = $lineNo . '행: 수량이 1 이상이어야 합니다 (' . $categoryName . ').';
+            continue;
+        }
+        $rows[] = array(
+            'line' => $lineNo,
+            'category' => $categoryName,
+            'quantity' => $quantity,
+            'location' => isset($cols[2]) ? trim($cols[2]) : '',
+            'note' => isset($cols[3]) ? trim($cols[3]) : '',
+        );
+    }
+
+    return array('rows' => $rows, 'errors' => $errors);
+}
+
+// CSV 가져오기. 전체가 하나의 트랜잭션이므로 중간에 실패하면 아무것도 반영되지 않는다.
+// 예전에는 트랜잭션도 예외 처리도 없어서, 중복 slug 같은 제약 위반이 나면
+// 일부 행만 반영된 채 치명적 오류 화면으로 끝났다.
+//
+// 루프 안에서 rental_load()로 전 테이블을 다시 읽던 것도 없앴다. 새로 만든
+// 카테고리는 $state에 직접 반영한다.
+function import_items_from_csv(&$state, $csvText, $actor)
+{
+    $parsed = parse_items_csv($csvText);
+    $errors = $parsed['errors'];
+
+    if (!$parsed['rows']) {
+        return array('created' => 0, 'created_ids' => array(), 'errors' => $errors);
+    }
+
+    $run = function () use (&$state, $parsed, $actor) {
+        $created = 0;
+        $createdIds = array();
+        foreach ($parsed['rows'] as $row) {
+            $category = find_category_by_name($state, $row['category']);
+            if (!$category) {
+                $category = create_category($state, $row['category'], 'CSV 가져오기', $actor);
+                // 운영 모드의 create_category()는 $state 배열을 갱신하지 않으므로
+                // 여기서 직접 넣어준다 (전체 재적재 대신).
+                if (config('mode') !== 'local') {
+                    $state['categories'][] = $category;
+                }
+            }
+            $items = add_items_to_category($state, $category['category_id'], $row['quantity'], $row['location'], $row['note'], $actor);
+            foreach ($items as $item) {
+                $state['items'][] = $item;
+                $createdIds[] = (int)$item['item_id'];
+                $created++;
             }
         }
-        $items = add_items_to_category($state, $category['category_id'], $quantity, $location, $note, $actor);
-        $created += count($items);
-        foreach ($items as $item) {
-            $createdIds[] = (int)$item['item_id'];
-        }
+        return array($created, $createdIds);
+    };
+
+    try {
         if (config('mode') !== 'local') {
-            $state = rental_load();
+            list($created, $createdIds) = db_transaction(function () use ($run) {
+                return $run();
+            });
+        } else {
+            list($created, $createdIds) = $run();
         }
+    } catch (Exception $e) {
+        // 트랜잭션이 통째로 되돌아갔으므로 $state도 신뢰할 수 없다. 다시 읽는다.
+        $state = rental_load();
+        $message = $e->getMessage();
+        if (stripos($message, 'uniq_category_slug') !== false || stripos($message, '1062') !== false) {
+            $message = '이미 있는 카테고리와 이름이 겹칩니다. 카테고리명을 확인해 주세요. (' . $message . ')';
+        }
+        return array(
+            'created' => 0,
+            'created_ids' => array(),
+            'errors' => array_merge($errors, array('가져오기를 취소했습니다 — ' . $message)),
+        );
     }
+
     return array('created' => $created, 'created_ids' => $createdIds, 'errors' => $errors);
 }
 
@@ -486,10 +633,12 @@ function retire_item(&$state, $itemId, $memo, $actor)
     if ($memo === '') {
         throw new RuntimeException('폐기 처리 사유를 입력해 주세요.');
     }
+    // 폐기는 항상 소프트 삭제(status=retired, is_active=0)로 처리한다.
+    // 예전에는 대여 이력이 없으면 행을 통째로 DELETE 했는데, kitel_rental_logs에는
+    // 그 기자재의 item.create / item.retire 로그가 FK 없이 그대로 남아서
+    // 로그 화면의 "item 47"을 아무 데서도 조회할 수 없게 됐다.
     if (config('mode') !== 'local') {
-        $pdo = db_connect();
-        $pdo->beginTransaction();
-        try {
+        db_transaction(function ($pdo) use (&$state, $itemId, $memo, $actor) {
             $stmt = $pdo->prepare('SELECT category_id, status FROM kitel_rental_items WHERE item_id = ? FOR UPDATE');
             $stmt->execute(array($itemId));
             $row = $stmt->fetch();
@@ -500,37 +649,23 @@ function retire_item(&$state, $itemId, $memo, $actor)
             if ($before === 'borrowed') {
                 throw new RuntimeException('대여 중인 기자재는 폐기 처리할 수 없습니다.');
             }
-            if (item_has_loan_history($state, $itemId)) {
-                $update = $pdo->prepare('UPDATE kitel_rental_items SET status = "retired", is_active = 0, updated_at = ? WHERE item_id = ?');
-                $update->execute(array(db_now(), $itemId));
-            } else {
-                $delete = $pdo->prepare('DELETE FROM kitel_rental_items WHERE item_id = ?');
-                $delete->execute(array($itemId));
-            }
+            $update = $pdo->prepare('UPDATE kitel_rental_items SET status = "retired", is_active = 0, updated_at = ? WHERE item_id = ?');
+            $update->execute(array(db_now(), $itemId));
             add_log($state, 'item.retire', $itemId, null, $before, 'retired', $memo, $actor);
             sync_category_next_serial($state, (int)$row['category_id']);
-            $pdo->commit();
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            throw $e;
-        }
+        });
         return;
     }
-    foreach ($state['items'] as $index => &$item) {
+    foreach ($state['items'] as &$item) {
         if ((int)$item['item_id'] === (int)$itemId) {
             if ($item['status'] === 'borrowed') {
                 throw new RuntimeException('대여 중인 기자재는 폐기 처리할 수 없습니다.');
             }
             $before = $item['status'];
             $categoryId = (int)$item['category_id'];
-            if (item_has_loan_history($state, $itemId)) {
-                $item['status'] = 'retired';
-                $item['is_active'] = 0;
-                $item['updated_at'] = now_text();
-            } else {
-                unset($state['items'][$index]);
-                $state['items'] = array_values($state['items']);
-            }
+            $item['status'] = 'retired';
+            $item['is_active'] = 0;
+            $item['updated_at'] = now_text();
             add_log($state, 'item.retire', $itemId, null, $before, 'retired', $memo, $actor);
             sync_category_next_serial($state, $categoryId);
             break;
@@ -539,37 +674,52 @@ function retire_item(&$state, $itemId, $memo, $actor)
     unset($item);
 }
 
-// 체크박스로 선택한 여러 기자재의 상태를 한 번에 바꾼다.
-// 대여 중인 기자재는 개별 화면과 동일하게 건너뛰고 skipped 카운트로 알려준다.
+// 체크박스로 선택한 여러 기자재를 한 번에 처리하는 공통 루틴.
+//
+// 운영 모드에서는 전체가 하나의 트랜잭션이다. 예전에는 건별로 트랜잭션이 따로
+// 열려서 중간에 실패하면 절반만 반영된 상태로 남았다. 또 "대여 중이면 건너뛴다"를
+// 요청 시작 시점의 $state로 판단했는데, 이제는 각 단일 작업 함수가 DB를 FOR UPDATE로
+// 다시 읽고 던지는 예외를 받아서 센다.
+function bulk_apply_to_items(&$state, array $itemIds, callable $apply)
+{
+    $itemIds = array_values(array_unique(array_map('intval', $itemIds)));
+
+    $run = function () use (&$state, $itemIds, $apply) {
+        $done = 0;
+        $skipped = 0;
+        foreach ($itemIds as $itemId) {
+            try {
+                $apply($state, $itemId);
+                $done++;
+            } catch (RuntimeException $e) {
+                // 대여 중이거나 이미 없는 항목은 건너뛴다 (전체를 되돌리지는 않는다).
+                $skipped++;
+            }
+        }
+        return array($done, $skipped);
+    };
+
+    if (config('mode') !== 'local') {
+        return db_transaction(function () use ($run) {
+            return $run();
+        });
+    }
+    return $run();
+}
+
 function bulk_update_item_status(&$state, array $itemIds, $status, $memo, $actor)
 {
-    $updated = 0;
-    $skipped = 0;
-    foreach (array_unique(array_map('intval', $itemIds)) as $itemId) {
-        $item = find_item($state, $itemId);
-        if (!$item || $item['status'] === 'borrowed') {
-            $skipped++;
-            continue;
-        }
+    list($updated, $skipped) = bulk_apply_to_items($state, $itemIds, function (&$state, $itemId) use ($status, $memo, $actor) {
         update_item_status($state, $itemId, $status, $memo, $actor);
-        $updated++;
-    }
+    });
     return array('updated' => $updated, 'skipped' => $skipped);
 }
 
 // 체크박스로 선택한 여러 기자재를 한 번에 폐기 처리한다. 대여 중인 항목은 건너뛴다.
 function bulk_retire_items(&$state, array $itemIds, $memo, $actor)
 {
-    $retired = 0;
-    $skipped = 0;
-    foreach (array_unique(array_map('intval', $itemIds)) as $itemId) {
-        $item = find_item($state, $itemId);
-        if (!$item || $item['status'] === 'borrowed') {
-            $skipped++;
-            continue;
-        }
+    list($retired, $skipped) = bulk_apply_to_items($state, $itemIds, function (&$state, $itemId) use ($memo, $actor) {
         retire_item($state, $itemId, $memo, $actor);
-        $retired++;
-    }
+    });
     return array('retired' => $retired, 'skipped' => $skipped);
 }

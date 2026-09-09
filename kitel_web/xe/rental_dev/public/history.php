@@ -2,7 +2,8 @@
 require_once __DIR__ . '/_bootstrap.php';
 $user = require_borrow_permission();
 $state = rental_load();
-$loans = group_loans_for_display($state, array_reverse(user_all_loans($state, $user['member_srl'])));
+$loanPage = user_all_loans($state, $user['member_srl'], rental_page_param(), 50);
+$loans = group_loans_for_display($state, $loanPage['rows']);
 render_header('내 대여 기록');
 ?>
 <h1>내 대여 기록</h1>
@@ -24,4 +25,5 @@ render_header('내 대여 기록');
     </tbody>
   </table>
 </section>
+<?php render_pagination($loanPage, 'history.php'); ?>
 <?php render_footer(); ?>

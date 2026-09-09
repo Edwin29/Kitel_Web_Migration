@@ -2,7 +2,8 @@
 require_once __DIR__ . '/_bootstrap.php';
 $user = require_borrow_permission();
 $state = rental_load();
-$loans = group_loans_for_display($state, user_active_loans($state, $user['member_srl']));
+$loanPage = user_active_loans($state, $user['member_srl'], 1, 200);
+$loans = group_loans_for_display($state, $loanPage['rows']);
 render_header('내 대여 목록');
 ?>
 <h1>내 대여 목록</h1>

@@ -50,8 +50,8 @@ try {
     echo "rental_load ok\n";
     echo "categories=" . count($state['categories']) . "\n";
     echo "items=" . count($state['items']) . "\n";
-    echo "loans=" . count($state['loans']) . "\n";
-    echo "logs=" . count($state['logs']) . "\n";
+    echo "loans=" . loan_query($state, array(), 1, 1)['total'] . "\n";
+    echo "logs=" . log_query($state, array(), 1, 1)['total'] . "\n";
 
     mark('6 active_categories');
     $categories = active_categories($state);

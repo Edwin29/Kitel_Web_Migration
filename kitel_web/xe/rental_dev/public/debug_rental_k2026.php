@@ -82,7 +82,7 @@ try {
     echo "RENTAL_LOAD=ok\n";
     echo "categories=" . count($state['categories']) . "\n";
     echo "items=" . count($state['items']) . "\n";
-    echo "loans=" . count($state['loans']) . "\n";
+    echo "loans=" . loan_query($state, array(), 1, 1)['total'] . "\n";
 
 } catch (Throwable $e) {
     echo "\nERROR_CLASS=" . get_class($e) . "\n";

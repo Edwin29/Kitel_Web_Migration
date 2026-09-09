@@ -61,10 +61,14 @@ if (is_post()) {
     }
     redirect_to('admin/items.php');
 }
-$query = isset($_GET['q']) ? trim($_GET['q']) : '';
-$status = isset($_GET['status']) ? $_GET['status'] : '';
-$categoryFilter = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
-$items = active_items($state);
+$filters = item_filters_from_request();
+$query = $filters['q'];
+$status = $filters['status'];
+$categoryFilter = $filters['category_id'];
+// 개수 관리 카테고리는 아래 별도 표에서 보여주므로 낱개 목록에서는 제외한다.
+// '폐기'를 고르면 is_active=0 항목을 보여준다 (예전에는 목록 자체를 active_items()로
+// 만들면서 드롭다운에만 '폐기'가 있어, 그 옵션은 항상 빈 결과였다).
+$items = item_rows_filtered($state, $filters, false);
 $bulkCategoryRows = array_values(array_filter(active_categories($state), function ($category) use ($categoryFilter, $query) {
     if (category_tracking_mode($category) !== 'bulk') {
         return false;
@@ -84,7 +88,7 @@ admin_nav();
   <h1>기자재 관리</h1>
   <div class="page-head-actions">
     <a class="button primary" href="<?php echo e(app_url('admin/item_new.php')); ?>">+ 물품 추가</a>
-    <a class="button no-print" href="<?php echo e(app_url('admin/export.php?type=items')); ?>">CSV 내보내기</a>
+    <a class="button no-print" href="<?php echo e(rental_query_url('admin/export.php', array('type' => 'items'))); ?>">CSV 내보내기</a>
   </div>
 </div>
 <section class="card bulk-bar no-print">
@@ -175,11 +179,6 @@ admin_nav();
   <table><thead><tr><th class="checkbox-col"><input type="checkbox" id="select-all-items" title="전체 선택"></th><th>라벨</th><th>카테고리</th><th class="status-col">상태</th><th>위치</th><th>관리</th></tr></thead><tbody>
   <?php foreach ($items as $item):
     $category = item_category($state, $item);
-    $haystack = $item['label'] . ' ' . $item['location'] . ' ' . $item['public_code'];
-    if ($category && category_tracking_mode($category) === 'bulk') continue;
-    if ($query !== '' && stripos($haystack, $query) === false) continue;
-    if ($status !== '' && $item['status'] !== $status) continue;
-    if ($categoryFilter > 0 && (int)$item['category_id'] !== $categoryFilter) continue;
   ?>
     <tr>
       <td class="checkbox-col"><input type="checkbox" class="item-select" value="<?php echo e($item['item_id']); ?>"></td>
@@ -192,7 +191,7 @@ admin_nav();
         <a class="button" href="<?php echo e(app_url('admin/item_history.php?item_id=' . $item['item_id'])); ?>">이력</a>
         <a class="button" href="<?php echo e(app_url('admin/item_edit.php?item_id=' . $item['item_id'])); ?>">수정</a>
         <a class="button" href="<?php echo e(app_url('admin/qr.php?item_id=' . $item['item_id'])); ?>">QR</a>
-        <?php if ($item['status'] !== 'borrowed'): ?>
+        <?php if ($item['status'] !== 'borrowed' && (int)$item['is_active'] === 1): ?>
           <form method="post">
             <?php echo csrf_input(); ?>
             <input type="hidden" name="action" value="status">
@@ -257,9 +256,16 @@ admin_nav();
     if (!form) { return; }
     form.addEventListener('submit', function (e) {
       var selected = checkedBoxes();
-      if (selected.length === 0 && form.id !== 'qr-bulk-form') {
+      if (selected.length === 0) {
         e.preventDefault();
         alert('먼저 표에서 기자재를 선택해 주세요.');
+        return;
+      }
+      // QR 인쇄는 라벨 한 장마다 서버에서 qrencode 프로세스를 하나씩 띄운다.
+      // 한 번에 너무 많이 보내면 서버가 버티지 못하고, GET URL 길이 제한에도 걸린다.
+      if (form.id === 'qr-bulk-form' && selected.length > 200) {
+        e.preventDefault();
+        alert('QR은 한 번에 200장까지 인쇄할 수 있습니다. 현재 ' + selected.length + '장 선택했습니다.');
         return;
       }
       form.querySelectorAll('input[name="item_ids[]"]').forEach(function (el) { el.remove(); });

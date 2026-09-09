@@ -1,5 +1,7 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
+// CLI 도구(tools/check.php 등)는 세션이 필요 없고, 이미 출력을 시작한 뒤에
+// session_start()를 부르면 "headers already sent" 경고가 난다.
+if (PHP_SAPI !== 'cli' && session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 

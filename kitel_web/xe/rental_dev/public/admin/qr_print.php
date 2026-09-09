@@ -15,15 +15,33 @@ $recentOnly = isset($_GET['recent']) && $_GET['recent'] === '1';
 if ($recentOnly) {
     $selectedIds = isset($_SESSION['last_added_item_ids']) ? array_map('intval', $_SESSION['last_added_item_ids']) : array();
 }
-$items = array_values(array_filter(active_items($state), function ($item) use ($categoryFilter, $selectedIds) {
-    if ($categoryFilter > 0 && (int)$item['category_id'] !== $categoryFilter) {
-        return false;
+// 라벨 한 장마다 서버에서 qrencode 프로세스를 하나씩 띄우므로 매수에 상한을 둔다.
+// 예전에는 아무것도 선택하지 않고 들어오면 전체 활성 기자재를 인쇄했다. 기자재가
+// 수백 개면 프로세스도 수백 개라 저사양 NAS에서는 그 자체가 자해성 부하였다.
+define('QR_PRINT_MAX', 200);
+
+$overLimit = false;
+$noSelection = false;
+
+if (!$selectedIds && $categoryFilter <= 0) {
+    // 선택도 없고 카테고리 필터도 없으면 전체 인쇄가 아니라 안내를 보여준다.
+    $items = array();
+    $noSelection = true;
+} else {
+    $items = array_values(array_filter(active_items($state), function ($item) use ($categoryFilter, $selectedIds) {
+        if ($categoryFilter > 0 && (int)$item['category_id'] !== $categoryFilter) {
+            return false;
+        }
+        if ($selectedIds && !in_array((int)$item['item_id'], $selectedIds, true)) {
+            return false;
+        }
+        return true;
+    }));
+    if (count($items) > QR_PRINT_MAX) {
+        $overLimit = count($items);
+        $items = array_slice($items, 0, QR_PRINT_MAX);
     }
-    if ($selectedIds && !in_array((int)$item['item_id'], $selectedIds, true)) {
-        return false;
-    }
-    return true;
-}));
+}
 $printCount = max(1, count($items));
 $printColumns = 1;
 $printRows = $printCount;
@@ -57,6 +75,9 @@ admin_nav();
   <button type="submit">필터</button>
   <button type="button" onclick="window.print()">인쇄</button>
 </form>
+<?php if ($overLimit): ?>
+  <p class="card no-print">조건에 맞는 기자재가 <?php echo (int)$overLimit; ?>개라 앞의 <?php echo QR_PRINT_MAX; ?>장만 출력합니다. 나머지는 카테고리나 item_id로 나눠서 인쇄해 주세요.</p>
+<?php endif; ?>
 <section class="qr-grid" style="--qr-columns: <?php echo (int)$printColumns; ?>; --qr-rows: <?php echo (int)$printRows; ?>; --qr-size: <?php echo e(number_format($printQrSize, 2, '.', '')); ?>mm;">
   <?php foreach ($items as $item): ?>
     <article class="qr-label">
@@ -65,7 +86,11 @@ admin_nav();
       <span class="muted"><?php echo e($item['public_code']); ?></span>
     </article>
   <?php endforeach; ?>
-  <?php if (!$items): ?><p class="card">출력할 QR이 없습니다.</p><?php endif; ?>
+  <?php if ($noSelection): ?>
+    <p class="card no-print">인쇄할 기자재를 먼저 고르세요 — 기자재 관리 화면에서 체크박스로 선택하거나, 위에서 카테고리를 고르거나, item_id를 직접 입력하면 됩니다. (한 번에 최대 <?php echo QR_PRINT_MAX; ?>장)</p>
+  <?php elseif (!$items): ?>
+    <p class="card">출력할 QR이 없습니다.</p>
+  <?php endif; ?>
 </section>
 </div>
 <?php render_footer(); ?>

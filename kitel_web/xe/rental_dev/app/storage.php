@@ -103,6 +103,12 @@ function rental_save($state)
     file_put_contents($file, json_encode($state, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
 }
 
+// 운영 모드에서는 "개수가 제한적인" 테이블만 미리 읽어둔다.
+// kitel_rental_loans / kitel_rental_logs 는 사용할수록 무한히 커지는 테이블이라
+// 여기서 통째로 읽지 않는다. 두 테이블은 loans.php / logger.php 의 조회 함수를 통해
+// 필요한 만큼만(WHERE + LIMIT) 가져온다. 이 두 키에 배열 대신 rental_unloaded()가
+// 들어 있는 이유는, 예전처럼 $state['loans'] 를 직접 훑는 코드가 남아 있으면
+// 조용히 빈 배열로 동작하는 대신 명확한 예외로 알려주기 위해서다.
 function rental_load_db()
 {
     $pdo = db_connect();
@@ -122,9 +128,86 @@ function rental_load_db()
         'bundle_categories' => $bundleCategories,
         'items' => $pdo->query('SELECT * FROM kitel_rental_items ORDER BY label, item_id')->fetchAll(),
         'allowed_groups' => $pdo->query('SELECT * FROM kitel_rental_allowed_groups ORDER BY permission_type, group_srl')->fetchAll(),
-        'loans' => $pdo->query('SELECT * FROM kitel_rental_loans ORDER BY borrowed_at DESC, loan_id DESC')->fetchAll(),
-        'logs' => $pdo->query('SELECT * FROM kitel_rental_logs ORDER BY created_at DESC, log_id DESC')->fetchAll(),
+        'loans' => rental_unloaded('loans'),
+        'logs' => rental_unloaded('logs'),
     );
+}
+
+// $state['loans'] / $state['logs'] 를 직접 훑으려는 코드를 잡아내기 위한 표식.
+// 배열처럼 순회하려고 하면 그 자리에서 터진다.
+function rental_unloaded($name)
+{
+    return new RentalUnloadedTable($name);
+}
+
+class RentalUnloadedTable implements IteratorAggregate, Countable
+{
+    private $name;
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    private function fail()
+    {
+        throw new RuntimeException(
+            'kitel_rental_' . $this->name . ' 는 운영 모드에서 통째로 읽지 않습니다. '
+            . ($this->name === 'logs' ? 'log_query()/logs_for_item()' : 'loan_query()/loans_for_item()')
+            . ' 등 조회 함수를 사용하세요.'
+        );
+    }
+
+    #[\ReturnTypeWillChange]
+    public function getIterator()
+    {
+        $this->fail();
+    }
+
+    #[\ReturnTypeWillChange]
+    public function count()
+    {
+        $this->fail();
+    }
+}
+
+// 목록 조회 결과의 공통 형태. 화면은 rows 를 그대로 순회하면 되고,
+// 정렬은 항상 이 계층에서 "최신 우선"으로 확정된다 (화면에서 뒤집지 않는다).
+function rental_page($rows, $total, $page, $perPage)
+{
+    $perPage = max(1, (int)$perPage);
+    $total = (int)$total;
+    $pages = max(1, (int)ceil($total / $perPage));
+    return array(
+        'rows' => $rows,
+        'total' => $total,
+        'page' => min(max(1, (int)$page), $pages),
+        'per_page' => $perPage,
+        'pages' => $pages,
+    );
+}
+
+// $_GET['page'] 처럼 신뢰할 수 없는 값에서 페이지 번호를 뽑는다.
+function rental_page_param($key = 'page')
+{
+    $value = isset($_GET[$key]) ? (int)$_GET[$key] : 1;
+    return max(1, $value);
+}
+
+// 현재 쿼리스트링에서 몇 개 키만 갈아끼운 URL을 만든다.
+// 페이지 이동 링크와 "지금 화면 그대로 CSV 내보내기" 링크가 같이 쓴다.
+function rental_query_url($path, array $overrides = array())
+{
+    $params = $_GET;
+    foreach ($overrides as $key => $value) {
+        if ($value === null || $value === '') {
+            unset($params[$key]);
+        } else {
+            $params[$key] = $value;
+        }
+    }
+    $query = http_build_query($params);
+    return app_url($path . ($query !== '' ? '?' . $query : ''));
 }
 
 function db_now()

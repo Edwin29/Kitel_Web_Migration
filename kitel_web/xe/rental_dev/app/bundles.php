@@ -204,7 +204,7 @@ function delete_bundle(&$state, $bundleId, $actor)
 {
     if (config('mode') !== 'local') {
         $pdo = db_connect();
-        $pdo->beginTransaction();
+        $txOwned = db_begin();
         try {
             $stmt = $pdo->prepare('SELECT name FROM kitel_rental_bundles WHERE bundle_id = ? AND is_active = 1 FOR UPDATE');
             $stmt->execute(array($bundleId));
@@ -217,10 +217,10 @@ function delete_bundle(&$state, $bundleId, $actor)
             $deleteBundle = $pdo->prepare('DELETE FROM kitel_rental_bundles WHERE bundle_id = ?');
             $deleteBundle->execute(array($bundleId));
             add_log($state, 'bundle.delete', null, null, null, null, $name, $actor);
-            $pdo->commit();
+            db_commit($txOwned);
             return;
         } catch (Exception $e) {
-            $pdo->rollBack();
+            db_rollback($txOwned);
             throw $e;
         }
     }
@@ -255,7 +255,7 @@ function move_category_to_bundle(&$state, $categoryId, $bundleId, $actor)
 
     if (config('mode') !== 'local') {
         $pdo = db_connect();
-        $pdo->beginTransaction();
+        $txOwned = db_begin();
         try {
             $delete = $pdo->prepare('DELETE FROM kitel_rental_bundle_categories WHERE category_id = ?');
             $delete->execute(array($categoryId));
@@ -271,10 +271,10 @@ function move_category_to_bundle(&$state, $categoryId, $bundleId, $actor)
                 $insert->execute(array($bundleId, $categoryId, $sortOrder, db_now(), db_now()));
             }
             add_log($state, 'bundle.category.move', null, null, null, null, $category['name'], $actor);
-            $pdo->commit();
+            db_commit($txOwned);
             return;
         } catch (Exception $e) {
-            $pdo->rollBack();
+            db_rollback($txOwned);
             throw $e;
         }
     }
@@ -295,14 +295,18 @@ function move_category_to_bundle(&$state, $categoryId, $bundleId, $actor)
     add_log($state, 'bundle.category.move', null, null, null, null, $category['name'], $actor);
 }
 
+// 아래 세 일괄 함수는 전체를 하나의 트랜잭션으로 감싼다. 예전에는 건별 함수가
+// 각자 트랜잭션을 열어서, 중간에 실패하면 절반만 반영된 채 남았다.
 function move_categories_to_bundle(&$state, array $categoryIds, $bundleId, $actor)
 {
-    $moved = 0;
-    foreach (array_unique(array_map('intval', $categoryIds)) as $categoryId) {
-        move_category_to_bundle($state, $categoryId, (int)$bundleId, $actor);
-        $moved++;
-    }
-    return $moved;
+    return db_run_atomically(function () use (&$state, $categoryIds, $bundleId, $actor) {
+        $moved = 0;
+        foreach (array_unique(array_map('intval', $categoryIds)) as $categoryId) {
+            move_category_to_bundle($state, $categoryId, (int)$bundleId, $actor);
+            $moved++;
+        }
+        return $moved;
+    });
 }
 
 function detach_category_bundle_links(&$state, $categoryId)
@@ -320,17 +324,18 @@ function detach_category_bundle_links(&$state, $categoryId)
 
 function bulk_update_category_tracking(&$state, array $categoryIds, $trackingMode, $maxPerUser, $actor)
 {
-    $updated = 0;
-    foreach (array_unique(array_map('intval', $categoryIds)) as $categoryId) {
-        update_category_tracking($state, $categoryId, $trackingMode, $maxPerUser, $actor);
-        $updated++;
-    }
-    return $updated;
+    return db_run_atomically(function () use (&$state, $categoryIds, $trackingMode, $maxPerUser, $actor) {
+        $updated = 0;
+        foreach (array_unique(array_map('intval', $categoryIds)) as $categoryId) {
+            update_category_tracking($state, $categoryId, $trackingMode, $maxPerUser, $actor);
+            $updated++;
+        }
+        return $updated;
+    });
 }
 
 function bulk_delete_categories(&$state, array $categoryIds, $actor)
 {
-    $deleted = 0;
     $ids = array_unique(array_map('intval', $categoryIds));
     foreach ($ids as $categoryId) {
         if (category_has_borrowed_items($state, $categoryId)) {
@@ -339,11 +344,14 @@ function bulk_delete_categories(&$state, array $categoryIds, $actor)
             throw new RuntimeException($name . ': 대여 중인 기자재가 있어 삭제할 수 없습니다.');
         }
     }
-    foreach ($ids as $categoryId) {
-        delete_category($state, $categoryId, $actor);
-        $deleted++;
-    }
-    return $deleted;
+    return db_run_atomically(function () use (&$state, $ids, $actor) {
+        $deleted = 0;
+        foreach ($ids as $categoryId) {
+            delete_category($state, $categoryId, $actor);
+            $deleted++;
+        }
+        return $deleted;
+    });
 }
 
 function category_has_borrowed_items($state, $categoryId)

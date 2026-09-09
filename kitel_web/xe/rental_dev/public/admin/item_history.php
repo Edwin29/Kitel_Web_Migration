@@ -9,10 +9,9 @@ if (!$item) {
     exit('기자재를 찾을 수 없습니다.');
 }
 $category = item_category($state, $item);
-$loans = item_all_loans($state, $itemId);
-$logs = array_values(array_filter($state['logs'], function ($log) use ($itemId) {
-    return (int)$log['item_id'] === (int)$itemId;
-}));
+// 둘 다 조회 계층에서 최신순 + 페이지 단위로 가져온다.
+$loans = item_all_loans($state, $itemId, rental_page_param('lpage'), 50);
+$logs = logs_for_item($state, $itemId, rental_page_param('gpage'), 100);
 render_header('기자재 이력', true);
 admin_nav();
 ?>
@@ -33,7 +32,7 @@ admin_nav();
   <table>
     <thead><tr><th>대여 번호</th><th>대여자</th><th>실사용자</th><th>대여일</th><th>반납 예정일</th><th>반납일</th><th>상태</th></tr></thead>
     <tbody>
-    <?php foreach (array_reverse($loans) as $loan): ?>
+    <?php foreach ($loans['rows'] as $loan): ?>
       <tr>
         <td><?php echo e($loan['loan_id']); ?></td>
         <td><?php echo e($loan['borrower_name_snapshot']); ?><br><span class="muted"><?php echo e($loan['borrower_user_id_snapshot']); ?></span></td>
@@ -44,9 +43,10 @@ admin_nav();
         <td><span class="badge <?php echo e($loan['status']); ?>"><?php echo e(loan_is_overdue($loan) ? '연체' : status_label($loan['status'])); ?></span></td>
       </tr>
     <?php endforeach; ?>
-    <?php if (!$loans): ?><tr><td colspan="7">대여 기록이 없습니다.</td></tr><?php endif; ?>
+    <?php if (!$loans['rows']): ?><tr><td colspan="7">대여 기록이 없습니다.</td></tr><?php endif; ?>
     </tbody>
   </table>
+  <?php render_pagination($loans, 'admin/item_history.php', 'lpage'); ?>
 </section>
 
 <section class="card table-wrap">
@@ -54,7 +54,7 @@ admin_nav();
   <table>
     <thead><tr><th>시간</th><th>처리자</th><th>액션</th><th>상태</th><th>메모</th></tr></thead>
     <tbody>
-    <?php foreach (array_reverse($logs) as $log): ?>
+    <?php foreach ($logs['rows'] as $log): ?>
       <tr>
         <td><?php echo e($log['created_at']); ?></td>
         <td><?php echo e($log['actor_member_srl']); ?></td>
@@ -63,8 +63,9 @@ admin_nav();
         <td><?php echo e($log['memo']); ?></td>
       </tr>
     <?php endforeach; ?>
-    <?php if (!$logs): ?><tr><td colspan="5">처리 로그가 없습니다.</td></tr><?php endif; ?>
+    <?php if (!$logs['rows']): ?><tr><td colspan="5">처리 로그가 없습니다.</td></tr><?php endif; ?>
     </tbody>
   </table>
+  <?php render_pagination($logs, 'admin/item_history.php', 'gpage'); ?>
 </section>
 <?php render_footer(); ?>

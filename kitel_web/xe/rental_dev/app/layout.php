@@ -46,6 +46,43 @@ function render_footer()
 </html><?php
 }
 
+// 목록 화면 하단의 페이지 이동. $result는 loan_query()/log_query()가 돌려주는 형태.
+// 현재 쿼리스트링(필터)을 유지한 채 page만 갈아끼운다.
+function render_pagination($result, $path, $param = 'page')
+{
+    if ($result['pages'] <= 1) {
+        echo '<p class="muted pager-summary">전체 ' . (int)$result['total'] . '건</p>';
+        return;
+    }
+    $page = (int)$result['page'];
+    $pages = (int)$result['pages'];
+    $window = 2;
+    $start = max(1, $page - $window);
+    $end = min($pages, $page + $window);
+    ?>
+    <nav class="pager no-print" aria-label="페이지 이동">
+      <span class="muted pager-summary">전체 <?php echo (int)$result['total']; ?>건 · <?php echo $page; ?>/<?php echo $pages; ?> 페이지</span>
+      <span class="pager-links">
+        <?php if ($page > 1): ?>
+          <a class="button" href="<?php echo e(rental_query_url($path, array($param => 1))); ?>">« 처음</a>
+          <a class="button" href="<?php echo e(rental_query_url($path, array($param => $page - 1))); ?>">‹ 이전</a>
+        <?php endif; ?>
+        <?php for ($i = $start; $i <= $end; $i++): ?>
+          <?php if ($i === $page): ?>
+            <strong class="pager-current" aria-current="page"><?php echo $i; ?></strong>
+          <?php else: ?>
+            <a class="button" href="<?php echo e(rental_query_url($path, array($param => $i))); ?>"><?php echo $i; ?></a>
+          <?php endif; ?>
+        <?php endfor; ?>
+        <?php if ($page < $pages): ?>
+          <a class="button" href="<?php echo e(rental_query_url($path, array($param => $page + 1))); ?>">다음 ›</a>
+          <a class="button" href="<?php echo e(rental_query_url($path, array($param => $pages))); ?>">마지막 »</a>
+        <?php endif; ?>
+      </span>
+    </nav>
+    <?php
+}
+
 // admin_nav()가 사이드바 래퍼를 열었는지 기억해서 render_footer()에서 자동으로 닫아주기 위한 내부 상태.
 // 이렇게 하면 admin 하위 화면 파일들을 개별 수정하지 않아도 된다.
 function _admin_layout_is_open($set = null)

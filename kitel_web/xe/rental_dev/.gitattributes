@@ -1,0 +1,6 @@
+# 이 트리는 Linux(Synology NAS)에 그대로 배포된다. 윈도우에서 편집하더라도
+# 작업 트리와 저장소 양쪽 모두 LF로 유지해서, 배포본에 CRLF가 섞이지 않게 한다.
+* text eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

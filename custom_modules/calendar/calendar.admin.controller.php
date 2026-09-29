@@ -36,6 +36,7 @@ class CalendarAdminController extends Calendar
 		$args->location = Context::get('location');
 		$args->category = Context::get('category');
 		$args->description = Context::get('description');
+		$args->module_srl = $this->module_info->module_srl;
 
 		if ($event_srl)
 		{
@@ -66,6 +67,7 @@ class CalendarAdminController extends Calendar
 	{
 		$args = new stdClass;
 		$args->event_srl = (int) Context::get('event_srl');
+		$args->module_srl = $this->module_info->module_srl;
 
 		$output = executeQuery('calendar.deleteEvent', $args);
 		if (!$output->toBool())

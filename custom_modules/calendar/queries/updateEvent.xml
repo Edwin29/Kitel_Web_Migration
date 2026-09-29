@@ -12,5 +12,6 @@
     </columns>
     <conditions>
         <condition operation="equal" column="event_srl" var="event_srl" notnull="notnull" />
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
     </conditions>
 </query>

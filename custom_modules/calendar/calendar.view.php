@@ -14,8 +14,8 @@ class CalendarView extends Calendar
 	 */
 	function dispCalendarIndex()
 	{
-		$year = (int) Context::get('y');
-		$month = (int) Context::get('m');
+		$year = (int) Context::get('cal_year');
+		$month = (int) Context::get('cal_month');
 		if ($year < 1970 || $month < 1 || $month > 12)
 		{
 			$year = (int) date('Y');
@@ -82,12 +82,15 @@ class CalendarView extends Calendar
 
 		Context::set('cur_year', $year);
 		Context::set('cur_month', $month);
+		Context::set('year_options', range($year - 2, $year + 2));
+		Context::set('month_options', range(1, 12));
 		Context::set('month_title', sprintf('%04d년 %02d월', $year, $month));
 		Context::set('prev_year', (int) date('Y', $prevTs));
 		Context::set('prev_month', (int) date('n', $prevTs));
 		Context::set('next_year', (int) date('Y', $nextTs));
 		Context::set('next_month', (int) date('n', $nextTs));
 		Context::set('weeks', $weeks);
+		Context::set('event_list', $events);
 		Context::set('weekday_names', array('일', '월', '화', '수', '목', '금', '토'));
 		Context::set('is_manager', $this->grant->manage ?? false);
 

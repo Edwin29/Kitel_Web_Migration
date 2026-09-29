@@ -34,6 +34,10 @@ class CalendarAdminView extends Calendar
 		{
 			$oCalendarModel = getModel('calendar');
 			$event = $oCalendarModel->getEvent($event_srl);
+			if (!$event || (int)$event->module_srl !== (int)$this->module_info->module_srl)
+			{
+				throw new Rhymix\Framework\Exceptions\TargetNotFound;
+			}
 		}
 		Context::set('event', $event);
 		$this->setTemplateFile('event_form');

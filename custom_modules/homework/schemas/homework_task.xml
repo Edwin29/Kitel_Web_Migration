@@ -3,6 +3,9 @@
 	<column name="module_srl" type="number" notnull="notnull" index="idx_module_srl" />
 	<column name="title" type="varchar" size="250" notnull="notnull" />
 	<column name="description" type="text" />
+	<column name="answer_fields" type="text" />
+	<column name="allowed_extensions" type="varchar" size="250" />
+	<column name="description_image" type="varchar" size="250" />
 	<column name="deadline" type="varchar" size="14" />
 	<column name="member_srl" type="number" notnull="notnull" />
 	<column name="regdate" type="varchar" size="14" notnull="notnull" />

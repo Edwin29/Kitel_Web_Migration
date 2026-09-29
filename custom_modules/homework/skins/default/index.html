@@ -1,24 +1,9 @@
 <load target="./homework.css" />
-
 <section class="kitel-homework" aria-labelledby="homework-title">
-    <header class="kitel-homework__heading">
-        <div>
-            <h1 id="homework-title">과제 게시판</h1>
-            <p>진행 중인 과제와 제출 상태를 확인하세요.</p>
-        </div>
-        <a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl','')}">제출현황 대시보드</a>
-    </header>
-    <div class="kitel-homework__table-wrap">
-        <table class="kitel-homework__table">
-            <thead><tr><th scope="col">과제</th><th scope="col">마감일</th><th scope="col" cond="$is_submitter">내 제출 상태</th></tr></thead>
-            <tbody cond="!$tasks"><tr><td colspan="{$is_submitter ? 3 : 2}" class="kitel-homework__empty">출제된 과제가 없습니다.</td></tr></tbody>
-            <tbody cond="$tasks">
-                <tr loop="$tasks=>$idx,$task">
-                    <td class="kitel-homework__task-name"><a href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}">{$task->title}</a><small cond="$is_submitter && $task->is_past_deadline">마감됨</small></td>
-                    <td class="kitel-homework__date"><span cond="$task->deadline">{substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)}</span><span cond="!$task->deadline">기한 없음</span></td>
-                    <td cond="$is_submitter"><span class="kitel-homework__status {$task->my_status === '미제출' ? 'is-missing' : ($task->my_status === '제출완료(지각)' ? 'is-late' : 'is-done')}">{$task->my_status}</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <header class="kitel-homework__heading"><div><h1 id="homework-title">과제 게시판</h1><p>진행 중인 과제와 제출 상태를 확인하세요.</p></div><a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl','')}">제출현황 대시보드</a></header>
+    <div class="kitel-homework__table-wrap"><table class="kitel-homework__table">
+        <thead><tr><th scope="col">과제</th><th scope="col">마감일</th><th scope="col" cond="$is_submitter">내 제출 상태</th><th scope="col" cond="$is_submitter">수정</th></tr></thead>
+        <tbody cond="!$tasks"><tr><td colspan="{$is_submitter ? 4 : 2}" class="kitel-homework__empty">출제된 과제가 없습니다.</td></tr></tbody>
+        <tbody cond="$tasks"><tr loop="$tasks=>$idx,$task"><td class="kitel-homework__task-name"><a href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}">{$task->title}</a><small cond="$is_submitter && $task->is_past_deadline">마감일 경과</small></td><td class="kitel-homework__date"><span cond="$task->deadline">{substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)}</span><span cond="!$task->deadline">기한 없음</span></td><td cond="$is_submitter"><span class="kitel-homework__status {$task->has_submission ? 'is-done' : 'is-missing'}">{$task->my_status}</span></td><td cond="$is_submitter"><a class="kitel-homework__edit-link" href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}#homework-submission">{$task->has_submission ? '수정' : '제출'}</a></td></tr></tbody>
+    </table></div>
 </section>

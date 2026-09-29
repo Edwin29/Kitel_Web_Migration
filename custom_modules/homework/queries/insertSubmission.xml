@@ -8,6 +8,7 @@
         <column name="task_srl" var="task_srl" filter="number" notnull="notnull" />
         <column name="member_srl" var="member_srl" filter="number" notnull="notnull" />
         <column name="content" var="content" />
+        <column name="answers" var="answers" />
         <column name="source_filename" var="source_filename" />
         <column name="stored_filename" var="stored_filename" />
         <column name="is_late" var="is_late" notnull="notnull" />

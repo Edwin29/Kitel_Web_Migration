@@ -40,6 +40,7 @@ class HomeworkAdminView extends Homework
 			}
 		}
 		Context::set('task', $task);
+		Context::set('answer_fields', $task ? self::getAnswerFields($task) : array());
 		$this->setTemplateFile('task_form');
 	}
 
@@ -106,10 +107,23 @@ class HomeworkAdminView extends Homework
 			}
 		}
 		Context::set('selected_task', $selected_task);
+		$selected_fields = $selected_task ? self::getAnswerFields($selected_task) : array();
+		foreach ($selected_rows as $selected_row)
+		{
+			if (!$selected_row->submission) continue;
+			$answers = self::getAnswers($selected_row->submission);
+			$parts = array($selected_row->submission->content);
+			foreach ($selected_fields as $field)
+			{
+				if (isset($answers[$field['id']])) $parts[] = $field['title'] . ': ' . $answers[$field['id']];
+			}
+			$selected_row->submission->display_content = trim(implode("\n", $parts));
+		}
 		Context::set('selected_rows', $selected_rows);
 		Context::set('submitted_count', $submitted_count);
 		Context::set('missing_count', count($rows) - $submitted_count);
 		Context::set('days_remaining', $selected_task && $selected_task->deadline ? (int) (new DateTimeImmutable(substr($selected_task->deadline, 0, 8)))->diff(new DateTimeImmutable('today'))->format('%r%a') * -1 : null);
+		Context::set('show_deadline_banner', false);
 		$this->setTemplateFile('dashboard');
 	}
 

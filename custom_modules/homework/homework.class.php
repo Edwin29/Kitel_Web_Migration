@@ -17,11 +17,33 @@ class Homework extends ModuleObject
 
 	function checkUpdate()
 	{
-		return false;
+		$db = DB::getInstance();
+		foreach (array('answer_fields', 'allowed_extensions', 'description_image') as $column)
+		{
+			if (!$db->isColumnExists('homework_task', $column)) return true;
+		}
+		return !$db->isColumnExists('homework_submission', 'answers');
 	}
 
 	function moduleUpdate()
 	{
+		$db = DB::getInstance();
+		if (!$db->isColumnExists('homework_task', 'answer_fields')) $db->addColumn('homework_task', 'answer_fields', 'text');
+		if (!$db->isColumnExists('homework_task', 'allowed_extensions')) $db->addColumn('homework_task', 'allowed_extensions', 'varchar', 250);
+		if (!$db->isColumnExists('homework_task', 'description_image')) $db->addColumn('homework_task', 'description_image', 'varchar', 250);
+		if (!$db->isColumnExists('homework_submission', 'answers')) $db->addColumn('homework_submission', 'answers', 'text');
+	}
+
+	public static function getAnswerFields($task)
+	{
+		$fields = json_decode($task->answer_fields ?? '', true);
+		return is_array($fields) ? $fields : array();
+	}
+
+	public static function getAnswers($submission)
+	{
+		$answers = json_decode($submission->answers ?? '', true);
+		return is_array($answers) ? $answers : array();
 	}
 }
 /* End of file homework.class.php */

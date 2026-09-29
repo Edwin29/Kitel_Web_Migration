@@ -23,6 +23,7 @@
 		<action name="dispHomeworkView" type="view" permission="list" standalone="false" />
 		<action name="procHomeworkSubmit" type="controller" permission="submit" method="POST" />
 		<action name="procHomeworkDownloadSubmission" type="controller" permission="list" method="GET|POST" />
+		<action name="procHomeworkTaskImage" type="controller" permission="list" method="GET" />
 
 		<action name="dispHomeworkAdminContent" type="view" admin_index="true" menu_name="homework" menu_index="true" permission="create" />
 		<action name="dispHomeworkAdminForm" type="view" menu_name="homework" permission="create" />

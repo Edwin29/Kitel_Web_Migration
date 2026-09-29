@@ -25,7 +25,8 @@ class HomeworkView extends Homework
 			foreach ($tasks as $task)
 			{
 				$submission = $oHomeworkModel->getSubmissionByMember($task->task_srl, $logged_info->member_srl);
-				$task->my_status = $submission ? ($submission->is_late === 'Y' ? '제출완료(지각)' : '제출완료') : '미제출';
+				$task->my_status = $submission ? '제출완료' : '미제출';
+				$task->has_submission = (bool)$submission;
 				$task->is_past_deadline = $task->deadline && $task->deadline < date('YmdHis');
 			}
 		}
@@ -66,10 +67,21 @@ class HomeworkView extends Homework
 			{
 				$member = MemberModel::getMemberInfoByMemberSrl($submission->member_srl);
 				$submission->nick_name = $member ? $member->nick_name : ('#' . $submission->member_srl);
+				$answers = self::getAnswers($submission);
+				$parts = array($submission->content);
+				foreach (self::getAnswerFields($task) as $field)
+				{
+					if (isset($answers[$field['id']])) $parts[] = $field['title'] . ': ' . $answers[$field['id']];
+				}
+				$submission->display_content = trim(implode("\n", $parts));
 			}
 		}
 
 		Context::set('task', $task);
+		Context::set('answer_fields', self::getAnswerFields($task));
+		Context::set('my_answers', $my_submission ? self::getAnswers($my_submission) : array());
+		Context::set('allowed_accept', $task->allowed_extensions ? '.' . str_replace(',', ',.', $task->allowed_extensions) : '');
+		Context::set('show_deadline_banner', false);
 		Context::set('my_submission', $my_submission);
 		Context::set('all_submissions', $all_submissions);
 		Context::set('is_submitter', $this->grant->submit ?? false);

@@ -1,39 +1,18 @@
 <load target="./homework.css" />
-
 <article class="kitel-homework kitel-homework--detail">
-    <div class="kitel-homework__hero">
-        <span class="kitel-homework__countdown" cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></span>
-        <span class="kitel-homework__countdown" cond="$days_remaining === null">과제</span>
-        <h1>{$task->title}</h1>
-        <a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '다시 제출하기' : '제출하기'}</a>
-    </div>
-    <div class="kitel-homework__meta"><span cond="$task->deadline">마감 {substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)} 23:59</span><span cond="!$task->deadline">마감 기한 없음</span><span cond="$is_past_deadline" class="kitel-homework__late">마감일 경과 · 지각 제출 가능</span><a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl',$task->task_srl)}">이 과제 제출현황</a></div>
-    <section class="kitel-homework__brief" aria-labelledby="homework-brief-title"><h2 id="homework-brief-title">과제 내용</h2><div class="kitel-homework__description">{$task->description}</div></section>
+    <div cond="$show_deadline_banner" class="kitel-homework__hero"><span class="kitel-homework__countdown" cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></span><span class="kitel-homework__countdown" cond="$days_remaining === null">과제</span><h1>{$task->title}</h1><a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '다시 제출하기' : '제출하기'}</a></div>
+    <div cond="!$show_deadline_banner" class="kitel-homework__title-row"><h1>{$task->title}</h1><a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '수정하기' : '제출하기'}</a></div>
+    <div class="kitel-homework__meta"><span cond="$task->deadline">마감 {substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)} 23:59</span><span cond="!$task->deadline">마감 기한 없음</span><a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl',$task->task_srl)}">이 과제 제출현황</a></div>
+    <section class="kitel-homework__brief" aria-labelledby="homework-brief-title"><h2 id="homework-brief-title">과제 내용</h2><div class="kitel-homework__description">{$task->description}<img cond="$task->description_image" class="kitel-homework__brief-image" src="{getUrl('act','procHomeworkTaskImage','task_srl',$task->task_srl)}" alt="과제 설명 이미지" /><div cond="$answer_fields" class="kitel-homework__prompts"><h3>추가 답변 항목</h3><ol><li loop="$answer_fields=>$index,$field">{$field['title']}</li></ol></div></div></section>
     <section cond="$is_submitter" id="homework-submission" class="kitel-homework__submit" aria-labelledby="homework-submit-title">
         <h2 id="homework-submit-title">과제 제출</h2>
-        <div cond="$my_submission" class="kitel-homework__previous"><strong>내 제출 내역</strong><span>{substr($my_submission->regdate,0,4)}.{substr($my_submission->regdate,4,2)}.{substr($my_submission->regdate,6,2)} {$my_submission->is_late === 'Y' ? '· 지각' : '· 제출 완료'}</span><a cond="$my_submission->source_filename" href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$my_submission->submission_srl)}">{$my_submission->source_filename} 다운로드</a></div>
-        <form action="./" method="post" enctype="multipart/form-data" class="kitel-homework__form">
-            <input type="hidden" name="module" value="homework" />
-            <input type="hidden" name="act" value="procHomeworkSubmit" />
-            <input type="hidden" name="mid" value="{$mid}" />
-            <input type="hidden" name="task_srl" value="{$task->task_srl}" />
-            <label for="homework-content">제출 내용</label>
-            <textarea id="homework-content" name="content" rows="10" placeholder="제출 내용을 작성해 주세요">{$my_submission ? $my_submission->content : ''}</textarea>
-            <label for="homework-file">첨부파일</label>
-            <input id="homework-file" type="file" name="Filedata" />
-            <p cond="$my_submission && $my_submission->source_filename" class="kitel-homework__hint">새 파일을 선택하지 않으면 기존 첨부파일이 유지됩니다.</p>
-            <button type="submit" class="kitel-homework__submit-button">{$my_submission ? '다시 제출하기' : '등록'}</button>
+        <div cond="$my_submission" class="kitel-homework__previous"><strong>내 제출 내역</strong><span>{substr($my_submission->regdate,0,4)}.{substr($my_submission->regdate,4,2)}.{substr($my_submission->regdate,6,2)} {substr($my_submission->regdate,8,2)}:{substr($my_submission->regdate,10,2)} · 제출완료</span><a cond="$my_submission->source_filename" href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$my_submission->submission_srl)}">{$my_submission->source_filename} 다운로드</a></div>
+        <form action="./" method="post" enctype="multipart/form-data" class="kitel-homework__form"><input type="hidden" name="module" value="homework" /><input type="hidden" name="act" value="procHomeworkSubmit" /><input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="task_srl" value="{$task->task_srl}" />
+            <label for="homework-content">제출 내용</label><textarea id="homework-content" name="content" rows="10" placeholder="제출 내용을 작성해 주세요">{$my_submission ? $my_submission->content : ''}</textarea>
+            <div class="kitel-homework__answer-field" loop="$answer_fields=>$index,$field"><label for="homework-answer-{$field['id']}">{$field['title']}</label><textarea id="homework-answer-{$field['id']}" name="answer[{$field['id']}]" style="min-height:{$field['height']}px" placeholder="답을 작성해 주세요">{$my_answers[$field['id']] ?? ''}</textarea></div>
+            <label for="homework-file">첨부 파일</label><input id="homework-file" type="file" name="Filedata" accept="{$allowed_accept}" /><p cond="$task->allowed_extensions" class="kitel-homework__hint">허용 형식: {$task->allowed_extensions}</p><p cond="$my_submission && $my_submission->source_filename" class="kitel-homework__hint">새 파일을 선택하지 않으면 기존 첨부 파일이 유지됩니다.</p><button type="submit" class="kitel-homework__submit-button">{$my_submission ? '수정 완료' : '등록'}</button>
         </form>
     </section>
-    <section cond="$can_view_all" class="kitel-homework__submissions" aria-labelledby="homework-submissions-title">
-        <h2 id="homework-submissions-title">제출 과제 목록 <span>{count($all_submissions)}명</span></h2>
-        <div class="kitel-homework__table-wrap"><table class="kitel-homework__table">
-            <thead><tr><th scope="col">제출자</th><th scope="col">제출일</th><th scope="col">상태</th><th scope="col">내용</th><th scope="col">첨부</th></tr></thead>
-            <tbody cond="!$all_submissions"><tr><td colspan="5" class="kitel-homework__empty">제출된 내역이 없습니다.</td></tr></tbody>
-            <tbody cond="$all_submissions"><tr loop="$all_submissions=>$idx,$sub">
-                <td>{$sub->nick_name}</td><td class="kitel-homework__date">{substr($sub->regdate,0,4)}.{substr($sub->regdate,4,2)}.{substr($sub->regdate,6,2)}</td><td><span class="kitel-homework__status {$sub->is_late === 'Y' ? 'is-late' : 'is-done'}">{$sub->is_late === 'Y' ? '지각' : '제출'}</span></td><td class="kitel-homework__submission-body">{$sub->content}</td><td><a cond="$sub->source_filename" href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$sub->submission_srl)}">{$sub->source_filename}</a><span cond="!$sub->source_filename">—</span></td>
-            </tr></tbody>
-        </table></div>
-    </section>
+    <section cond="$can_view_all" class="kitel-homework__submissions" aria-labelledby="homework-submissions-title"><h2 id="homework-submissions-title">제출 과제 목록 <span>{count($all_submissions)}명</span></h2><div class="kitel-homework__table-wrap"><table class="kitel-homework__table"><thead><tr><th scope="col">제출자</th><th scope="col">수정 시각</th><th scope="col">상태</th><th scope="col">내용</th><th scope="col">첨부</th></tr></thead><tbody cond="!$all_submissions"><tr><td colspan="5" class="kitel-homework__empty">제출 내역이 없습니다.</td></tr></tbody><tbody cond="$all_submissions"><tr loop="$all_submissions=>$idx,$sub"><td>{$sub->nick_name}</td><td class="kitel-homework__date">{substr($sub->regdate,0,4)}.{substr($sub->regdate,4,2)}.{substr($sub->regdate,6,2)} {substr($sub->regdate,8,2)}:{substr($sub->regdate,10,2)}</td><td><span class="kitel-homework__status is-done">제출완료</span></td><td class="kitel-homework__submission-body">{$sub->display_content}</td><td><a cond="$sub->source_filename" href="{getUrl('act','procHomeworkDownloadSubmission','submission_srl',$sub->submission_srl)}">{$sub->source_filename}</a><span cond="!$sub->source_filename">—</span></td></tr></tbody></table></div></section>
     <a class="kitel-homework__back" href="{getUrl('act','dispHomeworkIndex','task_srl','')}">과제 목록으로</a>
 </article>

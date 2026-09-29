@@ -43,13 +43,31 @@ class HomeworkController extends Homework
 		}
 
 		$logged_info = Context::get('logged_info');
-		$is_late = ($task->deadline && $task->deadline < date('YmdHis')) ? 'Y' : 'N';
+		$posted_answers = Context::get('answer');
+		if ($posted_answers !== null && !is_array($posted_answers)) throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		$answers = array();
+		foreach (self::getAnswerFields($task) as $field)
+		{
+			$id = $field['id'];
+			$value = $posted_answers[$id] ?? '';
+			if (!is_string($value)) throw new Rhymix\Framework\Exceptions\InvalidRequest;
+			$answers[$id] = trim($value);
+		}
+		$modified_at = date('YmdHis');
+		$is_late = ($task->deadline && $task->deadline < $modified_at) ? 'Y' : 'N';
 
 		$source_filename = null;
 		$stored_filename = null;
 		$file_info = Context::get('Filedata');
+		if ($file_info && !empty($file_info['error']) && (int)$file_info['error'] !== UPLOAD_ERR_NO_FILE)
+		{
+			throw new Rhymix\Framework\Exceptions\InvalidRequest('첨부파일 업로드에 실패했습니다. 파일 크기를 확인해 주세요.');
+		}
 		if ($file_info && is_uploaded_file($file_info['tmp_name']))
 		{
+			$allowed = array_filter(explode(',', (string)($task->allowed_extensions ?? '')));
+			$extension = strtolower(pathinfo((string)$file_info['name'], PATHINFO_EXTENSION));
+			if ($allowed && !in_array($extension, $allowed, true)) throw new Rhymix\Framework\Exceptions\InvalidRequest('이 과제에서 허용하지 않는 첨부파일 형식입니다.');
 			$submission_srl_for_file = getNextSequence();
 			$safe_name = preg_replace('/[^a-zA-Z0-9._\-가-힣]/u', '_', $file_info['name']);
 			$stored_filename = $submission_srl_for_file . '_' . $safe_name;
@@ -72,7 +90,9 @@ class HomeworkController extends Homework
 
 		$args = new stdClass;
 		$args->content = $content;
+		$args->answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
 		$args->is_late = $is_late;
+		$args->regdate = $modified_at;
 		if ($source_filename)
 		{
 			$args->source_filename = $source_filename;
@@ -114,6 +134,24 @@ class HomeworkController extends Homework
 
 		$this->setMessage('success_registed');
 		$this->setRedirectUrl(getNotEncodedUrl('', 'act', 'dispHomeworkView', 'mid', Context::get('mid'), 'task_srl', $task_srl));
+	}
+
+	/** Serve assignment artwork through the same list grant as its description. */
+	function procHomeworkTaskImage()
+	{
+		$task = getModel('homework')->getTask((int)Context::get('task_srl'));
+		if (!$task || (int)$task->module_srl !== (int)$this->module_info->module_srl || !$task->description_image || basename($task->description_image) !== $task->description_image)
+		{
+			throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		}
+		$path = FileHandler::getRealPath($this->getStorageDir() . 'task-images/' . $task->description_image);
+		if (!Rhymix\Framework\Storage::isFile($path)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		$mime = (new finfo(FILEINFO_MIME_TYPE))->file($path);
+		if (!in_array($mime, array('image/jpeg', 'image/png', 'image/webp', 'image/gif'), true)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		header('Content-Type: ' . $mime);
+		header('X-Content-Type-Options: nosniff');
+		readfile($path);
+		exit;
 	}
 
 	/**

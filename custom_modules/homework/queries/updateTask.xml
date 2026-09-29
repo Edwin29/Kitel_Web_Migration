@@ -5,6 +5,9 @@
     <columns>
         <column name="title" var="title" notnull="notnull" />
         <column name="description" var="description" />
+        <column name="answer_fields" var="answer_fields" />
+        <column name="allowed_extensions" var="allowed_extensions" />
+        <column name="description_image" var="description_image" />
         <column name="deadline" var="deadline" />
     </columns>
     <conditions>

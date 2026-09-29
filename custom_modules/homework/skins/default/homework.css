@@ -29,7 +29,17 @@
 .kitel-homework__brief { margin-bottom: var(--kitel-space-5, 40px); }
 .kitel-homework__brief h2, .kitel-homework__submit h2, .kitel-homework__submissions h2 { margin: 0 0 var(--kitel-space-3, 24px); font-size: var(--kitel-text-lg, 24px); font-weight: 500; }
 .kitel-homework__description { padding: var(--kitel-space-3, 24px); border: 1px solid var(--kitel-border, #e9e9e9); border-radius: var(--kitel-radius-sm, 5px); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; }
-.kitel-homework__submit { width: min(865px, 100%); margin: 0 auto var(--kitel-space-6, 48px); padding: var(--kitel-space-4, 32px); border: 1px solid var(--kitel-border, #e9e9e9); border-radius: var(--kitel-radius-sm, 5px); }
+.kitel-homework__submit { width: 100%; margin: 0 0 var(--kitel-space-6, 48px); padding: var(--kitel-space-4, 32px); border: 1px solid var(--kitel-border, #e9e9e9); border-radius: var(--kitel-radius-sm, 5px); }
+.kitel-homework__title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.kitel-homework__title-row h1 { min-width: 0; margin: 0; font-size: clamp(28px, 2.5vw, 40px); font-weight: 500; overflow-wrap: anywhere; }
+.kitel-homework__title-row .kitel-homework__jump { margin-left: auto; }
+.kitel-homework__brief-image { display: block; max-width: 100%; height: auto; margin-top: 16px; }
+.kitel-homework__prompts { margin-top: 24px; white-space: normal; }
+.kitel-homework__prompts h3 { margin: 0 0 8px; font-size: 18px; font-weight: 500; }
+.kitel-homework__prompts ol { margin: 0; padding-left: 24px; }
+.kitel-homework__prompts li + li { margin-top: 8px; }
+.kitel-homework__edit-link { display: inline-flex; padding: 8px 16px; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 20px; white-space: nowrap; }
+.kitel-homework__answer-field { display: grid; gap: 12px; margin-top: 16px; }
 .kitel-homework__previous { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 24px; padding: 16px; background: var(--kitel-primary-soft, #eef1fb); font-size: var(--kitel-text-sm, 16px); }
 .kitel-homework__previous a { color: var(--kitel-primary, #191970); overflow-wrap: anywhere; }
 .kitel-homework__form { display: grid; gap: 12px; }

@@ -7,7 +7,8 @@
         <a loop="$tasks=>$index,$item" class="{$selected_task->task_srl == $item->task_srl ? 'is-selected' : ''}" href="{getUrl('act','dispHomeworkAdminDashboard','task_srl',$item->task_srl)}">{$item->title}</a>
     </div>
     <section cond="$selected_task" aria-labelledby="kitel-hw-selected-title">
-        <div class="kitel-hw-admin__hero"><strong cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></strong><strong cond="$days_remaining === null">과제</strong><h2 id="kitel-hw-selected-title">{$selected_task->title}</h2></div>
+        <div cond="$show_deadline_banner" class="kitel-hw-admin__hero"><strong cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></strong><strong cond="$days_remaining === null">과제</strong><h2 id="kitel-hw-selected-title">{$selected_task->title}</h2></div>
+        <h2 cond="!$show_deadline_banner" id="kitel-hw-selected-title" class="kitel-hw-admin__selected-title">{$selected_task->title}</h2>
         <div class="kitel-hw-admin__summary"><div><span>제출 인원</span><strong>{$submitted_count}</strong></div><div><span>미제출 인원</span><strong>{$missing_count}</strong></div></div>
         <h3>제출 과제 목록</h3>
         <p cond="!$rows" class="kitel-hw-admin__empty">준회원 그룹에 속한 회원이 없습니다.</p>
@@ -16,8 +17,8 @@
             <tbody><tr loop="$selected_rows=>$index,$selected_row">
                 <td>{$selected_row->member->nick_name}</td>
                 <td><span cond="!$selected_row->submission">미제출</span><span cond="$selected_row->submission">{$selected_row->submission->is_late === 'Y' ? '지각 제출' : '제출'}</span></td>
-                <td><span cond="$selected_row->submission">{substr($selected_row->submission->regdate,0,4)}.{substr($selected_row->submission->regdate,4,2)}.{substr($selected_row->submission->regdate,6,2)}</span><span cond="!$selected_row->submission">—</span></td>
-                <td class="kitel-hw-admin__content">{$selected_row->submission ? $selected_row->submission->content : '—'}</td>
+                <td><span cond="$selected_row->submission">{substr($selected_row->submission->regdate,0,4)}.{substr($selected_row->submission->regdate,4,2)}.{substr($selected_row->submission->regdate,6,2)} {substr($selected_row->submission->regdate,8,2)}:{substr($selected_row->submission->regdate,10,2)}</span><span cond="!$selected_row->submission">—</span></td>
+                <td class="kitel-hw-admin__content">{$selected_row->submission ? $selected_row->submission->display_content : '—'}</td>
                 <td><a cond="$selected_row->submission && $selected_row->submission->source_filename" href="{getUrl('module','','act','procHomeworkDownloadSubmission','mid',$mid,'submission_srl',$selected_row->submission->submission_srl)}">{$selected_row->submission->source_filename}</a><span cond="!$selected_row->submission || !$selected_row->submission->source_filename">—</span></td>
             </tr></tbody>
         </table></div>
@@ -28,7 +29,7 @@
         <p cond="!$tasks || !$rows" class="kitel-hw-admin__empty">표시할 과제 또는 준회원이 없습니다.</p>
         <div cond="$tasks && $rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
             <thead><tr><th scope="col" class="kitel-hw-admin__member">준회원</th><th scope="col" loop="$tasks=>$tidx,$task">{$task->title}</th></tr></thead>
-            <tbody><tr loop="$rows=>$ridx,$row"><th scope="row" class="kitel-hw-admin__member">{$row->member->nick_name}</th><block loop="$row->cells=>$cidx,$cell"><td cond="!$cell">미제출</td><td cond="$cell">{$cell->is_late === 'Y' ? '지각' : '제출'}<br>{substr($cell->regdate,0,4)}.{substr($cell->regdate,4,2)}.{substr($cell->regdate,6,2)}</td></block></tr></tbody>
+            <tbody><tr loop="$rows=>$ridx,$row"><th scope="row" class="kitel-hw-admin__member">{$row->member->nick_name}</th><block loop="$row->cells=>$cidx,$cell"><td cond="!$cell">미제출</td><td cond="$cell">{$cell->is_late === 'Y' ? '지각' : '제출'}<br>{substr($cell->regdate,0,4)}.{substr($cell->regdate,4,2)}.{substr($cell->regdate,6,2)} {substr($cell->regdate,8,2)}:{substr($cell->regdate,10,2)}</td></block></tr></tbody>
         </table></div>
     </section>
 </div>

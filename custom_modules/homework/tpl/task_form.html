@@ -1,28 +1,20 @@
 <include target="./header.html" />
-
-<form action="./" method="post" class="kitel-hw-admin kitel-hw-admin__task-form">
-	<input type="hidden" name="module" value="admin" />
-	<input type="hidden" name="act" value="procHomeworkAdminInsertTask" />
-	<input type="hidden" name="mid" value="{$mid}" />
-	<input type="hidden" name="task_srl" value="{$task->task_srl}"|cond="$task" />
-
-	<table class="x_table x_table-bordered" width="100%">
-		<tr>
-			<th style="width:140px">제목</th>
-			<td><input type="text" name="title" value="{$task->title}" style="width:100%" required /></td>
-		</tr>
-		<tr>
-			<th>마감일</th>
-			<td><input type="date" name="deadline" value="{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}"|cond="$task && $task->deadline" /></td>
-		</tr>
-		<tr>
-			<th>설명 / 제출 양식 안내</th>
-			<td><textarea name="description" rows="8" style="width:100%">{$task->description}</textarea></td>
-		</tr>
-	</table>
-
-	<div style="margin-top:12px">
-		<button type="submit" class="x_btn x_btn-primary">저장</button>
-		<a class="x_btn" href="{getUrl('act','dispHomeworkAdminContent')}">취소</a>
-	</div>
+<load target="./task-form.js" />
+<form action="./" method="post" enctype="multipart/form-data" class="kitel-hw-admin kitel-hw-admin__task-form" id="kitel-task-form">
+    <input type="hidden" name="module" value="admin" /><input type="hidden" name="act" value="procHomeworkAdminInsertTask" /><input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="task_srl" value="{$task->task_srl}"|cond="$task" />
+    <div class="kitel-hw-admin__editor-card">
+        <h2>{$task ? '과제 수정' : '과제 추가'}</h2>
+        <label for="hw-task-title">과제 제목</label><input id="hw-task-title" type="text" name="title" value="{$task->title}" required maxlength="250" />
+        <label for="hw-task-description">과제 내용</label><textarea id="hw-task-description" name="description" rows="10" placeholder="과제 설명을 작성해 주세요">{$task->description}</textarea>
+        <label for="hw-task-image">설명 이미지</label><input id="hw-task-image" type="file" name="description_image_upload" accept="image/png,image/jpeg,image/webp,image/gif" /><p class="kitel-hw-admin__hint">JPG, PNG, WebP, GIF 이미지를 첨부할 수 있습니다.</p>
+        <img cond="$task && $task->description_image" class="kitel-hw-admin__preview" src="{getUrl('module','','act','procHomeworkTaskImage','mid',$mid,'task_srl',$task->task_srl)}" alt="현재 과제 설명 이미지" />
+        <label for="hw-task-deadline">마감일</label><input id="hw-task-deadline" type="date" name="deadline" value="{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}"|cond="$task && $task->deadline" />
+        <label for="hw-task-extensions">제출 첨부파일 허용 형식</label><input id="hw-task-extensions" type="text" name="allowed_extensions" value="{$task->allowed_extensions}" placeholder="예: pdf,zip,docx" /><p class="kitel-hw-admin__hint">쉼표로 구분합니다. 비워 두면 형식을 제한하지 않습니다.</p>
+    </div>
+    <section class="kitel-hw-admin__field-section" aria-labelledby="hw-fields-title"><h2 id="hw-fields-title">추가 답변 항목</h2><p>준회원이 답을 입력할 항목의 제목과 입력 박스를 추가하세요. 박스 오른쪽 아래를 드래그하면 높이가 조정됩니다.</p>
+        <div id="hw-field-list"><div class="kitel-hw-admin__field" loop="$answer_fields=>$index,$field"><input type="hidden" name="field_id[]" value="{$field['id']}" /><input type="hidden" name="field_height[]" value="{$field['height']}" class="js-field-height" /><label for="hw-field-title-{$index}">항목 제목</label><input id="hw-field-title-{$index}" type="text" name="field_title[]" value="{$field['title']}" maxlength="120" required /><label for="hw-field-preview-{$index}">답변 박스 미리보기</label><textarea id="hw-field-preview-{$index}" class="js-field-preview" style="height:{$field['height']}px" readonly placeholder="준회원이 여기에 답을 입력합니다."></textarea><button type="button" class="x_btn js-remove-field">항목 삭제</button></div></div>
+        <button type="button" id="hw-add-field" class="x_btn">+ 답변 항목 추가</button>
+    </section>
+    <div class="kitel-hw-admin__form-actions"><button type="submit" class="x_btn x_btn-primary">저장</button><a class="x_btn" href="{getUrl('act','dispHomeworkAdminContent')}">취소</a></div>
 </form>
+<template id="hw-field-template"><div class="kitel-hw-admin__field"><input type="hidden" name="field_id[]" /><input type="hidden" name="field_height[]" value="180" class="js-field-height" /><label>항목 제목</label><input type="text" name="field_title[]" maxlength="120" required placeholder="예: 1번 문제 답안" /><label>답변 박스 미리보기</label><textarea class="js-field-preview" style="height:180px" readonly placeholder="준회원이 여기에 답을 입력합니다."></textarea><button type="button" class="x_btn js-remove-field">항목 삭제</button></div></template>

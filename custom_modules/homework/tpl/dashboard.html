@@ -1,35 +1,34 @@
 <include target="./header.html" />
+<load target="./homework-admin.css" />
 
-<style>
-.hw-dash { overflow-x: auto; }
-.hw-dash table { border-collapse: collapse; white-space: nowrap; }
-.hw-dash th, .hw-dash td { border: 1px solid #ddd; padding: 6px 10px; text-align: center; }
-.hw-dash th.member-col, .hw-dash td.member-col { text-align: left; position: sticky; left: 0; background: #fff; }
-.hw-dash .status-ok { color: #2a7a3b; font-weight: 600; }
-.hw-dash .status-late { color: #c07a00; font-weight: 600; }
-.hw-dash .status-none { color: #bbb; }
-</style>
+<div class="kitel-hw-admin">
+    <p cond="!$tasks" class="kitel-hw-admin__empty">출제된 과제가 없습니다. 과제를 먼저 등록해 주세요.</p>
+    <div cond="$tasks" class="kitel-hw-admin__selector" aria-label="과제 선택">
+        <a loop="$tasks=>$index,$item" class="{$selected_task->task_srl == $item->task_srl ? 'is-selected' : ''}" href="{getUrl('act','dispHomeworkAdminDashboard','task_srl',$item->task_srl)}">{$item->title}</a>
+    </div>
+    <section cond="$selected_task" aria-labelledby="kitel-hw-selected-title">
+        <div class="kitel-hw-admin__hero"><strong cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></strong><strong cond="$days_remaining === null">과제</strong><h2 id="kitel-hw-selected-title">{$selected_task->title}</h2></div>
+        <div class="kitel-hw-admin__summary"><div><span>제출 인원</span><strong>{$submitted_count}</strong></div><div><span>미제출 인원</span><strong>{$missing_count}</strong></div></div>
+        <h3>제출 과제 목록</h3>
+        <p cond="!$rows" class="kitel-hw-admin__empty">준회원 그룹에 속한 회원이 없습니다.</p>
+        <div cond="$rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
+            <thead><tr><th scope="col">준회원</th><th scope="col">제출 상태</th><th scope="col">제출일</th><th scope="col">내용</th><th scope="col">첨부</th></tr></thead>
+            <tbody><tr loop="$selected_rows=>$index,$selected_row">
+                <td>{$selected_row->member->nick_name}</td>
+                <td><span cond="!$selected_row->submission">미제출</span><span cond="$selected_row->submission">{$selected_row->submission->is_late === 'Y' ? '지각 제출' : '제출'}</span></td>
+                <td><span cond="$selected_row->submission">{substr($selected_row->submission->regdate,0,4)}.{substr($selected_row->submission->regdate,4,2)}.{substr($selected_row->submission->regdate,6,2)}</span><span cond="!$selected_row->submission">—</span></td>
+                <td class="kitel-hw-admin__content">{$selected_row->submission ? $selected_row->submission->content : '—'}</td>
+                <td><a cond="$selected_row->submission && $selected_row->submission->source_filename" href="{getUrl('module','','act','procHomeworkDownloadSubmission','mid',$mid,'submission_srl',$selected_row->submission->submission_srl)}">{$selected_row->submission->source_filename}</a><span cond="!$selected_row->submission || !$selected_row->submission->source_filename">—</span></td>
+            </tr></tbody>
+        </table></div>
+    </section>
 
-<p cond="!$tasks">출제된 과제가 없습니다.</p>
-<p cond="$tasks && !$rows">준회원 그룹에 속한 회원이 없습니다.</p>
-
-<div class="hw-dash" cond="$tasks && $rows">
-	<table>
-		<thead>
-			<tr>
-				<th class="member-col">준회원</th>
-				<th loop="$tasks=>$tidx,$task">{$task->title}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr loop="$rows=>$ridx,$row">
-				<td class="member-col">{$row->member->nick_name}</td>
-				<block loop="$row->cells=>$cidx,$cell">
-				<td cond="!$cell" class="status-none">미제출</td>
-				<td cond="$cell && $cell->is_late=='N'" class="status-ok">제출<br>{substr($cell->regdate,4,2)}/{substr($cell->regdate,6,2)}</td>
-				<td cond="$cell && $cell->is_late=='Y'" class="status-late">지각<br>{substr($cell->regdate,4,2)}/{substr($cell->regdate,6,2)}</td>
-				</block>
-			</tr>
-		</tbody>
-	</table>
+    <section class="kitel-hw-admin__matrix" aria-labelledby="kitel-hw-matrix-title">
+        <h3 id="kitel-hw-matrix-title">전체 과제 × 준회원 제출현황</h3>
+        <p cond="!$tasks || !$rows" class="kitel-hw-admin__empty">표시할 과제 또는 준회원이 없습니다.</p>
+        <div cond="$tasks && $rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
+            <thead><tr><th scope="col" class="kitel-hw-admin__member">준회원</th><th scope="col" loop="$tasks=>$tidx,$task">{$task->title}</th></tr></thead>
+            <tbody><tr loop="$rows=>$ridx,$row"><th scope="row" class="kitel-hw-admin__member">{$row->member->nick_name}</th><block loop="$row->cells=>$cidx,$cell"><td cond="!$cell">미제출</td><td cond="$cell">{$cell->is_late === 'Y' ? '지각' : '제출'}<br>{substr($cell->regdate,0,4)}.{substr($cell->regdate,4,2)}.{substr($cell->regdate,6,2)}</td></block></tr></tbody>
+        </table></div>
+    </section>
 </div>

@@ -14,6 +14,19 @@ class HomeworkController extends Homework
 		return './files/attach/homework/' . $this->module_info->module_srl . '/';
 	}
 
+	private function deleteStoredFile($filename)
+	{
+		if (!$filename || basename($filename) !== $filename)
+		{
+			return;
+		}
+		$path = FileHandler::getRealPath($this->getStorageDir() . $filename);
+		if (Rhymix\Framework\Storage::isFile($path))
+		{
+			Rhymix\Framework\Storage::delete($path);
+		}
+	}
+
 	/**
 	 * @brief Submit or resubmit (upsert keyed by task_srl + member_srl)
 	 */
@@ -88,7 +101,15 @@ class HomeworkController extends Homework
 
 		if (!$output->toBool())
 		{
+			if ($stored_filename)
+			{
+				$this->deleteStoredFile($stored_filename);
+			}
 			return $output;
+		}
+		if ($existing && $stored_filename && $existing->stored_filename && $existing->stored_filename !== $stored_filename)
+		{
+			$this->deleteStoredFile($existing->stored_filename);
 		}
 
 		$this->setMessage('success_registed');

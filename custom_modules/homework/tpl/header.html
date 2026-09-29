@@ -1,8 +1,9 @@
-<div class="x_page-header">
-	<h1>과제게시판 관리 (기술부)</h1>
-</div>
-<ul class="x_nav x_nav-tabs">
-	<li class="x_active"|cond="$act=='dispHomeworkAdminContent'"><a href="{getUrl('act','dispHomeworkAdminContent')}">과제 관리</a></li>
-	<li class="x_active"|cond="$act=='dispHomeworkAdminDashboard'"><a href="{getUrl('act','dispHomeworkAdminDashboard')}">제출현황 대시보드</a></li>
-	<li class="x_active"|cond="$act=='dispHomeworkAdminGrantInfo'"><a href="{getUrl('act','dispHomeworkAdminGrantInfo')}">권한 관리</a></li>
-</ul>
+<load target="./homework-admin.css" />
+<header class="kitel-hw-admin-header">
+    <h1>과제게시판 관리</h1>
+    <nav aria-label="과제 관리 메뉴">
+        <a class="{$act === 'dispHomeworkAdminContent' || $act === 'dispHomeworkAdminForm' ? 'is-current' : ''}" href="{getUrl('act','dispHomeworkAdminContent')}">과제 관리</a>
+        <a class="{$act === 'dispHomeworkAdminDashboard' ? 'is-current' : ''}" href="{getUrl('act','dispHomeworkAdminDashboard')}">제출현황 대시보드</a>
+        <a class="{$act === 'dispHomeworkAdminGrantInfo' ? 'is-current' : ''}" href="{getUrl('act','dispHomeworkAdminGrantInfo')}">권한 관리</a>
+    </nav>
+</header>

@@ -1,10 +1,11 @@
 <include target="./header.html" />
+<div class="kitel-hw-admin">
 
 <div class="x_btn-group" style="margin-bottom:12px">
 	<a class="x_btn x_btn-primary" href="{getUrl('act','dispHomeworkAdminForm')}">+ 새 과제 출제</a>
 </div>
 
-<table class="x_table x_table-bordered" width="100%">
+<table class="x_table x_table-bordered kitel-hw-admin__task-table" width="100%">
 	<thead>
 		<tr>
 			<th>제목</th>
@@ -24,8 +25,15 @@
 			<td>
 				<a href="{getUrl('act','dispHomeworkAdminForm','task_srl',$task->task_srl)}">수정</a>
 				&nbsp;|&nbsp;
-				<a href="{getUrl('act','procHomeworkAdminDeleteTask','task_srl',$task->task_srl)}" onclick="return confirm('이 과제와 모든 제출물을 삭제하시겠습니까?')">삭제</a>
+				<form action="./" method="post" style="display:inline" onsubmit="return confirm('이 과제와 모든 제출물을 삭제하시겠습니까?')">
+					<input type="hidden" name="module" value="admin" />
+					<input type="hidden" name="act" value="procHomeworkAdminDeleteTask" />
+					<input type="hidden" name="mid" value="{$mid}" />
+					<input type="hidden" name="task_srl" value="{$task->task_srl}" />
+					<button type="submit" class="x_btn x_btn-link">삭제</button>
+				</form>
 			</td>
 		</tr>
 	</tbody>
 </table>
+</div>

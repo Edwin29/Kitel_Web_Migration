@@ -18,6 +18,14 @@ class HomeworkAdminController extends Homework
 		$title = trim(Context::get('title'));
 		$description = Context::get('description');
 		$deadline_date = Context::get('deadline');
+		if ($deadline_date)
+		{
+			$date = DateTimeImmutable::createFromFormat('!Y-m-d', $deadline_date);
+			if (!$date || $date->format('Y-m-d') !== $deadline_date)
+			{
+				throw new Rhymix\Framework\Exceptions\InvalidRequest;
+			}
+		}
 		$deadline = $deadline_date ? (str_replace('-', '', $deadline_date) . '235959') : '';
 
 		if ($title === '')
@@ -34,6 +42,11 @@ class HomeworkAdminController extends Homework
 
 		if ($task_srl)
 		{
+			$existing = getModel('homework')->getTask($task_srl);
+			if (!$existing || (int) $existing->module_srl !== (int) $this->module_info->module_srl)
+			{
+				throw new Rhymix\Framework\Exceptions\InvalidRequest;
+			}
 			$args->task_srl = $task_srl;
 			$output = executeQuery('homework.updateTask', $args);
 		}
@@ -55,7 +68,7 @@ class HomeworkAdminController extends Homework
 	}
 
 	/**
-	 * @brief Delete a task and every submission under it (DB rows; physical files are left for manual cleanup)
+	 * @brief Delete a task and every submission under it, including attached files
 	 */
 	function procHomeworkAdminDeleteTask()
 	{
@@ -69,8 +82,29 @@ class HomeworkAdminController extends Homework
 
 		$args = new stdClass;
 		$args->task_srl = $task_srl;
-		executeQuery('homework.deleteSubmissionsByTask', $args);
-		executeQuery('homework.deleteTask', $args);
+		$submissions = $oHomeworkModel->getSubmissionsByTask($task_srl);
+		$deleted_submissions = executeQuery('homework.deleteSubmissionsByTask', $args);
+		if (!$deleted_submissions->toBool())
+		{
+			return $deleted_submissions;
+		}
+		$deleted_task = executeQuery('homework.deleteTask', $args);
+		if (!$deleted_task->toBool())
+		{
+			return $deleted_task;
+		}
+		foreach ($submissions as $submission)
+		{
+			if (!$submission->stored_filename || basename($submission->stored_filename) !== $submission->stored_filename)
+			{
+				continue;
+			}
+			$path = FileHandler::getRealPath('./files/attach/homework/' . $this->module_info->module_srl . '/' . $submission->stored_filename);
+			if (Rhymix\Framework\Storage::isFile($path))
+			{
+				Rhymix\Framework\Storage::delete($path);
+			}
+		}
 
 		$this->setMessage('success_deleted');
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispHomeworkAdminContent', 'mid', Context::get('mid')));

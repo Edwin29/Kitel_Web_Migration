@@ -21,7 +21,7 @@
 	<actions>
 		<action name="dispHomeworkIndex" type="view" permission="list" standalone="false" index="true" />
 		<action name="dispHomeworkView" type="view" permission="list" standalone="false" />
-		<action name="procHomeworkSubmit" type="controller" permission="submit" />
+		<action name="procHomeworkSubmit" type="controller" permission="submit" method="POST" />
 		<action name="procHomeworkDownloadSubmission" type="controller" permission="list" method="GET|POST" />
 
 		<action name="dispHomeworkAdminContent" type="view" admin_index="true" menu_name="homework" menu_index="true" permission="create" />
@@ -29,7 +29,7 @@
 		<action name="dispHomeworkAdminDashboard" type="view" menu_name="homework" permission="create" />
 		<action name="dispHomeworkAdminGrantInfo" type="view" menu_name="homework" permission="create" />
 
-		<action name="procHomeworkAdminInsertTask" type="controller" permission="create" />
-		<action name="procHomeworkAdminDeleteTask" type="controller" permission="create" method="GET|POST" />
+		<action name="procHomeworkAdminInsertTask" type="controller" permission="create" method="POST" />
+		<action name="procHomeworkAdminDeleteTask" type="controller" permission="create" method="POST" />
 	</actions>
 </module>

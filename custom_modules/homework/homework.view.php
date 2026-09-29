@@ -26,6 +26,7 @@ class HomeworkView extends Homework
 			{
 				$submission = $oHomeworkModel->getSubmissionByMember($task->task_srl, $logged_info->member_srl);
 				$task->my_status = $submission ? ($submission->is_late === 'Y' ? '제출완료(지각)' : '제출완료') : '미제출';
+				$task->is_past_deadline = $task->deadline && $task->deadline < date('YmdHis');
 			}
 		}
 
@@ -73,6 +74,8 @@ class HomeworkView extends Homework
 		Context::set('is_submitter', $this->grant->submit ?? false);
 		Context::set('can_view_all', $this->grant->view_all ?? false);
 		Context::set('is_past_deadline', $task->deadline && $task->deadline < date('YmdHis'));
+		$days_remaining = $task->deadline ? (int) (new DateTimeImmutable(substr($task->deadline, 0, 8)))->diff(new DateTimeImmutable('today'))->format('%r%a') * -1 : null;
+		Context::set('days_remaining', $days_remaining);
 
 		$this->setTemplateFile('view');
 	}

@@ -34,6 +34,10 @@ class HomeworkAdminView extends Homework
 		{
 			$oHomeworkModel = getModel('homework');
 			$task = $oHomeworkModel->getTask($task_srl);
+			if (!$task || (int) $task->module_srl !== (int) $this->module_info->module_srl)
+			{
+				throw new Rhymix\Framework\Exceptions\TargetNotFound;
+			}
 		}
 		Context::set('task', $task);
 		$this->setTemplateFile('task_form');
@@ -48,6 +52,15 @@ class HomeworkAdminView extends Homework
 		$module_srl = $this->module_info->module_srl;
 
 		$tasks = $oHomeworkModel->getTaskList($module_srl);
+		$selected_task = null;
+		$requested_task_srl = (int) Context::get('task_srl');
+		foreach ($tasks as $task)
+		{
+			if (!$selected_task || (int) $task->task_srl === $requested_task_srl)
+			{
+				$selected_task = $task;
+			}
+		}
 		$members = $oHomeworkModel->getJuniorMembers();
 		$submissions = $oHomeworkModel->getSubmissionsByModule($module_srl);
 
@@ -75,6 +88,28 @@ class HomeworkAdminView extends Homework
 
 		Context::set('tasks', $tasks);
 		Context::set('rows', $rows);
+		$selected_rows = array();
+		$submitted_count = 0;
+		foreach ($rows as $row)
+		{
+			foreach ($tasks as $index => $task)
+			{
+				if ($selected_task && (int) $task->task_srl === (int) $selected_task->task_srl)
+				{
+					$selected_rows[] = (object) array('member' => $row->member, 'submission' => $row->cells[$index]);
+					if ($row->cells[$index])
+					{
+						$submitted_count++;
+					}
+					break;
+				}
+			}
+		}
+		Context::set('selected_task', $selected_task);
+		Context::set('selected_rows', $selected_rows);
+		Context::set('submitted_count', $submitted_count);
+		Context::set('missing_count', count($rows) - $submitted_count);
+		Context::set('days_remaining', $selected_task && $selected_task->deadline ? (int) (new DateTimeImmutable(substr($selected_task->deadline, 0, 8)))->diff(new DateTimeImmutable('today'))->format('%r%a') * -1 : null);
 		$this->setTemplateFile('dashboard');
 	}
 

@@ -62,6 +62,18 @@
 .kitel-homework__submissions h2 span { color: var(--kitel-text-secondary, #626262); font-size: var(--kitel-text-sm, 16px); }
 .kitel-homework__submission-body { min-width: 200px; max-width: 360px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .kitel-homework__back { display: inline-block; color: var(--kitel-text-secondary, #626262); }
+.kitel-homework--index .kitel-homework__table { table-layout: fixed; }
+.kitel-homework--index .kitel-homework__table.is-submitter th:nth-child(1) { width: 34%; }
+.kitel-homework--index .kitel-homework__table.is-submitter th:nth-child(2) { width: 23.5%; }
+.kitel-homework--index .kitel-homework__table.is-submitter th:nth-child(3) { width: 22.5%; }
+.kitel-homework--index .kitel-homework__table.is-submitter th:nth-child(4) { width: 20%; }
+.kitel-homework--index .kitel-homework__table.is-reader th:nth-child(1) { width: 66%; }
+.kitel-homework--index .kitel-homework__table.is-reader th:nth-child(2) { width: 34%; }
+.kitel-homework--index .kitel-homework__table td { padding-block: 13px; }
+.kitel-homework--index .kitel-homework__task-name a { font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.kitel-homework--index .kitel-homework__date { font-size: 15px; }
+.kitel-homework--index .kitel-homework__status,
+.kitel-homework--index .kitel-homework__edit-link { display: inline-flex; box-sizing: border-box; min-height: 32px; align-items: center; justify-content: center; padding: 5px 12px; font-size: 14px; line-height: 20px; }
 .kitel-homework__pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; }
 .kitel-homework__pagination > * { display: inline-flex; min-width: 36px; min-height: 36px; align-items: center; justify-content: center; padding: 5px 9px; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 4px; font-size: 14px; text-decoration: none; }
 .kitel-homework__pagination a { color: var(--kitel-primary, #191970); }

@@ -44,3 +44,18 @@ Local QA temporarily added tasks to reach 11 total: both lists showed 10 rows on
 ## Dashboard entry follow-up
 
 The task list now displays **제출현황 대시보드** when the viewer has `create`, and task detail displays **이 과제 제출현황** for the same grant. Both links lead to the existing admin dashboard; the detail link selects its current task. Local browser checks confirmed the links and navigation for admin and a technical-department QA account, while a full member saw neither link. The QA account was removed after the check.
+
+## Dashboard visual demo fixture (2026-09-30)
+
+The submitted/missing summary cards are scaled to about 75% of their previous desktop width and height, with their label and number sizes reduced proportionally. On a narrow viewport the cards retain a fluid width and stack as before.
+
+`scripts/phase6-dashboard-fixture-dev.php` creates local development data only. It checks the exact `D:/rhymix_dev/www/rhymix` root, `rhymix_dev` database on loopback port 3307, homework module 149, and 준회원 group 3. Dry-run is the default. The fixture adds one **hidden** `[P6DEMO] 과제 제출 시연` task, four marked junior accounts with random undisclosed passwords, and two example submissions to that task. The other two accounts remain unsubmitted. Existing tasks and submissions are not modified. Hidden status keeps the demo task off the member-facing assignment list while it remains available in the technical dashboard. The demo accounts are intended for visual QA, not login.
+
+```powershell
+D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php
+D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php --apply
+D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php --cleanup
+D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php --cleanup --apply
+```
+
+Cleanup checks the exact fixture markers and refuses to remove the demo task if another account has submitted to it. As of this local preview, the fixture is installed: the default dashboard shows **2 submitted / 2 missing**. To remove it, preview and apply the cleanup commands above. The repository contains the repeatable script, not user data or database exports.

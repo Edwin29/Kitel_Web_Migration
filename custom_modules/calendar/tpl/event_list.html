@@ -26,7 +26,13 @@
 			<td>
 				<a href="{getUrl('act','dispCalendarAdminForm','event_srl',$event->event_srl)}">수정</a>
 				&nbsp;|&nbsp;
-				<a href="{getUrl('act','procCalendarAdminDeleteEvent','event_srl',$event->event_srl)}" onclick="return confirm('삭제하시겠습니까?')">삭제</a>
+				<form action="./" method="post" style="display:inline" onsubmit="return confirm('삭제하시겠습니까?')">
+					<input type="hidden" name="module" value="admin" />
+					<input type="hidden" name="act" value="procCalendarAdminDeleteEvent" />
+					<input type="hidden" name="mid" value="{$mid}" />
+					<input type="hidden" name="event_srl" value="{$event->event_srl}" />
+					<button type="submit" class="x_btn x_btn-link">삭제</button>
+				</form>
 			</td>
 		</tr>
 	</tbody>

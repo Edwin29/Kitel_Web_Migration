@@ -15,16 +15,19 @@ class CalendarAdminController extends Calendar
 	function procCalendarAdminInsertEvent()
 	{
 		$event_srl = (int) Context::get('event_srl');
-		$title = trim(Context::get('title'));
-		$start_date = str_replace('-', '', Context::get('start_date'));
-		$end_date = str_replace('-', '', Context::get('end_date'));
-		if ($end_date === '')
+		$title_input = Context::get('title');
+		if (!is_string($title_input) || trim($title_input) === '')
 		{
-			$end_date = $start_date;
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
 		}
+		$title = trim($title_input);
+		$start_date = $this->normalizeEventDate(Context::get('start_date'));
+		$end_input = Context::get('end_date');
+		$end_date = $end_input === null || (is_string($end_input) && trim($end_input) === '')
+			? $start_date : $this->normalizeEventDate($end_input);
 		if ($end_date < $start_date)
 		{
-			$end_date = $start_date;
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
 		}
 
 		$logged_info = Context::get('logged_info');
@@ -58,6 +61,25 @@ class CalendarAdminController extends Calendar
 
 		$this->setMessage('success_registed');
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispCalendarAdminContent', 'mid', Context::get('mid')));
+	}
+
+	private function normalizeEventDate($value)
+	{
+		if (!is_string($value))
+		{
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		}
+		$value = trim($value);
+		if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $value, $parts)
+			&& !preg_match('/^(\d{4})(\d{2})(\d{2})$/D', $value, $parts))
+		{
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		}
+		if (!checkdate((int) $parts[2], (int) $parts[3], (int) $parts[1]))
+		{
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		}
+		return $parts[1] . $parts[2] . $parts[3];
 	}
 
 	/**

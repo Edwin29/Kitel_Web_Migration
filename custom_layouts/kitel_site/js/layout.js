@@ -9,18 +9,26 @@
     var toggle = site.querySelector('.kitel-mobile-toggle');
     var mobile = site.querySelector('.kitel-mobile');
 
+    var megaTrigger = null;
+    var returningFocus = false;
+
     function closeMega() {
         if (mega) mega.hidden = true;
         if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (link) { link.setAttribute('aria-expanded', 'false'); });
     }
     function openMega(link) {
         if (!mega || window.matchMedia('(max-width: 1120px)').matches) return;
+        if (returningFocus) return;
+        megaTrigger = link;
         mega.hidden = false;
-        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (item) { item.setAttribute('aria-expanded', item === link ? 'true' : 'false'); });
+        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (item) { item.setAttribute('aria-expanded', 'true'); });
     }
     function closeMobile() {
         if (mobile) mobile.hidden = true;
-        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', '메뉴 열기');
+        }
     }
     if (nav) {
         nav.addEventListener('pointerover', function (event) {
@@ -44,13 +52,20 @@
             closeMega();
             mobile.hidden = !opening;
             toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            toggle.setAttribute('aria-label', opening ? '메뉴 닫기' : '메뉴 열기');
         });
     }
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
+            var hadMega = mega && !mega.hidden;
+            var hadMobile = mobile && !mobile.hidden;
             closeMega();
             closeMobile();
-            if (toggle && window.matchMedia('(max-width: 1120px)').matches) toggle.focus();
+            if (hadMega && megaTrigger) {
+                returningFocus = true;
+                megaTrigger.focus();
+                returningFocus = false;
+            } else if (hadMobile && toggle) toggle.focus();
         }
     });
     document.addEventListener('pointerdown', function (event) {

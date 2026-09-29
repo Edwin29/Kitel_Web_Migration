@@ -18,10 +18,8 @@
 }
 .kitel-site .kitel-button:hover { background: #111155; }
 .kitel-site .kitel-button:focus-visible,
-.kitel-site a:focus-visible,
-.kitel-site button:focus-visible,
-.kitel-site input:focus-visible,
-.kitel-site summary:focus-visible {
+.kitel-site .kitel-input:focus-visible,
+:where(.kitel-chrome a, .kitel-chrome button, .kitel-chrome input, .kitel-chrome summary, a.kitel-chrome):focus-visible {
     outline: 2px solid var(--kitel-primary);
     outline-offset: 3px;
 }

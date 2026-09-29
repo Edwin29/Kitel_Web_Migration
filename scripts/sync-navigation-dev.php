@@ -9,15 +9,9 @@ foreach ($argv as $argument) {
         $root = substr($argument, strlen('--rhymix-root='));
     }
 }
-$root = realpath($root);
-if (!$root || !is_file($root . '/files/config/config.php')) {
-    throw new RuntimeException('A local Rhymix installation is required.');
-}
-$config = include $root . '/files/config/config.php';
+require_once __DIR__ . '/dev-environment-guard.php';
+[$root, $config] = kitelDevConfig($root);
 $db = $config['db']['master'];
-if (!in_array($db['host'], ['localhost', '127.0.0.1', '::1'], true)) {
-    throw new RuntimeException('Refusing a non-local database host.');
-}
 $prefix = $db['prefix'];
 if (!preg_match('/^[a-zA-Z0-9_]+$/', $prefix)) {
     throw new RuntimeException('Invalid table prefix.');

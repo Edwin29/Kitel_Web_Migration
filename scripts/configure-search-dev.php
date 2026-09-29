@@ -2,15 +2,9 @@
 /** Configure local Integrated Search with an explicitly public content source. Dry-run by default. */
 declare(strict_types=1);
 
-$root = realpath('D:/rhymix_dev/www/rhymix');
-if (!$root || !is_file($root . '/files/config/config.php')) {
-    throw new RuntimeException('Local Rhymix installation not found.');
-}
-$config = include $root . '/files/config/config.php';
+require_once __DIR__ . '/dev-environment-guard.php';
+[$root, $config] = kitelDevConfig('D:/rhymix_dev/www/rhymix');
 $db = $config['db']['master'];
-if (!in_array($db['host'], ['localhost', '127.0.0.1', '::1'], true) || !preg_match('/^[a-zA-Z0-9_]+$/', $db['prefix'])) {
-    throw new RuntimeException('Refusing a non-local or invalid database.');
-}
 $pdo = new PDO(
     sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $db['host'], $db['port'] ?: 3306, $db['database']),
     $db['user'], $db['pass'],

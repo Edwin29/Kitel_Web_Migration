@@ -6,14 +6,14 @@
 {@ Context::addHtmlHeader('<link rel="icon" type="image/svg+xml" href="' . \RX_BASEURL . 'layouts/kitel_site/img/kitel-mark.svg">'); }
 
 {@ $nav_items = isset($GNB->list) ? $GNB->list : array(); foreach ($nav_items as $nav_key => $nav_item) if (($nav_item['url'] ?? '') === 'index') unset($nav_items[$nav_key]); }
-{@ $nav_rendered_module = $current_module_info->module ?? ''; $nav_rendered_mid = $current_module_info->mid ?? $mid; $nav_forward = !empty($act) ? ModuleModel::getActionForward($act) : null; $nav_has_active_page = $nav_rendered_mid === $mid && !in_array($nav_rendered_module, array('member', 'integration_search')) && (!$nav_forward || !in_array($nav_forward->module, array('member', 'integration_search'))); }
+{@ $nav_rendered_module = $current_module_info->module ?? ''; $nav_rendered_mid = $current_module_info->mid ?? $mid; $nav_forward = !empty($act) ? ModuleModel::getActionForward($act) : null; $nav_is_error = (int)Context::get('http_status_code') >= 400 || (string)Context::get('system_message') !== ''; $nav_has_active_page = !$nav_is_error && $nav_rendered_mid === $mid && !in_array($nav_rendered_module, array('member', 'integration_search')) && (!$nav_forward || !in_array($nav_forward->module, array('member', 'integration_search'))); }
 {@ $nav_category = Context::get('category'); }
 {@ $nav_current_section = null; }
 <block loop="$nav_items=>$nav_key,$nav_item" cond="$nav_has_active_page && $nav_item['selected'] && $nav_item['list']">{@ $nav_current_section = $nav_item; }</block>
 {@ $nav_vertical_section = $nav_current_section && in_array($nav_current_section['url'], array('about', 'etc')); $nav_section_label = $nav_current_section && in_array($nav_current_section['link'], array('Else', '기타')) ? '지원' : ($nav_current_section['link'] ?? ''); $nav_section_heading = $nav_current_section && $nav_current_section['url'] === 'news' ? 'News' : $nav_section_label; }
-<div class="kitel-site">
-    <a class="kitel-skip" href="#kitel-content">본문으로 건너뛰기</a>
-    <header class="kitel-header">
+<div class="kitel-site" data-section="{$nav_current_section['url'] ?? ''}">
+    <a class="kitel-skip kitel-chrome" href="#kitel-content">본문으로 건너뛰기</a>
+    <header class="kitel-header kitel-chrome">
         <div class="kitel-header__inner">
             <a class="kitel-brand" href="{getUrl('', 'mid', 'index')}" aria-label="KITEL 홈">
                 <img src="./img/kitel-mark.svg" width="70" height="70" alt="KITEL" />
@@ -48,6 +48,7 @@
 
         <nav id="kitel-mega-menu" class="kitel-mega" aria-label="하위 메뉴" hidden cond="$nav_items">
             <div class="kitel-mega__inner">
+                <div class="kitel-mega__columns">
                 <div class="kitel-mega__column" loop="$nav_items=>$key1,$item1">
                     <ul cond="$item1['list']">
                         <li loop="$item1['list']=>$key2,$item2">
@@ -55,6 +56,7 @@
                             <a class="{$nav_child_active ? 'is-active' : ''}" href="{$item2['href']}" target="_blank"|cond="$item2['open_window'] == 'Y'" rel="noopener noreferrer">{$item2['link']}</a>
                         </li>
                     </ul>
+                </div>
                 </div>
             </div>
         </nav>
@@ -89,14 +91,14 @@
         </nav>
     </header>
 
-    <div class="kitel-section-banner" cond="$nav_vertical_section">
+    <div class="kitel-section-banner kitel-chrome" cond="$nav_vertical_section">
         <div class="kitel-section-banner__inner kitel-container">
             <img src="./img/kitel-mark.svg" width="24" height="24" alt="" />
             <span>{$nav_section_label}</span>
         </div>
     </div>
 
-    <nav class="kitel-section-nav kitel-section-nav--horizontal kitel-container" aria-label="현재 섹션" cond="$nav_current_section && !$nav_vertical_section">
+    <nav class="kitel-chrome kitel-section-nav kitel-section-nav--horizontal kitel-container" aria-label="현재 섹션" cond="$nav_current_section && !$nav_vertical_section">
         <a class="kitel-section-nav__title" href="{$nav_current_section['href']}">{$nav_section_heading}</a>
         <ul class="kitel-section-nav__links">
             <li loop="$nav_current_section['list']=>$key2,$item2">
@@ -107,7 +109,7 @@
     </nav>
 
     <div class="kitel-content-shell {$nav_vertical_section ? 'has-sidebar' : ''} {$nav_current_section && !$nav_vertical_section ? 'has-horizontal-nav' : ''}">
-        <nav class="kitel-section-nav kitel-section-nav--vertical" aria-label="현재 섹션" cond="$nav_vertical_section">
+        <nav class="kitel-chrome kitel-section-nav kitel-section-nav--vertical" aria-label="현재 섹션" cond="$nav_vertical_section">
             <a class="kitel-section-nav__title" href="{$nav_current_section['href']}">{$nav_section_label}</a>
             <ul class="kitel-section-nav__links">
                 <li loop="$nav_current_section['list']=>$key2,$item2"><a class="{$nav_has_active_page && $item2['selected'] ? 'is-active' : ''}" href="{$item2['href']}">{$item2['link']}</a></li>
@@ -116,7 +118,7 @@
         <main id="kitel-content" class="kitel-main">{$content|noescape}</main>
     </div>
 
-    <footer class="kitel-footer">
+    <footer class="kitel-footer kitel-chrome">
         <div class="kitel-footer__sitemap kitel-container">
             <div class="kitel-footer__column" loop="$nav_items=>$key1,$item1">
                 {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }

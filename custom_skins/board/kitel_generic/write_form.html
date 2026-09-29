@@ -1,0 +1,51 @@
+<include target="_header.html" />
+<form action="./" method="post" onsubmit="return procFilter(this, window.insert)" class="kitel-board__write-form">
+    <input type="hidden" name="mid" value="{$mid}" />
+    <input type="hidden" name="content" value="{$oDocument->getContentText()}" />
+    <input type="hidden" name="document_srl" value="{$document_srl}" />
+    <div class="kitel-board__write-heading">
+        <h2>{$oDocument->isExists() ? $lang->cmd_modify : '게시글 쓰기'}</h2>
+        <button type="submit">{$lang->cmd_registration}</button>
+    </div>
+    <div class="kitel-board__write-grid">
+        <div class="kitel-board__write-main">
+            <div class="kitel-board__write-fields">
+                <label cond="$module_info->use_category=='Y'" class="kitel-board__sr-only" for="kitel-write-category">{$lang->category}</label>
+                <select cond="$module_info->use_category=='Y'" id="kitel-write-category" name="category_srl">
+                    <option value="">{$lang->category}</option>
+                    <option loop="$category_list=>$key,$val" value="{$val->category_srl}" disabled="disabled"|cond="!$val->grant" selected="selected"|cond="$val->grant && (($val->selected && !$oDocument->get('category_srl')) || $val->category_srl == $oDocument->get('category_srl'))">{str_repeat('&nbsp;&nbsp;', $val->depth)} {$val->title} ({$val->document_count})</option>
+                </select>
+                <label class="kitel-board__sr-only" for="kitel-write-title">{$lang->title}</label>
+                <input id="kitel-write-title" type="text" name="title" value="{escape($oDocument->getTitleText(), false)}" placeholder="제목을 입력해주세요" required />
+                <select cond="$grant->manager" name="is_notice" aria-label="공지 설정">
+                    <option value="N" selected="selected"|cond="$oDocument->get('is_notice') === 'N'">{$lang->not_notice}</option>
+                    <option value="Y" selected="selected"|cond="$oDocument->get('is_notice') === 'Y'">{$lang->notice}</option>
+                    <option value="A" selected="selected"|cond="$oDocument->get('is_notice') === 'A'">{$lang->notice_all}</option>
+                </select>
+                <div cond="count($extra_keys)" class="kitel-board__write-extras"><div loop="$extra_keys=>$key,$val"><label>{$val->name}<em cond="$val->is_required=='Y'"> *</em></label>{$val->getFormHTML()}</div></div>
+            </div>
+            <div class="kitel-board__write-editor">{$oDocument->getEditor()}</div>
+            <div cond="!$is_logged" class="kitel-board__write-guest">
+                <label>{$lang->writer}<input type="text" name="nick_name" value="{escape($oDocument->get('nick_name'), false)}" /></label>
+                <label>{$lang->password}<input type="password" name="password" /></label>
+                <label>{$lang->homepage}<input type="text" name="homepage" value="{escape($oDocument->get('homepage'), false)}" /></label>
+            </div>
+            <details class="kitel-board__write-more"><summary>추가 설정</summary>
+                <label cond="$grant->manager"><input type="checkbox" name="title_bold" value="Y" checked="checked"|cond="$oDocument->get('title_bold')=='Y'" />{$lang->title_bold}</label>
+                <label><input type="checkbox" name="comment_status" value="ALLOW" checked="checked"|cond="$oDocument->allowComment()" />{$lang->allow_comment}</label>
+                <label><input type="checkbox" name="allow_trackback" value="Y" checked="checked"|cond="$oDocument->allowTrackback()" />{$lang->allow_trackback}</label>
+                <label cond="$is_logged"><input type="checkbox" name="notify_message" value="Y" checked="checked"|cond="$oDocument->useNotify()" />{$lang->notify}</label>
+                <label>{$lang->tag}<input type="text" name="tags" value="{escape($oDocument->get('tags') ?? '', false)}" /></label>
+                <button cond="$is_logged && (!$oDocument->isExists() || $oDocument->get('status') == 'TEMP')" type="button" onclick="doDocumentSave(this);">{$lang->cmd_temp_save}</button>
+                <button cond="$is_logged && (!$oDocument->isExists() || $oDocument->get('status') == 'TEMP')" type="button" onclick="doDocumentLoad(this);">{$lang->cmd_load}</button>
+            </details>
+            <div cond="isset($captcha) && $captcha && $captcha->isTargetAction('document')">{$captcha}</div>
+        </div>
+        <fieldset class="kitel-board__visibility">
+            <legend>공개 설정</legend>
+            <label cond="$module_info->secret=='Y'"><input type="checkbox" name="is_secret" value="Y" checked="checked"|cond="$oDocument->isSecret()" />{$lang->secret}</label>
+            <label loop="$status_list=>$key,$value" cond="is_array($status_list)"><input type="radio" name="status" value="{$key}" checked="checked"|cond="$oDocument->get('status') == $key || ($key == 'PUBLIC' && !$document_srl)" />{$value}</label>
+        </fieldset>
+    </div>
+</form>
+<include target="_footer.html" />

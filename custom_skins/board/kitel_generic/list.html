@@ -1,0 +1,46 @@
+<include target="_header.html" />
+<include cond="$oDocument->isExists()" target="_read.html" />
+<block cond="!$oDocument->isExists()">
+<div class="kitel-board__list" id="board_list">
+    <div class="kitel-board__toolbar">
+        <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
+        <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
+            <input type="hidden" name="mid" value="{$mid}" />
+            <input type="hidden" name="category" value="{$category}" />
+            <label class="kitel-board__sr-only" for="kitel-board-keyword">{$lang->cmd_search}</label>
+            <input id="kitel-board-keyword" type="search" name="search_keyword" value="{escape($search_keyword ?? '', false)}" />
+            <select name="search_target" aria-label="검색 대상">
+                <option loop="$search_option=>$key,$val" value="{$key}" selected="selected"|cond="$search_target==$key">{$val}</option>
+            </select>
+            <button type="submit" aria-label="{$lang->cmd_search}"></button>
+        </form>
+    </div>
+    <div cond="$grant->manager" class="kitel-board__management"><a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a></div>
+    <table cond="$document_list || $notice_list" class="kitel-board__table">
+        <thead><tr><th scope="col">{$lang->title}</th><th scope="col">{$lang->date}</th><th scope="col">{$lang->readed_count}</th><th scope="col">{$lang->category}</th></tr></thead>
+        <tbody>
+            <tr loop="$notice_list=>$no,$document" class="kitel-board__notice"><include target="_row.html" /></tr>
+            <tr loop="$document_list=>$no,$document"><include target="_row.html" /></tr>
+        </tbody>
+    </table>
+    <div cond="!$document_list && !$notice_list && !$search_keyword" class="kitel-board__state">
+        <p>등록된 게시글이 없습니다.</p>
+        <a cond="$grant->write_document" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">첫 글 작성</a>
+    </div>
+    <div cond="!$document_list && !$notice_list && $search_keyword" class="kitel-board__state">
+        <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
+        <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null)}">검색 초기화</a>
+    </div>
+    <nav cond="($document_list || $notice_list) && $page_navigation" class="kitel-board__pagination" aria-label="게시글 페이지">
+        <a href="{getUrl('page',1,'document_srl','','division',$division,'last_division',$last_division)}">First</a>
+        <a href="{getUrl('page',max(1,$page-1),'document_srl','','division',$division,'last_division',$last_division)}">Back</a>
+        <block loop="$page_no=$page_navigation->getNextPage()">
+            <strong cond="$page==$page_no" aria-current="page">{$page_no}</strong>
+            <a cond="$page!=$page_no" href="{getUrl('page',$page_no,'document_srl','','division',$division,'last_division',$last_division)}">{$page_no}</a>
+        </block>
+        <a href="{getUrl('page',min($page_navigation->last_page,$page+1),'document_srl','','division',$division,'last_division',$last_division)}">Next</a>
+        <a href="{getUrl('page',$page_navigation->last_page,'document_srl','','division',$division,'last_division',$last_division)}">Last</a>
+    </nav>
+</div>
+</block>
+<include target="_footer.html" />

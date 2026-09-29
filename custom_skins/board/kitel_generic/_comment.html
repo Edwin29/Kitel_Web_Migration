@@ -1,0 +1,35 @@
+<section class="kitel-board__comments" id="comment">
+    <h2>{$lang->comment} <span>{$oDocument->getCommentCount()}</span></h2>
+    <ol cond="$oDocument->getCommentCount()" class="kitel-board__comment-list">
+        <li loop="$oDocument->getComments()=>$key,$comment" id="comment_{$comment->comment_srl}" class="kitel-board__comment" data-depth="{$comment->get('depth')}">
+            <div class="kitel-board__comment-meta"><strong>{$comment->getNickName()}</strong><time>{$comment->getRegdate('Y.m.d H:i')}</time></div>
+            <div cond="$comment->status == RX_STATUS_DELETED" class="kitel-board__comment-body">{$lang->msg_deleted_comment}</div>
+            <div cond="$comment->status == RX_STATUS_DELETED_BY_ADMIN" class="kitel-board__comment-body">{$lang->msg_admin_deleted_comment}</div>
+            <form cond="$comment->status != RX_STATUS_DELETED && $comment->status != RX_STATUS_DELETED_BY_ADMIN && !$comment->isAccessible()" action="./" method="get" onsubmit="return procFilter(this, input_password)">
+                <input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="document_srl" value="{$oDocument->document_srl}" /><input type="hidden" name="comment_srl" value="{$comment->comment_srl}" />
+                <label for="comment-password-{$comment->comment_srl}">{$lang->msg_input_password}</label><input id="comment-password-{$comment->comment_srl}" type="password" name="password" /><button type="submit">{$lang->cmd_input}</button>
+            </form>
+            <div cond="$comment->status != RX_STATUS_DELETED && $comment->status != RX_STATUS_DELETED_BY_ADMIN && $comment->isAccessible()" class="kitel-board__comment-body rhymix_content xe_content">{$comment->getContent(false)}</div>
+            <ul cond="$comment->hasUploadedFiles()" class="kitel-board__files"><li loop="$comment->getUploadedFiles()=>$key,$file"><a href="{getUrl('')}{$file->download_url}">{$file->source_filename}</a></li></ul>
+            <div class="kitel-board__comment-actions">
+                <a cond="$oDocument->allowComment()" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardReplyComment', 'comment_srl', $comment->comment_srl)}">{$lang->cmd_reply}</a>
+                <a cond="$comment->isGranted() || !$comment->get('member_srl')" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardModifyComment', 'comment_srl', $comment->comment_srl)}">{$lang->cmd_modify}</a>
+                <a cond="$comment->isGranted() || !$comment->get('member_srl')" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardDeleteComment', 'comment_srl', $comment->comment_srl)}">{$lang->cmd_delete}</a>
+            </div>
+        </li>
+    </ol>
+    <nav cond="$oDocument->comment_page_navigation" class="kitel-board__pagination" aria-label="댓글 페이지">
+        <a href="{getUrl('cpage',1)}#comment">First</a>
+        <block loop="$page_no=$oDocument->comment_page_navigation->getNextPage()"><strong cond="$cpage==$page_no" aria-current="page">{$page_no}</strong><a cond="$cpage!=$page_no" href="{getUrl('cpage',$page_no)}#comment">{$page_no}</a></block>
+        <a href="{getUrl('cpage',$oDocument->comment_page_navigation->last_page)}#comment">Last</a>
+    </nav>
+    <form cond="$grant->write_comment && $oDocument->isEnableComment()" action="./" method="post" onsubmit="return procFilter(this, insert_comment)" class="kitel-board__comment-form" id="write_comment">
+        <input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="document_srl" value="{$oDocument->document_srl}" /><input type="hidden" name="comment_srl" value="" /><input type="hidden" name="content" value="" />
+        {$oDocument->getCommentEditor()}
+        <div cond="!$is_logged"><label>{$lang->writer} <input type="text" name="nick_name" /></label><label>{$lang->password} <input type="password" name="password" /></label><label>{$lang->homepage} <input type="text" name="homepage" /></label></div>
+        <label cond="$is_logged"><input type="checkbox" name="notify_message" value="Y" />{$lang->notify}</label>
+        <label cond="$module_info->secret=='Y'"><input type="checkbox" name="is_secret" value="Y" />{$lang->secret}</label>
+        <div cond="isset($captcha) && $captcha && $captcha->isTargetAction('comment')">{$captcha}</div>
+        <button type="submit">{$lang->cmd_comment_registration}</button>
+    </form>
+</section>

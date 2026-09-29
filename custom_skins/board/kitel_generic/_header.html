@@ -1,0 +1,16 @@
+<load target="board.default.css" />
+<load target="board.default.js" type="body" />
+<load target="kitel-board.css" />
+{@ $category_list = $category_list ?? array(); $search_option = $search_option ?? array(); }
+{@ $kitel_board_title = $mid === 'news' && !empty($category) && isset($category_list[$category]) ? $category_list[$category]->title : ($module_info->browser_title ?: $module_info->mid); }
+<div class="board kitel-board">
+    <div cond="$module_info->header_text" class="kitel-board__intro">{$module_info->header_text}</div>
+    <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && !$oDocument->isExists()">
+        <h1>{$kitel_board_title}</h1>
+        <p cond="$module_info->description">{$module_info->description}</p>
+        <a cond="$grant->manager" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
+    </div>
+    <nav cond="$mid !== 'news' && $module_info->use_category=='Y' && count($category_list)" class="kitel-board__categories" aria-label="게시판 분류">
+        <a href="{getUrl('category','','page','')}" class="is-active"|cond="!$category">{$lang->total}</a>
+        <a loop="$category_list=>$key,$item" href="{getUrl('category',$item->category_srl,'document_srl','','page','')}" class="is-active"|cond="(int)$category === (int)$item->category_srl">{$item->title}</a>
+    </nav>

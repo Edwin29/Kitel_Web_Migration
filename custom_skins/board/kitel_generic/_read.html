@@ -1,0 +1,47 @@
+<article class="kitel-board__detail">
+    <header class="kitel-board__post-header">
+        <h2>{$oDocument->getTitle()}</h2>
+        <div class="kitel-board__post-meta">
+            <span cond="($module_info->display_author ?? 'Y') !== 'N'">{$oDocument->getNickName()}</span>
+            <time>{$oDocument->getRegdate('Y.m.d H:i')}</time>
+            <span>{$lang->readed_count} {$oDocument->get('readed_count') ?: 0}</span>
+            <span>{$lang->comment} {$oDocument->getCommentCount()}</span>
+            <span cond="$module_info->use_category=='Y' && isset($category_list[$oDocument->get('category_srl')])" class="kitel-board__badge">{$category_list[$oDocument->get('category_srl')]->title}</span>
+        </div>
+    </header>
+    <div cond="!$grant->view" class="kitel-board__state kitel-board__locked">
+        <p>로그인 후 확인할 수 있습니다.</p>
+        <a cond="!$is_logged" href="{getUrl('', 'mid', 'member', 'act', 'dispMemberLoginForm')}">로그인</a>
+        <a cond="$is_logged" href="{getUrl('document_srl','')}">목록으로</a>
+    </div>
+    <div cond="$grant->view && !$oDocument->isAccessible()" class="kitel-board__state">
+        <form action="./" method="get" onsubmit="return procFilter(this, input_password)">
+            <input type="hidden" name="mid" value="{$mid}" />
+            <input type="hidden" name="page" value="{$page}" />
+            <input type="hidden" name="document_srl" value="{$oDocument->document_srl}" />
+            <label for="kitel-document-password">{$lang->msg_is_secret} {$lang->msg_input_password}</label>
+            <input type="password" name="password" id="kitel-document-password" />
+            <button type="submit">{$lang->cmd_input}</button>
+        </form>
+    </div>
+    <block cond="$grant->view && $oDocument->isAccessible()">
+        <dl cond="$oDocument->isExtraVarsExists()" class="kitel-board__extras">
+            <div loop="$oDocument->getExtraVars()=>$key,$val" cond="$val->hasValue()"><dt>{$val->name}</dt><dd>{$val->getValueHTML()}</dd></div>
+        </dl>
+        <div cond="$oDocument->hasUploadedFiles()" class="kitel-board__files">
+            <h3>{$lang->uploaded_file}</h3>
+            <ul><li loop="$oDocument->getUploadedFiles()=>$key,$file"><a href="{getUrl('')}{$file->download_url}">{$file->source_filename}</a> <span>{FileHandler::filesize($file->file_size)}</span></li></ul>
+        </div>
+        <div class="kitel-board__body rhymix_content xe_content">{$oDocument->getContent(false)}</div>
+        {@ $tag_list = $oDocument->get('tag_list'); }
+        <div cond="count($tag_list ?: [])" class="kitel-board__tags"><a loop="$tag_list=>$key,$tag" href="{getUrl('', 'mid', $mid, 'search_target', 'tag', 'search_keyword', $tag)}" rel="tag">{escape($tag, false)}</a></div>
+    </block>
+    <div class="kitel-board__actions">
+        <a href="{getUrl('document_srl','')}">{$lang->cmd_list}</a>
+        <a cond="$oDocument->isEditable()" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'document_srl', $oDocument->document_srl)}">{$lang->cmd_modify}</a>
+        <a cond="$oDocument->isEditable()" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardDelete', 'document_srl', $oDocument->document_srl)}">{$lang->cmd_delete}</a>
+        <a class="document_{$oDocument->document_srl}" href="#popup_menu_area" onclick="return false">{$lang->cmd_document_do}</a>
+    </div>
+</article>
+<include cond="$oDocument->allowTrackback()" target="_trackback.html" />
+<include cond="$grant->view && $oDocument->isAccessible() && $oDocument->isEnableComment()" target="_comment.html" />

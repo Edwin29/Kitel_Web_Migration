@@ -96,7 +96,7 @@ XE의 메일 발송(`mail()` → ssmtp → Gmail SMTP)이 **개인 Gmail 계정�
 ### Study
 | 항목 | 상태 | 비고 |
 |---|---|---|
-| 자료실 | ✅✅ 완료(모듈) / ⬜ 콘텐츠 이관 미착수 | `custom_modules/archive` 구현+검증 완료. 단 NAS Drive 실제 자료(311GB, 2-4번 참고) 이관은 범위 재검토 후 착수 필요 |
+| 자료실 | ✅ 기존 백엔드 / ⏸ Phase 5 퍼블리싱·이관 보류 | `custom_modules/archive`는 보존. NAS Drive 실제 자료(약 311GB)의 이관 범위와 폴더 구조, 홈페이지 권한, 공동 수정·버전·삭제·기록 정책을 먼저 결정해야 함. [Phase 5 보류 기록](phase5-archive-deferred.md) 참고. Phase 6 Homework는 진행 가능 |
 | 과제게시판 | ✅✅ 완료 | `custom_modules/homework`, 제출현황 대시보드 포함 |
 | 작품전시회 게시판 | ✅✅ 완료 | board+`custom_skins/board/kitel_gallery`, 승인 워크플로우 검증 완료. 과거 축제게시판 데이터(524건)는 보류 상태로 아카이브 보관 |
 | 세미나 게시판 | 🔧 골격만 | mid=seminar 게시판+grants는 스켈레톤 단계에서 생성됨. **발표자/발표일자 확장변수 미구현**(명세는 있음, [board-feature-specs.md §6](board-feature-specs.md)). 강좌게시판(lecture, 92건) 데이터 흡수도 대기 중 |

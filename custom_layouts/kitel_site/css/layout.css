@@ -52,7 +52,7 @@
     opacity: 0;
 }
 .kitel-nav__link:hover::after,
-.kitel-nav__link:focus-visible::after,
+.kitel-nav__link:focus-visible::after { opacity: .45; }
 .kitel-nav__link.is-active::after { opacity: 1; }
 .kitel-header__actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .kitel-search {

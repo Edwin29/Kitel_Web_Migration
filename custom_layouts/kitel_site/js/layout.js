@@ -13,18 +13,24 @@
         if (mega) mega.hidden = true;
         if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (link) { link.setAttribute('aria-expanded', 'false'); });
     }
-    function openMega() {
+    function openMega(link) {
         if (!mega || window.matchMedia('(max-width: 1120px)').matches) return;
         mega.hidden = false;
-        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (link) { link.setAttribute('aria-expanded', 'true'); });
+        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (item) { item.setAttribute('aria-expanded', item === link ? 'true' : 'false'); });
     }
     function closeMobile() {
         if (mobile) mobile.hidden = true;
         if (toggle) toggle.setAttribute('aria-expanded', 'false');
     }
     if (nav) {
-        nav.addEventListener('pointerenter', openMega);
-        nav.addEventListener('focusin', openMega);
+        nav.addEventListener('pointerover', function (event) {
+            var link = event.target.closest('.kitel-nav__link');
+            if (link && nav.contains(link)) openMega(link);
+        });
+        nav.addEventListener('focusin', function (event) {
+            var link = event.target.closest('.kitel-nav__link');
+            if (link && nav.contains(link)) openMega(link);
+        });
     }
     if (header) {
         header.addEventListener('pointerleave', closeMega);

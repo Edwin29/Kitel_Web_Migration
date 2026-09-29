@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout version="0.2">
+    <title xml:lang="ko">KITEL 공통 레이아웃</title>
+    <title xml:lang="en">KITEL Site Layout</title>
+    <description xml:lang="ko">KITEL 신규 홈페이지의 헤더, 메뉴, 검색, 계정 동작, 푸터를 제공하는 레이아웃입니다.</description>
+    <version>1.0</version>
+    <date>2026-09-29</date>
+    <author email_address="webmaster@kitel.kw.ac.kr">
+        <name xml:lang="ko">KITEL</name>
+    </author>
+    <menus>
+        <menu name="GNB" maxdepth="3" default="true">
+            <title xml:lang="ko">전체 메뉴</title>
+        </menu>
+    </menus>
+</layout>

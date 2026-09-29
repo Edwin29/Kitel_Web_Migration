@@ -1,0 +1,105 @@
+<load target="css/font.css" />
+<load target="css/tokens.css" />
+<load target="css/components.css" />
+<load target="css/layout.css" />
+<load target="js/layout.js" type="body" />
+
+{@ $nav_items = isset($GNB->list) ? $GNB->list : array(); if ($nav_items && reset($nav_items)['link'] === 'Welcome') array_shift($nav_items) }
+<div class="kitel-site">
+    <a class="kitel-skip" href="#kitel-content">본문으로 건너뛰기</a>
+    <header class="kitel-header">
+        <div class="kitel-header__inner">
+            <a class="kitel-brand" href="{getUrl('', 'mid', 'index')}" aria-label="KITEL 홈">
+                <img src="./img/kitel-mark.svg" width="70" height="70" alt="KITEL" />
+            </a>
+
+            <nav class="kitel-nav" aria-label="전체 메뉴" cond="$nav_items">
+                <block loop="$nav_items=>$key1,$item1">
+                    {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
+                    <a class="kitel-nav__link {$item1['selected'] ? 'is-active' : ''}" href="{$item1['href']}" target="_blank"|cond="$item1['open_window'] == 'Y'" rel="noopener noreferrer" aria-controls="kitel-mega-menu" aria-expanded="false">{$label1}</a>
+                </block>
+            </nav>
+
+            <div class="kitel-header__actions">
+                <form class="kitel-search" action="{getUrl()}" method="get" role="search" no-error-return-url="true">
+                    <input type="hidden" name="mid" value="{$mid}" />
+                    <input type="hidden" name="act" value="IS" />
+                    <input type="search" name="is_keyword" value="{$is_keyword ?? ''}" aria-label="사이트 검색" required="required" />
+                    <button type="submit" aria-label="검색"><img src="./img/search.svg" width="24" height="24" alt="" /></button>
+                </form>
+                <div class="kitel-account" cond="!$is_logged">
+                    <a href="{getUrl('act', 'dispMemberLoginForm')}">Login</a>
+                    <a href="{getUrl('act', 'dispMemberSignUpForm')}">Signup</a>
+                </div>
+                <div class="kitel-account" cond="$is_logged">
+                    <a href="{getUrl('act', 'dispMemberInfo')}">My Page</a>
+                    <a href="{getUrl('act', 'dispMemberLogout')}">Logout</a>
+                </div>
+                <span class="kitel-language" aria-hidden="true"><img src="./img/globe.svg" width="24" height="24" alt="" /></span>
+            </div>
+            <button class="kitel-mobile-toggle" type="button" aria-label="메뉴 열기" aria-controls="kitel-mobile-menu" aria-expanded="false"><span></span></button>
+        </div>
+
+        <nav id="kitel-mega-menu" class="kitel-mega" aria-label="하위 메뉴" hidden cond="$nav_items">
+            <div class="kitel-mega__inner">
+                <div class="kitel-mega__column" loop="$nav_items=>$key1,$item1">
+                    <ul cond="$item1['list']">
+                        <li loop="$item1['list']=>$key2,$item2"><a class="{$item2['selected'] ? 'is-active' : ''}" href="{$item2['href']}" target="_blank"|cond="$item2['open_window'] == 'Y'" rel="noopener noreferrer">{$item2['link']}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <nav id="kitel-mobile-menu" class="kitel-mobile" aria-label="모바일 메뉴" hidden>
+            <form class="kitel-search kitel-mobile__search" action="{getUrl()}" method="get" role="search" no-error-return-url="true">
+                <input type="hidden" name="mid" value="{$mid}" />
+                <input type="hidden" name="act" value="IS" />
+                <input type="search" name="is_keyword" value="{$is_keyword ?? ''}" aria-label="사이트 검색" placeholder="검색" required="required" />
+                <button type="submit" aria-label="검색"><img src="./img/search.svg" width="24" height="24" alt="" /></button>
+            </form>
+            <ul class="kitel-mobile__list">
+                <li loop="$nav_items=>$key1,$item1">
+                    {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
+                    <details>
+                        <summary>{$label1}</summary>
+                        <a class="kitel-mobile__all" href="{$item1['href']}">{$label1} 전체 보기</a>
+                        <ul cond="$item1['list']">
+                            <li loop="$item1['list']=>$key2,$item2"><a href="{$item2['href']}">{$item2['link']}</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+            <div class="kitel-mobile__account" cond="!$is_logged">
+                <a href="{getUrl('act', 'dispMemberLoginForm')}">Login</a>
+                <a href="{getUrl('act', 'dispMemberSignUpForm')}">Signup</a>
+            </div>
+            <div class="kitel-mobile__account" cond="$is_logged">
+                <a href="{getUrl('act', 'dispMemberInfo')}">My Page</a>
+                <a href="{getUrl('act', 'dispMemberLogout')}">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <nav class="kitel-section-nav kitel-container" aria-label="현재 섹션" loop="$nav_items=>$key1,$item1" cond="$item1['selected'] && $item1['list']">
+        {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
+        <a class="kitel-section-nav__title" href="{$item1['href']}">{$label1}</a>
+        <ul class="kitel-section-nav__links">
+            <li loop="$item1['list']=>$key2,$item2"><a class="{$item2['selected'] ? 'is-active' : ''}" href="{$item2['href']}">{$item2['link']}</a></li>
+        </ul>
+    </nav>
+
+    <main id="kitel-content" class="kitel-main">{$content|noescape}</main>
+
+    <footer class="kitel-footer">
+        <div class="kitel-footer__sitemap kitel-container">
+            <div class="kitel-footer__column" loop="$nav_items=>$key1,$item1">
+                {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
+                <a class="kitel-footer__title" href="{$item1['href']}">{$label1}</a>
+                <ul cond="$item1['list']">
+                    <li loop="$item1['list']=>$key2,$item2"><a class="{$item2['selected'] ? 'is-active' : ''}" href="{$item2['href']}">{$item2['link']}</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="kitel-footer__meta">Copyright © KITEL @ KW Univ. All Rights Reserved.</div>
+    </footer>
+</div>

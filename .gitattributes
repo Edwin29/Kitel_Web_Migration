@@ -1,0 +1,13 @@
+/custom_modules/** text=auto eol=lf
+/custom_skins/** text=auto eol=lf
+/custom_widgets/** text=auto eol=lf
+/custom_layouts/** text=auto eol=lf
+/scripts/*.ps1 text eol=crlf
+
+*.gif binary -eol
+*.jpg binary -eol
+*.jpeg binary -eol
+*.png binary -eol
+*.webp binary -eol
+*.woff binary -eol
+*.woff2 binary -eol

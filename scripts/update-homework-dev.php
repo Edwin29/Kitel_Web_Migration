@@ -1,5 +1,5 @@
 <?php
-/** Local-only schema update for the Phase 6 homework form revision. Dry run by default. */
+/** Local-only additive schema update for Homework. Dry run by default. */
 declare(strict_types=1);
 require_once __DIR__ . '/dev-environment-guard.php';
 
@@ -18,6 +18,7 @@ $columns = [
         'answer_fields' => 'TEXT NULL',
         'allowed_extensions' => 'VARCHAR(250) NULL',
         'description_image' => 'VARCHAR(250) NULL',
+        'is_visible' => "CHAR(1) NOT NULL DEFAULT 'Y'",
     ],
     'rx_homework_submission' => ['answers' => 'TEXT NULL'],
 ];

@@ -6,6 +6,7 @@
 	<column name="answer_fields" type="text" />
 	<column name="allowed_extensions" type="varchar" size="250" />
 	<column name="description_image" type="varchar" size="250" />
+	<column name="is_visible" type="char" size="1" notnull="notnull" default="Y" />
 	<column name="deadline" type="varchar" size="14" />
 	<column name="member_srl" type="number" notnull="notnull" />
 	<column name="regdate" type="varchar" size="14" notnull="notnull" />

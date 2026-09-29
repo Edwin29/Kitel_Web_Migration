@@ -17,6 +17,10 @@
     cursor: pointer;
 }
 .kitel-site .kitel-button:hover { background: #111155; }
+.kitel-site .kitel-write-action { display: inline-flex; min-height: 32px; align-items: center; justify-content: center; gap: 4px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--kitel-primary); color: #fff; font: 600 var(--kitel-text-sm)/1 var(--kitel-font); text-decoration: none; white-space: nowrap; cursor: pointer; }
+.kitel-site .kitel-write-action::before { display: block; width: 16px; height: 16px; background: url('../img/write.svg') center / contain no-repeat; content: ''; }
+.kitel-site .kitel-write-action:hover { background: #111155; color: #fff; }
+.kitel-site .kitel-write-action:focus-visible { outline: 2px solid var(--kitel-primary); outline-offset: 3px; }
 .kitel-site .kitel-button:focus-visible,
 .kitel-site .kitel-input:focus-visible,
 :where(.kitel-chrome a, .kitel-chrome button, .kitel-chrome input, .kitel-chrome summary, a.kitel-chrome):focus-visible {

@@ -5,7 +5,7 @@
  */
 class HomeworkModel extends Homework
 {
-	function getTaskPage($module_srl, $page, $list_count = 10)
+	function getTaskPage($module_srl, $page, $list_count = 10, $visible_only = false)
 	{
 		$args = new stdClass;
 		$args->module_srl = (int)$module_srl;
@@ -13,6 +13,7 @@ class HomeworkModel extends Homework
 		$args->list_count = $list_count;
 		$args->page_count = 5;
 		$args->sort_index = 'task_srl';
+		if ($visible_only) $args->is_visible = 'Y';
 		return executeQueryArray('homework.getTaskPage', $args);
 	}
 

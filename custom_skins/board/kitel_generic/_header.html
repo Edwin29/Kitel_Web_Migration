@@ -18,7 +18,7 @@
                 <a class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
             </div>
             <div class="kitel-board__toolbar">
-                <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
+                <a cond="$grant->write_document" class="kitel-board__write kitel-write-action" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">{$lang->cmd_write}</a>
                 <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
                     <input type="hidden" name="mid" value="{$mid}" />
                     <input type="hidden" name="category" value="{$category}" />

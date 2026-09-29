@@ -1,7 +1,10 @@
 <query id="getTaskPage" action="select">
     <tables><table name="homework_task" /></tables>
     <columns><column name="*" /></columns>
-    <conditions><condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" /></conditions>
+    <conditions>
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" />
+        <condition operation="equal" column="is_visible" var="is_visible" pipe="and" />
+    </conditions>
     <navigation>
         <index var="sort_index" default="task_srl" order="desc" />
         <list_count var="list_count" default="10" />

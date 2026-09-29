@@ -8,6 +8,7 @@
 .kitel-hw-admin__selector { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
 .kitel-hw-admin__selector a { display: inline-block; padding: 8px 14px; border-radius: 20px; background: var(--hw-subtle); color: inherit; text-decoration: none; }
 .kitel-hw-admin__selector a.is-selected { background: var(--hw-primary); color: #fff; }
+.kitel-hw-admin__selector small { margin-left: 7px; font-size: 11px; opacity: .75; }
 .kitel-hw-admin__hero { display: flex; min-height: 100px; align-items: center; gap: 16px; padding: 20px 24px; border: 1px solid #1c1f25; }
 .kitel-hw-admin__hero strong { flex: none; font-size: clamp(32px, 4vw, 60px); line-height: 1; }
 .kitel-hw-admin__hero h2 { margin: 0; font-size: clamp(24px, 2.5vw, 40px); font-weight: 300; overflow-wrap: anywhere; }
@@ -28,11 +29,20 @@
 .kitel-hw-admin__member { position: sticky; left: 0; z-index: 1; min-width: 130px; background: #fff; }
 .kitel-hw-admin__matrix thead .kitel-hw-admin__member { background: var(--hw-subtle); }
 .kitel-hw-admin__empty { padding: 32px; background: var(--hw-subtle); color: #626262; }
-.kitel-hw-admin__task-table { width: 100%; border-collapse: collapse; }
+.kitel-hw-admin__task-table { width: 100%; min-width: 680px; border-collapse: collapse; }
+.kitel-hw-admin__toolbar { display: flex; justify-content: flex-end; margin-bottom: 16px; }
 .kitel-hw-admin__task-table th, .kitel-hw-admin__task-table td { padding: 14px 16px; border-bottom: 1px solid var(--hw-border); text-align: left; }
 .kitel-hw-admin__task-table th { background: var(--hw-subtle); font-weight: 500; }
 .kitel-hw-admin__task-table a { color: var(--hw-primary); }
 .kitel-hw-admin__task-table .x_btn-link { padding: 0; border: 0; background: none; color: var(--hw-primary); font: inherit; cursor: pointer; }
+.kitel-hw-admin__task-actions { display: flex; align-items: center; gap: 16px; }
+.kitel-hw-admin__task-actions form { margin: 0; }
+.kitel-hw-admin__visibility { display: inline-flex; width: 76px; height: 30px; align-items: center; justify-content: flex-start; gap: 5px; padding: 3px 5px; border: 1px solid #72a9e4; border-radius: 16px; background: rgba(106, 174, 244, .26); color: #244d7c; font: 600 13px var(--kitel-font, Pretendard, sans-serif); cursor: pointer; }
+.kitel-hw-admin__visibility.is-off { flex-direction: row-reverse; border-color: #c7cbd1; background: #e8e9eb; color: #62676f; }
+.kitel-hw-admin__visibility-knob { width: 20px; height: 20px; flex: none; border-radius: 50%; background: #528fd2; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+.kitel-hw-admin__visibility.is-off .kitel-hw-admin__visibility-knob { background: #858b93; }
+.kitel-hw-admin__visibility:hover { filter: brightness(.96); }
+.kitel-hw-admin__visibility:focus-visible { outline: 2px solid var(--hw-primary); outline-offset: 3px; }
 .kitel-hw-admin__task-form .x_table { width: 100%; border-collapse: collapse; }
 .kitel-hw-admin__task-form .x_table th, .kitel-hw-admin__task-form .x_table td { padding: 16px; border-bottom: 1px solid var(--hw-border); text-align: left; }
 .kitel-hw-admin__task-form .x_table th { width: 170px; background: var(--hw-subtle); font-weight: 500; }
@@ -54,8 +64,6 @@
 .kitel-hw-admin__field { padding: 24px; }
 .kitel-hw-admin__field .js-remove-field { justify-self: end; }
 .kitel-hw-admin__form-actions { display: flex; gap: 12px; }
-/* Desktop shell begins after the 80px header and 65px productive section nav. */
-.kitel-site:has(.kitel-hw-admin--list) .kitel-content-shell.has-horizontal-nav { min-height: calc(100dvh - 145px); }
 .kitel-hw-admin__pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; padding-bottom: 40px; }
 .kitel-hw-admin__pagination > * { display: inline-flex; min-width: 36px; min-height: 36px; align-items: center; justify-content: center; padding: 5px 9px; border: 1px solid var(--hw-border); border-radius: 4px; font-size: 14px; text-decoration: none; }
 .kitel-hw-admin__pagination a { color: var(--hw-primary); }

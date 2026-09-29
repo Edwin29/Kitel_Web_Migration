@@ -41,6 +41,10 @@ class HomeworkController extends Homework
 		{
 			throw new Rhymix\Framework\Exceptions\InvalidRequest;
 		}
+		if (($task->is_visible ?? 'Y') === 'N' && !($this->grant->create ?? false))
+		{
+			throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		}
 
 		$logged_info = Context::get('logged_info');
 		$posted_answers = Context::get('answer');
@@ -144,6 +148,7 @@ class HomeworkController extends Homework
 		{
 			throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		}
+		if (($task->is_visible ?? 'Y') === 'N' && !($this->grant->create ?? false)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		$path = FileHandler::getRealPath($this->getStorageDir() . 'task-images/' . $task->description_image);
 		if (!Rhymix\Framework\Storage::isFile($path)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		$mime = (new finfo(FILEINFO_MIME_TYPE))->file($path);
@@ -167,6 +172,8 @@ class HomeworkController extends Homework
 		{
 			throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		}
+		$task = $oHomeworkModel->getTask($submission->task_srl);
+		if (!$task || (int)$task->module_srl !== (int)$this->module_info->module_srl || (($task->is_visible ?? 'Y') === 'N' && !($this->grant->create ?? false))) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 
 		$logged_info = Context::get('logged_info');
 		$is_owner = $logged_info && (int) $submission->member_srl === (int) $logged_info->member_srl;

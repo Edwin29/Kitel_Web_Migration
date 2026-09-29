@@ -124,52 +124,23 @@ class HomeworkAdminController extends Homework
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispHomeworkAdminContent', 'mid', Context::get('mid')));
 	}
 
-	/**
-	 * @brief Delete a task and every submission under it, including attached files
-	 */
-	function procHomeworkAdminDeleteTask()
+	/** Show or hide a task without modifying its submissions or attachments. */
+	function procHomeworkAdminSetVisibility()
 	{
-		$task_srl = (int) Context::get('task_srl');
-		$oHomeworkModel = getModel('homework');
-		$task = $oHomeworkModel->getTask($task_srl);
-		if (!$task || (int) $task->module_srl !== (int) $this->module_info->module_srl)
-		{
-			throw new Rhymix\Framework\Exceptions\InvalidRequest;
-		}
-
+		$task_srl = (int)Context::get('task_srl');
+		$is_visible = Context::get('is_visible');
+		if (!$task_srl || !in_array($is_visible, array('Y', 'N'), true)) throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		$task = getModel('homework')->getTask($task_srl);
+		if (!$task || (int)$task->module_srl !== (int)$this->module_info->module_srl) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		$args = new stdClass;
 		$args->task_srl = $task_srl;
-		$submissions = $oHomeworkModel->getSubmissionsByTask($task_srl);
-		$deleted_submissions = executeQuery('homework.deleteSubmissionsByTask', $args);
-		if (!$deleted_submissions->toBool())
-		{
-			return $deleted_submissions;
-		}
-		$deleted_task = executeQuery('homework.deleteTask', $args);
-		if (!$deleted_task->toBool())
-		{
-			return $deleted_task;
-		}
-		foreach ($submissions as $submission)
-		{
-			if (!$submission->stored_filename || basename($submission->stored_filename) !== $submission->stored_filename)
-			{
-				continue;
-			}
-			$path = FileHandler::getRealPath('./files/attach/homework/' . $this->module_info->module_srl . '/' . $submission->stored_filename);
-			if (Rhymix\Framework\Storage::isFile($path))
-			{
-				Rhymix\Framework\Storage::delete($path);
-			}
-		}
-		if ($task->description_image && basename($task->description_image) === $task->description_image)
-		{
-			$image_path = FileHandler::getRealPath('./files/attach/homework/' . $this->module_info->module_srl . '/task-images/' . $task->description_image);
-			if (Rhymix\Framework\Storage::isFile($image_path)) Rhymix\Framework\Storage::delete($image_path);
-		}
-
-		$this->setMessage('success_deleted');
-		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispHomeworkAdminContent', 'mid', Context::get('mid')));
+		$args->module_srl = $this->module_info->module_srl;
+		$args->is_visible = $is_visible;
+		$output = executeQuery('homework.updateTaskVisibility', $args);
+		if (!$output->toBool()) return $output;
+		$this->setMessage('success_updated');
+		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispHomeworkAdminContent', 'mid', Context::get('mid'), 'page', max(1, (int)Context::get('page'))));
 	}
+
 }
 /* End of file homework.admin.controller.php */

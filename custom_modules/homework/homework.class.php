@@ -18,7 +18,7 @@ class Homework extends ModuleObject
 	function checkUpdate()
 	{
 		$db = DB::getInstance();
-		foreach (array('answer_fields', 'allowed_extensions', 'description_image') as $column)
+		foreach (array('answer_fields', 'allowed_extensions', 'description_image', 'is_visible') as $column)
 		{
 			if (!$db->isColumnExists('homework_task', $column)) return true;
 		}
@@ -31,6 +31,7 @@ class Homework extends ModuleObject
 		if (!$db->isColumnExists('homework_task', 'answer_fields')) $db->addColumn('homework_task', 'answer_fields', 'text');
 		if (!$db->isColumnExists('homework_task', 'allowed_extensions')) $db->addColumn('homework_task', 'allowed_extensions', 'varchar', 250);
 		if (!$db->isColumnExists('homework_task', 'description_image')) $db->addColumn('homework_task', 'description_image', 'varchar', 250);
+		if (!$db->isColumnExists('homework_task', 'is_visible')) $db->addColumn('homework_task', 'is_visible', 'char', 1, 'Y', true);
 		if (!$db->isColumnExists('homework_submission', 'answers')) $db->addColumn('homework_submission', 'answers', 'text');
 	}
 

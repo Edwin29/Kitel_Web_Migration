@@ -19,12 +19,12 @@ class HomeworkView extends Homework
 		$logged_info = Context::get('logged_info');
 
 		$page = max(1, (int)Context::get('page'));
-		$output = $oHomeworkModel->getTaskPage($module_srl, $page);
+		$output = $oHomeworkModel->getTaskPage($module_srl, $page, 10, true);
 		if (!$output->toBool()) return $output;
 		if ($output->page_navigation && $page > $output->page_navigation->last_page && $output->page_navigation->last_page > 0)
 		{
 			$page = $output->page_navigation->last_page;
-			$output = $oHomeworkModel->getTaskPage($module_srl, $page);
+			$output = $oHomeworkModel->getTaskPage($module_srl, $page, 10, true);
 			if (!$output->toBool()) return $output;
 		}
 		$tasks = is_array($output->data) ? $output->data : array();
@@ -59,6 +59,10 @@ class HomeworkView extends Homework
 		$oHomeworkModel = getModel('homework');
 		$task = $oHomeworkModel->getTask($task_srl);
 		if (!$task || (int) $task->module_srl !== (int) $this->module_info->module_srl)
+		{
+			throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		}
+		if (($task->is_visible ?? 'Y') === 'N' && !($this->grant->create ?? false))
 		{
 			throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		}

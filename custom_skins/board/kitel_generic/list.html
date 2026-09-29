@@ -3,7 +3,7 @@
 <include cond="$oDocument->isExists()" target="_read.html" />
 <include cond="!$oDocument->isExists() && $mid === 'sharing'" target="_community_list.html" />
 <block cond="!$oDocument->isExists() && $mid !== 'sharing'">
-<div class="kitel-board__list" id="board_list">
+<div class="kitel-board__list kitel-list-surface" id="board_list">
     <table cond="$document_list || $notice_list" class="kitel-board__table">
         <thead><tr><th scope="col">{$lang->title}</th><th scope="col">{$lang->date}</th><th scope="col">{$lang->readed_count}</th><th scope="col">{$lang->category}</th></tr></thead>
         <tbody>

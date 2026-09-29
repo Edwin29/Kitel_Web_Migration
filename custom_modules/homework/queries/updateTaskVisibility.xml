@@ -1,0 +1,8 @@
+<query id="updateTaskVisibility" action="update">
+    <tables><table name="homework_task" /></tables>
+    <columns><column name="is_visible" var="is_visible" notnull="notnull" /></columns>
+    <conditions>
+        <condition operation="equal" column="task_srl" var="task_srl" notnull="notnull" />
+        <condition operation="equal" column="module_srl" var="module_srl" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

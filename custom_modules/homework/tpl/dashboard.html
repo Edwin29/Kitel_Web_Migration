@@ -4,7 +4,7 @@
 <div class="kitel-hw-admin">
     <p cond="!$tasks" class="kitel-hw-admin__empty">출제된 과제가 없습니다. 과제를 먼저 등록해 주세요.</p>
     <div cond="$tasks" class="kitel-hw-admin__selector" aria-label="과제 선택">
-        <a loop="$tasks=>$index,$item" class="{$selected_task->task_srl == $item->task_srl ? 'is-selected' : ''}" href="{getUrl('act','dispHomeworkAdminDashboard','task_srl',$item->task_srl)}">{$item->title}</a>
+        <a loop="$tasks=>$index,$item" class="{$selected_task->task_srl == $item->task_srl ? 'is-selected' : ''}" href="{getUrl('act','dispHomeworkAdminDashboard','task_srl',$item->task_srl)}">{$item->title}<small cond="$item->is_visible === 'N'">미표시</small></a>
     </div>
     <section cond="$selected_task" aria-labelledby="kitel-hw-selected-title">
         <div cond="$show_deadline_banner" class="kitel-hw-admin__hero"><strong cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></strong><strong cond="$days_remaining === null">과제</strong><h2 id="kitel-hw-selected-title">{$selected_task->title}</h2></div>

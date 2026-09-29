@@ -14,7 +14,7 @@
 .kg_pending_badge { display:inline-block; font-size:.72em; background:#f0ad4e; color:#fff; padding:2px 7px; border-radius:10px; margin-bottom:6px; }
 .kg_empty { text-align:center; color:#999; padding:60px 0; }
 </style>
-<div class="board_list kg_list" id="board_list" cond="isset($list_config)">
+<div class="board_list kg_list kitel-list-surface" id="board_list" cond="isset($list_config)">
 	{@ $kg_cards = array() }
 	<block loop="$notice_list=>$kg_no,$kg_doc">
 		{@ if($kg_doc->isAccessible()) $kg_cards[] = $kg_doc }

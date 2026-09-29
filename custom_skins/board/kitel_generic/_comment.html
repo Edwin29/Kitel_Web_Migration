@@ -10,7 +10,7 @@
                 <label for="comment-password-{$comment->comment_srl}">{$lang->msg_input_password}</label><input id="comment-password-{$comment->comment_srl}" type="password" name="password" /><button type="submit">{$lang->cmd_input}</button>
             </form>
             <div cond="$comment->status != RX_STATUS_DELETED && $comment->status != RX_STATUS_DELETED_BY_ADMIN && $comment->isAccessible()" class="kitel-board__comment-body rhymix_content xe_content">{$comment->getContent(false)}</div>
-            <ul cond="$comment->hasUploadedFiles()" class="kitel-board__files"><li loop="$comment->getUploadedFiles()=>$key,$file"><a href="{getUrl('')}{$file->download_url}">{$file->source_filename}</a></li></ul>
+            <ul cond="$comment->status != RX_STATUS_DELETED && $comment->status != RX_STATUS_DELETED_BY_ADMIN && $comment->isAccessible() && $comment->hasUploadedFiles()" class="kitel-board__files"><li loop="$comment->getUploadedFiles()=>$key,$file"><a href="{getUrl('')}{$file->download_url}">{$file->source_filename}</a></li></ul>
             <div class="kitel-board__comment-actions">
                 <a cond="$oDocument->allowComment()" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardReplyComment', 'comment_srl', $comment->comment_srl)}">{$lang->cmd_reply}</a>
                 <a cond="$comment->isGranted() || !$comment->get('member_srl')" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardModifyComment', 'comment_srl', $comment->comment_srl)}">{$lang->cmd_modify}</a>

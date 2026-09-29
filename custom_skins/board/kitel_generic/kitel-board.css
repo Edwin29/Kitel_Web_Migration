@@ -39,10 +39,12 @@
 .kitel-board__comment-count { margin-left: 5px; color: var(--kb-primary); font-size: 14px; }
 .kitel-board__notice .kitel-board__row-title a { font-weight: 600; }
 .kitel-board__badge { display: inline-block; padding: 5px 7px; border-radius: 5px; color: #fff; background: var(--kb-primary); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.kitel-board__badge--mobile { display: none; }
 .kitel-board__state { padding: 48px 24px; border-block: 1px solid var(--kb-border); text-align: center; color: var(--kb-muted); }
 .kitel-board__state p { margin: 0 0 18px; }.kitel-board__state a { color: var(--kb-primary); text-decoration: underline; }
 .kitel-board__pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: auto 0 70px; padding-top: 72px; }
-.kitel-board__pagination a, .kitel-board__pagination strong { display: inline-flex; min-width: 36px; height: 36px; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid #e9e9e9; border-radius: 4px; font-size: 14px; font-weight: 400; }
+.kitel-board__pagination a, .kitel-board__pagination strong, .kitel-board__pagination span[aria-disabled] { display: inline-flex; min-width: 36px; height: 36px; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid #e9e9e9; border-radius: 4px; font-size: 14px; font-weight: 400; }
+.kitel-board__pagination span[aria-disabled] { color: var(--kb-muted); opacity: .55; }
 .kitel-board__pagination strong { border-color: #000; color: #fff; background: #000; font-weight: 700; }
 .kitel-board__detail { margin-bottom: 64px; }
 .kitel-board__post-header { padding-bottom: 24px; border-bottom: 1px solid var(--kb-border); }
@@ -70,5 +72,6 @@
 .kitel-board__write-editor { margin-top: 40px; min-height: 360px; }.kitel-board__visibility { align-self: start; min-width: 0; margin: 0; padding: 16px; border: 0; background: #f5f5f5; }.kitel-board__visibility legend { width: 100%; padding: 0 0 10px; border-bottom: 1px solid var(--kb-muted); }.kitel-board__visibility label { display: block; margin-top: 14px; }
 .kitel-board__write-guest { display: grid; gap: 12px; }.kitel-board__write-more { margin-top: 22px; }.kitel-board__write-more label { display: block; margin-top: 12px; }.kitel-board__write-more summary { cursor: pointer; }
 @media (max-width: 700px) { .kitel-board__write-grid { grid-template-columns: 1fr; }.kitel-board__visibility { grid-row: 1; }.kitel-board__write-heading h2 { font-size: 24px; } }
-@media (max-width: 700px) { .kitel-board__heading h1 { font-size: 34px; }.kitel-board__heading p { font-size: 18px; }.kitel-board__toolbar { flex-wrap: wrap; }.kitel-board__table th:nth-child(3), .kitel-board__table td:nth-child(3) { display: none; }.kitel-board__table th:first-child { width: 60%; }.kitel-board__table th:nth-child(2) { width: 24%; }.kitel-board__table th:nth-child(4) { width: 16%; }.kitel-board__table td, .kitel-board__table th { padding-inline: 6px; font-size: 13px; }.kitel-board__row-title a { font-size: 16px; }.kitel-board__row-title small { font-size: 13px; } }
+@media (max-width: 1200px) { .kitel-board__table th:first-child { width: 50%; }.kitel-board__table th:nth-child(2) { width: 17%; }.kitel-board__table th:nth-child(3) { width: 10%; }.kitel-board__table th:nth-child(4) { width: 23%; } }
+@media (max-width: 700px) { .kitel-board__heading h1 { font-size: 34px; }.kitel-board__heading p { font-size: 18px; }.kitel-board__toolbar { flex-wrap: wrap; }.kitel-board__table th:nth-child(3), .kitel-board__table td:nth-child(3), .kitel-board__table th:nth-child(4), .kitel-board__table td:nth-child(4) { display: none; }.kitel-board__table th:first-child { width: 70%; }.kitel-board__table th:nth-child(2) { width: 30%; }.kitel-board__table td, .kitel-board__table th { padding-inline: 6px; font-size: 13px; }.kitel-board__row-title a { font-size: 16px; }.kitel-board__row-title small { font-size: 13px; }.kitel-board__badge--mobile { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 11px; vertical-align: middle; } }
 @media (max-width: 700px) { .kitel-board__list { min-height: 520px; }.kitel-board__pagination { margin-bottom: 40px; } }

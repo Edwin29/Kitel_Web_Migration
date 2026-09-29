@@ -3,11 +3,12 @@
 <load target="kitel-board.css" />
 {@ $category_list = $category_list ?? array(); $search_option = $search_option ?? array(); }
 {@ $kitel_board_title = $mid === 'news' && !empty($category) && isset($category_list[$category]) ? $category_list[$category]->title : ($module_info->browser_title ?: $module_info->mid); }
+{@ $kitel_board_description = !empty($category) && isset($category_list[$category]) && !empty($category_list[$category]->description) ? $category_list[$category]->description : $module_info->description; }
 <div class="board kitel-board">
     <div cond="$module_info->header_text" class="kitel-board__intro">{$module_info->header_text}</div>
-    <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && !$oDocument->isExists()">
+    <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && (!$oDocument || !$oDocument->isExists())">
         <h1>{$kitel_board_title}</h1>
-        <p cond="$module_info->description">{$module_info->description}</p>
+        <p cond="$kitel_board_description">{$kitel_board_description}</p>
         <a cond="$grant->manager" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
     </div>
     <nav cond="$mid !== 'news' && $module_info->use_category=='Y' && count($category_list)" class="kitel-board__categories" aria-label="게시판 분류">

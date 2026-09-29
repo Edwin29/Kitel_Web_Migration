@@ -33,7 +33,6 @@
             <details class="kitel-board__write-more"><summary>추가 설정</summary>
                 <label cond="$grant->manager"><input type="checkbox" name="title_bold" value="Y" checked="checked"|cond="$oDocument->get('title_bold')=='Y'" />{$lang->title_bold}</label>
                 <label><input type="checkbox" name="comment_status" value="ALLOW" checked="checked"|cond="$oDocument->allowComment()" />{$lang->allow_comment}</label>
-                <label><input type="checkbox" name="allow_trackback" value="Y" checked="checked"|cond="$oDocument->allowTrackback()" />{$lang->allow_trackback}</label>
                 <label cond="$is_logged"><input type="checkbox" name="notify_message" value="Y" checked="checked"|cond="$oDocument->useNotify()" />{$lang->notify}</label>
                 <label>{$lang->tag}<input type="text" name="tags" value="{escape($oDocument->get('tags') ?? '', false)}" /></label>
                 <button cond="$is_logged && (!$oDocument->isExists() || $oDocument->get('status') == 'TEMP')" type="button" onclick="doDocumentSave(this);">{$lang->cmd_temp_save}</button>

@@ -27,19 +27,23 @@
         <p>등록된 게시글이 없습니다.</p>
         <a cond="$grant->write_document" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">첫 글 작성</a>
     </div>
-    <div cond="!$document_list && !$notice_list && $search_keyword" class="kitel-board__state">
+    <div cond="!$document_list && $search_keyword" class="kitel-board__state">
         <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
         <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null)}">검색 초기화</a>
     </div>
     <nav cond="($document_list || $notice_list) && $page_navigation" class="kitel-board__pagination" aria-label="게시글 페이지">
-        <a href="{getUrl('page',1,'document_srl','','division',$division,'last_division',$last_division)}">First</a>
-        <a href="{getUrl('page',max(1,$page-1),'document_srl','','division',$division,'last_division',$last_division)}">Back</a>
+        <a cond="$page > 1" href="{getUrl('page',1,'document_srl','','division',$division,'last_division',$last_division)}">First</a>
+        <span cond="$page <= 1" aria-disabled="true">First</span>
+        <a cond="$page > 1" href="{getUrl('page',$page-1,'document_srl','','division',$division,'last_division',$last_division)}">Back</a>
+        <span cond="$page <= 1" aria-disabled="true">Back</span>
         <block loop="$page_no=$page_navigation->getNextPage()">
             <strong cond="$page==$page_no" aria-current="page">{$page_no}</strong>
             <a cond="$page!=$page_no" href="{getUrl('page',$page_no,'document_srl','','division',$division,'last_division',$last_division)}">{$page_no}</a>
         </block>
-        <a href="{getUrl('page',min($page_navigation->last_page,$page+1),'document_srl','','division',$division,'last_division',$last_division)}">Next</a>
-        <a href="{getUrl('page',$page_navigation->last_page,'document_srl','','division',$division,'last_division',$last_division)}">Last</a>
+        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page+1,'document_srl','','division',$division,'last_division',$last_division)}">Next</a>
+        <span cond="$page >= $page_navigation->last_page" aria-disabled="true">Next</span>
+        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page_navigation->last_page,'document_srl','','division',$division,'last_division',$last_division)}">Last</a>
+        <span cond="$page >= $page_navigation->last_page" aria-disabled="true">Last</span>
     </nav>
 </div>
 </block>

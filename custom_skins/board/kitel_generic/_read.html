@@ -43,5 +43,4 @@
         <a class="document_{$oDocument->document_srl}" href="#popup_menu_area" onclick="return false">{$lang->cmd_document_do}</a>
     </div>
 </article>
-<include cond="$oDocument->allowTrackback()" target="_trackback.html" />
 <include cond="$grant->view && $oDocument->isAccessible() && $oDocument->isEnableComment()" target="_comment.html" />

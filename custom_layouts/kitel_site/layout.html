@@ -8,7 +8,6 @@
 {@ $nav_items = isset($GNB->list) ? $GNB->list : array(); foreach ($nav_items as $nav_key => $nav_item) if (($nav_item['url'] ?? '') === 'index') unset($nav_items[$nav_key]); }
 {@ $nav_rendered_module = $current_module_info->module ?? ''; $nav_rendered_mid = $current_module_info->mid ?? $mid; $nav_forward = !empty($act) ? ModuleModel::getActionForward($act) : null; $nav_is_error = (int)Context::get('http_status_code') >= 400 || (string)Context::get('system_message') !== ''; $nav_has_active_page = !$nav_is_error && $nav_rendered_mid === $mid && !in_array($nav_rendered_module, array('member', 'integration_search')) && (!$nav_forward || !in_array($nav_forward->module, array('member', 'integration_search'))); }
 {@ $nav_category = Context::get('category'); }
-{@ $nav_news_document_request = (int)Context::get('document_srl') > 0 || (int)($_GET['document_srl'] ?? 0) > 0 || preg_match('~/news/[0-9]+(?:/|$)~', (string)parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH)); }
 {@ $nav_current_section = null; }
 <block loop="$nav_items=>$nav_key,$nav_item" cond="$nav_has_active_page && $nav_item['selected'] && $nav_item['list']">{@ $nav_current_section = $nav_item; }</block>
 {@ $nav_vertical_section = $nav_current_section && in_array($nav_current_section['url'], array('about', 'etc')); $nav_section_label = $nav_current_section && in_array($nav_current_section['link'], array('Else', '기타')) ? '지원' : ($nav_current_section['link'] ?? ''); $nav_section_heading = $nav_current_section && $nav_current_section['url'] === 'news' ? 'News' : $nav_section_label; }
@@ -117,12 +116,6 @@
             </ul>
         </nav>
         <main id="kitel-content" class="kitel-main">
-            <div class="kitel-board-access-state" cond="$nav_is_error && $nav_rendered_mid === 'news' && $nav_news_document_request">
-                <h1>Kitel News</h1>
-                <p cond="!$is_logged">로그인 후 게시글 본문을 확인할 수 있습니다.</p>
-                <p cond="$is_logged">이 게시글의 열람 권한이 없습니다.</p>
-                <a href="{getUrl('', 'mid', 'news')}">목록으로</a>
-            </div>
             {$content|noescape}
         </main>
     </div>

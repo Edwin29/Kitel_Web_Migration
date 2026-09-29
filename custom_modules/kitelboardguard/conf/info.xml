@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+    <title xml:lang="ko">KITEL 게시판 첨부 권한</title>
+    <title xml:lang="en">KITEL Board Attachment Guard</title>
+    <description xml:lang="ko">공통 게시판 첨부 다운로드에 문서와 댓글 열람 권한을 적용합니다.</description>
+    <version>1.0</version>
+    <date>2026-09-30</date>
+    <category>service</category>
+    <author email_address="dev@kitel.local" link=""><name xml:lang="ko">KITEL</name></author>
+</module>

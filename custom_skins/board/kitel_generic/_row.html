@@ -2,6 +2,7 @@
     <a href="{getUrl('document_srl',$document->document_srl,'cpage','')}">{$document->getTitle()}</a>
     <span cond="$document->getCommentCount()" class="kitel-board__comment-count">[{$document->getCommentCount()}]</span>
     <small cond="($module_info->display_author ?? 'Y') !== 'N'">{$document->getNickName()}</small>
+    <span cond="$module_info->use_category=='Y' && isset($category_list[$document->get('category_srl')])" class="kitel-board__badge kitel-board__badge--mobile">{$category_list[$document->get('category_srl')]->title}</span>
 </td>
 <td>{$document->getRegdate('Y.m.d')}</td>
 <td>{$document->get('readed_count') ?: 0}</td>

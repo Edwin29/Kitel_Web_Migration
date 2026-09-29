@@ -6,4 +6,11 @@
         <tbody cond="!$tasks"><tr><td colspan="{$is_submitter ? 4 : 2}" class="kitel-homework__empty">출제된 과제가 없습니다.</td></tr></tbody>
         <tbody cond="$tasks"><tr loop="$tasks=>$idx,$task"><td class="kitel-homework__task-name"><a href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}">{$task->title}</a><small cond="$is_submitter && $task->is_past_deadline">마감일 경과</small></td><td class="kitel-homework__date"><span cond="$task->deadline">{substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)}</span><span cond="!$task->deadline">기한 없음</span></td><td cond="$is_submitter"><span class="kitel-homework__status {$task->has_submission ? 'is-done' : 'is-missing'}">{$task->my_status}</span></td><td cond="$is_submitter"><a class="kitel-homework__edit-link" href="{getUrl('act','dispHomeworkView','task_srl',$task->task_srl)}#homework-submission">{$task->has_submission ? '수정' : '제출'}</a></td></tr></tbody>
     </table></div>
+    <nav cond="$tasks && $page_navigation" class="kitel-homework__pagination" aria-label="과제 목록 페이지">
+        <a cond="$page > 1" href="{getUrl('page',1)}" aria-label="첫 페이지">처음</a><span cond="$page <= 1" aria-disabled="true">처음</span>
+        <a cond="$page > 1" href="{getUrl('page',$page-1)}" aria-label="이전 페이지">이전</a><span cond="$page <= 1" aria-disabled="true">이전</span>
+        <block loop="$page_no=$page_navigation->getNextPage()"><strong cond="$page == $page_no" aria-current="page">{$page_no}</strong><a cond="$page != $page_no" href="{getUrl('page',$page_no)}">{$page_no}</a></block>
+        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page+1)}" aria-label="다음 페이지">다음</a><span cond="$page >= $page_navigation->last_page" aria-disabled="true">다음</span>
+        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page_navigation->last_page)}" aria-label="마지막 페이지">마지막</a><span cond="$page >= $page_navigation->last_page" aria-disabled="true">마지막</span>
+    </nav>
 </section>

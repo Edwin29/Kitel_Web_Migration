@@ -18,7 +18,16 @@ class HomeworkView extends Homework
 		$oHomeworkModel = getModel('homework');
 		$logged_info = Context::get('logged_info');
 
-		$tasks = $oHomeworkModel->getTaskList($module_srl);
+		$page = max(1, (int)Context::get('page'));
+		$output = $oHomeworkModel->getTaskPage($module_srl, $page);
+		if (!$output->toBool()) return $output;
+		if ($output->page_navigation && $page > $output->page_navigation->last_page && $output->page_navigation->last_page > 0)
+		{
+			$page = $output->page_navigation->last_page;
+			$output = $oHomeworkModel->getTaskPage($module_srl, $page);
+			if (!$output->toBool()) return $output;
+		}
+		$tasks = is_array($output->data) ? $output->data : array();
 
 		if ($this->grant->submit ?? false)
 		{
@@ -32,6 +41,8 @@ class HomeworkView extends Homework
 		}
 
 		Context::set('tasks', $tasks);
+		Context::set('page', $page);
+		Context::set('page_navigation', $output->page_navigation);
 		Context::set('is_submitter', $this->grant->submit ?? false);
 		Context::set('can_view_all', $this->grant->view_all ?? false);
 		Context::set('can_manage', $this->grant->create ?? false);

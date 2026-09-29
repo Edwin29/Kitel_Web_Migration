@@ -53,5 +53,10 @@
 .kitel-homework__submissions h2 span { color: var(--kitel-text-secondary, #626262); font-size: var(--kitel-text-sm, 16px); }
 .kitel-homework__submission-body { min-width: 200px; max-width: 360px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .kitel-homework__back { display: inline-block; color: var(--kitel-text-secondary, #626262); }
+.kitel-homework__pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; }
+.kitel-homework__pagination > * { display: inline-flex; min-width: 36px; min-height: 36px; align-items: center; justify-content: center; padding: 5px 9px; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 4px; font-size: 14px; text-decoration: none; }
+.kitel-homework__pagination a { color: var(--kitel-primary, #191970); }
+.kitel-homework__pagination a:hover, .kitel-homework__pagination strong { border-color: var(--kitel-primary, #191970); background: var(--kitel-primary, #191970); color: #fff; }
+.kitel-homework__pagination span { color: var(--kitel-text-muted, #a9aeb3); }
 .kitel-homework a:focus-visible, .kitel-homework button:focus-visible, .kitel-homework textarea:focus-visible, .kitel-homework input:focus-visible { outline: 2px solid var(--kitel-primary, #191970); outline-offset: 3px; }
 @media (max-width: 700px) { .kitel-homework__hero { flex-wrap: wrap; padding: 16px; }.kitel-homework__hero h1 { flex: 1 1 calc(100% - 125px); }.kitel-homework__jump { margin-left: 0; }.kitel-homework__submit { padding: 20px; } }

@@ -54,3 +54,10 @@
 .kitel-hw-admin__field { padding: 24px; }
 .kitel-hw-admin__field .js-remove-field { justify-self: end; }
 .kitel-hw-admin__form-actions { display: flex; gap: 12px; }
+/* Desktop shell begins after the 80px header and 65px productive section nav. */
+.kitel-site:has(.kitel-hw-admin--list) .kitel-content-shell.has-horizontal-nav { min-height: calc(100dvh - 145px); }
+.kitel-hw-admin__pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; padding-bottom: 40px; }
+.kitel-hw-admin__pagination > * { display: inline-flex; min-width: 36px; min-height: 36px; align-items: center; justify-content: center; padding: 5px 9px; border: 1px solid var(--hw-border); border-radius: 4px; font-size: 14px; text-decoration: none; }
+.kitel-hw-admin__pagination a { color: var(--hw-primary); }
+.kitel-hw-admin__pagination a:hover, .kitel-hw-admin__pagination strong { border-color: var(--hw-primary); background: var(--hw-primary); color: #fff; }
+.kitel-hw-admin__pagination span { color: #a9aeb3; }

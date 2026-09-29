@@ -27,6 +27,12 @@ The local development database still contains the pre-existing `품평회 과제
 - The image route checks the homework `list` grant. Accepted image MIME types are JPEG, PNG, WebP, and GIF. Submission extension restrictions are checked on the server; the file input `accept` attribute is only a convenience. Leaving the extension setting blank preserves the former unrestricted behavior.
 - New fields use `homework_task.answer_fields`, `allowed_extensions`, `description_image` and `homework_submission.answers`. New installs use the XML schemas; an existing Rhymix install can apply the module update. For the known local development database, `php scripts/update-homework-dev.php` previews four additive columns and `php scripts/update-homework-dev.php --apply` adds them after verifying the development root, DB, and homework module. Existing rows are preserved. Sync source files with `scripts/sync-dev.ps1` separately.
 
+## Task list pagination follow-up
+
+The member task list and the technical management list each use the same server-side `getTaskPage` query, ten tasks per page, ordered by task ID descending. The dashboard still loads all tasks for its full submission matrix. The management list keeps a white content region through the bottom of a short desktop viewport so the grey footer does not begin immediately after the last table row. This is scoped to the homework management list.
+
+Local QA temporarily added tasks to reach 11 total: both lists showed 10 rows on page 1 and one on page 2, with working next-page links. An out-of-range page request resolved to the last valid page. The temporary tasks were deleted. With the original seven tasks, the footer started at viewport y=900 at 1920, 1440, and 1024 widths with a 900px-high browser window; no horizontal overflow was observed at 390px.
+
 ## Dashboard entry follow-up
 
 The task list now displays **제출현황 대시보드** when the viewer has `create`, and task detail displays **이 과제 제출현황** for the same grant. Both links lead to the existing admin dashboard; the detail link selects its current task. Local browser checks confirmed the links and navigation for admin and a technical-department QA account, while a full member saw neither link. The QA account was removed after the check.

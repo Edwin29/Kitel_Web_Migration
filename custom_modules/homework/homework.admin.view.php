@@ -17,9 +17,20 @@ class HomeworkAdminView extends Homework
 	function dispHomeworkAdminContent()
 	{
 		$oHomeworkModel = getModel('homework');
-		$tasks = $oHomeworkModel->getTaskList($this->module_info->module_srl);
+		$page = max(1, (int)Context::get('page'));
+		$output = $oHomeworkModel->getTaskPage($this->module_info->module_srl, $page);
+		if (!$output->toBool()) return $output;
+		if ($output->page_navigation && $page > $output->page_navigation->last_page && $output->page_navigation->last_page > 0)
+		{
+			$page = $output->page_navigation->last_page;
+			$output = $oHomeworkModel->getTaskPage($this->module_info->module_srl, $page);
+			if (!$output->toBool()) return $output;
+		}
+		$tasks = is_array($output->data) ? $output->data : array();
 
 		Context::set('tasks', $tasks);
+		Context::set('page', $page);
+		Context::set('page_navigation', $output->page_navigation);
 		$this->setTemplateFile('task_list');
 	}
 

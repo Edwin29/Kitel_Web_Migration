@@ -5,6 +5,17 @@
  */
 class HomeworkModel extends Homework
 {
+	function getTaskPage($module_srl, $page, $list_count = 10)
+	{
+		$args = new stdClass;
+		$args->module_srl = (int)$module_srl;
+		$args->page = max(1, (int)$page);
+		$args->list_count = $list_count;
+		$args->page_count = 5;
+		$args->sort_index = 'task_srl';
+		return executeQueryArray('homework.getTaskPage', $args);
+	}
+
 	function getTaskList($module_srl)
 	{
 		$args = new stdClass;

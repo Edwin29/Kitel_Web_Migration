@@ -1,0 +1,13 @@
+<a class="kitel-community__post-link" href="{getUrl('document_srl',$document->document_srl,'cpage','')}">
+    <div class="kitel-community__post-copy">
+        <strong><span cond="$document->isNotice()" class="kitel-community__notice-label">공지</span>{$document->getTitle()}</strong>
+        <p cond="$document->isAccessible()">{$document->getSummary(90)}</p>
+        <p cond="!$document->isAccessible()">비밀글입니다.</p>
+        <span class="kitel-community__post-author" cond="($module_info->display_author ?? 'Y') !== 'N'">{$document->getNickName()} · {$document->getRegdate('Y.m.d')}</span>
+        <time cond="($module_info->display_author ?? 'Y') === 'N'" datetime="{$document->getRegdate('Y-m-d')}">{$document->getRegdate('Y.m.d')}</time>
+    </div>
+    <span class="kitel-community__post-counts" aria-label="댓글 {$document->getCommentCount()}개, 추천 {$document->get('voted_count')}개">
+        <span class="kitel-community__comments" aria-hidden="true">{$document->getCommentCount()}</span>
+        <span class="kitel-community__votes" aria-hidden="true">{$document->get('voted_count') ?: 0}</span>
+    </span>
+</a>

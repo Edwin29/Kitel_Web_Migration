@@ -1,0 +1,47 @@
+<section class="kitel-community" id="board_list" aria-labelledby="kitel-community-title">
+    <div class="kitel-community__band">
+        <div class="kitel-community__band-inner">
+            <h1 id="kitel-community-title">{$kitel_board_title}</h1>
+            <form action="{getUrl()}" method="get" class="kitel-community__search" rx-autoform="false" role="search">
+                <input type="hidden" name="mid" value="{$mid}" />
+                <input type="hidden" name="category" value="{$category}" />
+                <label class="kitel-board__sr-only" for="kitel-community-keyword">게시글 검색</label>
+                <input id="kitel-community-keyword" type="search" name="search_keyword" value="{escape($search_keyword ?? '', false)}" placeholder="게시글 검색" />
+                <select name="search_target" aria-label="검색 대상">
+                    <option loop="$search_option=>$key,$val" value="{$key}" selected="selected"|cond="$search_target==$key">{$val}</option>
+                </select>
+                <button type="submit" aria-label="검색"></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="kitel-community__intro">
+        <div class="kitel-community__avatar" aria-hidden="true">K</div>
+        <div class="kitel-community__intro-copy">
+            <strong>함께 나누는 이야기</strong>
+            <p cond="$kitel_board_description">{$kitel_board_description}</p>
+            <p cond="!$kitel_board_description">KITEL 회원들의 소식과 이야기를 공유해 주세요.</p>
+        </div>
+        <a cond="$grant->write_document" class="kitel-community__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">글쓰기</a>
+    </div>
+
+    <div class="kitel-community__columns">
+        <div class="kitel-community__feed">
+            <div cond="$grant->manager" class="kitel-board__management"><a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a></div>
+            <ul cond="$document_list || $notice_list" class="kitel-community__posts">
+                <li loop="$notice_list=>$no,$document" class="kitel-community__post kitel-community__post--notice"><include target="_community_row.html" /></li>
+                <li loop="$document_list=>$no,$document" class="kitel-community__post"><include target="_community_row.html" /></li>
+            </ul>
+            <div cond="!$document_list && !$notice_list && !$search_keyword" class="kitel-board__state">
+                <p>등록된 게시글이 없습니다.</p>
+                <a cond="$grant->write_document" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">첫 글 작성</a>
+            </div>
+            <div cond="!$document_list && $search_keyword" class="kitel-board__state">
+                <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
+                <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null)}">검색 초기화</a>
+            </div>
+            <include target="_pagination.html" />
+        </div>
+        <include target="_community_aside.html" />
+    </div>
+</section>

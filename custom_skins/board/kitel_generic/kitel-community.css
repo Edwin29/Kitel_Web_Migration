@@ -1,0 +1,37 @@
+.kitel-community { --kc-bg: #f2f3f5; --kc-muted: #777e89; }
+.kitel-community__band { width: 100vw; margin-left: calc(50% - 50vw); background: var(--kb-primary); color: #fff; }
+.kitel-community__band-inner { display: flex; width: min(1160px, calc(100% - 48px)); min-height: 80px; margin-inline: auto; align-items: center; justify-content: space-between; gap: 24px; }
+.kitel-community__band h1 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 600; }
+.kitel-community__search { display: flex; width: min(330px, 100%); height: 40px; align-items: center; padding: 0 12px; border-radius: 22px; background: #fff; }
+.kitel-community__search input { min-width: 0; flex: 1; border: 0; outline: 0; font: inherit; color: var(--kb-text); }
+.kitel-community__search select { max-width: 75px; border: 0; background: transparent; color: var(--kc-muted); font-size: 12px; }
+.kitel-community__search button { width: 26px; height: 26px; flex: none; border: 0; background: transparent url('../../../../layouts/kitel_site/img/search.svg') center / 24px 24px no-repeat; cursor: pointer; }
+.kitel-community__intro { display: flex; width: min(964px, 100%); min-height: 125px; align-items: center; gap: 20px; margin: 72px auto 70px; padding: 20px 28px; border-radius: 6px; background: var(--kc-bg); }
+.kitel-community__avatar { display: grid; width: 68px; height: 68px; flex: none; place-items: center; border-radius: 50%; background: #fff; color: var(--kb-primary); font-size: 27px; font-weight: 700; }
+.kitel-community__intro-copy { min-width: 0; flex: 1; }
+.kitel-community__intro-copy strong { font-size: 21px; font-weight: 600; }
+.kitel-community__intro-copy p { margin: 7px 0 0; color: var(--kc-muted); font-size: 15px; }
+.kitel-community__write { display: inline-flex; min-height: 40px; align-items: center; padding: 0 22px; border-radius: 22px; background: var(--kb-primary); color: #fff; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.kitel-community__columns { display: grid; width: min(964px, 100%); grid-template-columns: minmax(0, 1fr) 210px; gap: 70px; align-items: start; margin-inline: auto; }
+.kitel-community__posts { margin: 0; padding: 0; list-style: none; }
+.kitel-community__post { border-bottom: 1px solid var(--kb-border); }
+.kitel-community__post-link { display: flex; min-height: 86px; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; color: var(--kb-text); text-decoration: none; }
+.kitel-community__post-link:hover strong { color: var(--kb-primary); }
+.kitel-community__post-copy { min-width: 0; }
+.kitel-community__post-copy strong { display: block; overflow: hidden; font-size: 16px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.kitel-community__post-copy p { overflow: hidden; margin: 6px 0 0; color: var(--kc-muted); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.kitel-community__post-author, .kitel-community__post-copy time { display: block; margin-top: 5px; color: var(--kc-muted); font-size: 12px; }
+.kitel-community__notice-label { margin-right: 8px; color: var(--kb-primary); font-weight: 700; }
+.kitel-community__post-counts { display: flex; flex: none; gap: 16px; align-items: center; font-size: 14px; }
+.kitel-community__comments, .kitel-community__votes { display: inline-flex; align-items: center; gap: 4px; }
+.kitel-community__comments { color: var(--kb-primary); }
+.kitel-community__comments::before { content: ''; width: 14px; height: 11px; border: 1.5px solid currentColor; border-radius: 5px; }
+.kitel-community__votes::before { content: '♡'; font-size: 22px; line-height: 1; }
+.kitel-community__aside { display: grid; gap: 20px; }
+.kitel-community__aside-card { min-height: 138px; padding: 22px; border-radius: 6px; background: var(--kc-bg); }
+.kitel-community__aside-card h2 { margin: 0 0 16px; font-size: 17px; font-weight: 600; }
+.kitel-community__aside-card p { margin: 0; color: var(--kc-muted); font-size: 14px; line-height: 1.5; }
+.kitel-community__aside-card a { display: inline-block; margin-top: 14px; color: var(--kb-primary); font-size: 14px; }
+.kitel-community .kitel-board__pagination { margin-top: 0; }
+@media (max-width: 850px) { .kitel-community__columns { grid-template-columns: minmax(0, 1fr); gap: 36px; }.kitel-community__aside { grid-template-columns: repeat(2, minmax(0, 1fr)); }.kitel-community__intro { margin-block: 45px; } }
+@media (max-width: 600px) { .kitel-community__band-inner { flex-wrap: wrap; padding-block: 16px; }.kitel-community__band h1 { font-size: 24px; }.kitel-community__search { width: 100%; }.kitel-community__intro { flex-wrap: wrap; margin-block: 28px; padding: 18px; }.kitel-community__avatar { width: 52px; height: 52px; }.kitel-community__write { width: 100%; justify-content: center; }.kitel-community__aside { grid-template-columns: 1fr; }.kitel-community__post-counts { gap: 8px; font-size: 12px; } }

@@ -1,6 +1,7 @@
 <include target="_header.html" />
 <include cond="$oDocument->isExists()" target="_read.html" />
-<block cond="!$oDocument->isExists()">
+<include cond="!$oDocument->isExists() && $mid === 'sharing'" target="_community_list.html" />
+<block cond="!$oDocument->isExists() && $mid !== 'sharing'">
 <div class="kitel-board__list" id="board_list">
     <div class="kitel-board__toolbar">
         <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
@@ -31,20 +32,7 @@
         <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
         <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null)}">검색 초기화</a>
     </div>
-    <nav cond="($document_list || $notice_list) && $page_navigation" class="kitel-board__pagination" aria-label="게시글 페이지">
-        <a cond="$page > 1" href="{getUrl('page',1,'document_srl','','division',$division,'last_division',$last_division)}">First</a>
-        <span cond="$page <= 1" aria-disabled="true">First</span>
-        <a cond="$page > 1" href="{getUrl('page',$page-1,'document_srl','','division',$division,'last_division',$last_division)}">Back</a>
-        <span cond="$page <= 1" aria-disabled="true">Back</span>
-        <block loop="$page_no=$page_navigation->getNextPage()">
-            <strong cond="$page==$page_no" aria-current="page">{$page_no}</strong>
-            <a cond="$page!=$page_no" href="{getUrl('page',$page_no,'document_srl','','division',$division,'last_division',$last_division)}">{$page_no}</a>
-        </block>
-        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page+1,'document_srl','','division',$division,'last_division',$last_division)}">Next</a>
-        <span cond="$page >= $page_navigation->last_page" aria-disabled="true">Next</span>
-        <a cond="$page < $page_navigation->last_page" href="{getUrl('page',$page_navigation->last_page,'document_srl','','division',$division,'last_division',$last_division)}">Last</a>
-        <span cond="$page >= $page_navigation->last_page" aria-disabled="true">Last</span>
-    </nav>
+    <include target="_pagination.html" />
 </div>
 </block>
 <include target="_footer.html" />

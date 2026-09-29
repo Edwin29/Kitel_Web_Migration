@@ -93,8 +93,33 @@ class HomeworkView extends Homework
 		}
 
 		Context::set('task', $task);
-		Context::set('answer_fields', self::getAnswerFields($task));
-		Context::set('my_answers', $my_submission ? self::getAnswers($my_submission) : array());
+		$answer_fields = self::getAnswerFields($task);
+		$my_answers = $my_submission ? self::getAnswers($my_submission) : array();
+		$questions = array(array(
+			'id' => 'primary',
+			'input_name' => 'content',
+			'prompt_html' => self::getQuestionPromptHtml($task),
+			'height' => self::getPrimaryAnswerHeight($task),
+			'answer' => $my_submission ? $my_submission->content : '',
+		));
+		if ($task->description_image)
+		{
+			$url = getNotEncodedUrl('', 'act', 'procHomeworkTaskImage', 'mid', Context::get('mid'), 'task_srl', $task->task_srl);
+			$questions[0]['prompt_html'] .= '<p><img src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" alt="과제 설명 이미지"></p>';
+		}
+		foreach ($answer_fields as $field)
+		{
+			$questions[] = array(
+				'id' => $field['id'],
+				'input_name' => 'answer[' . $field['id'] . ']',
+				'prompt_html' => self::getQuestionPromptHtml($task, $field),
+				'height' => $field['height'] ?? 180,
+				'answer' => $my_answers[$field['id']] ?? '',
+			);
+		}
+		Context::set('questions', $questions);
+		Context::set('answer_fields', $answer_fields);
+		Context::set('my_answers', $my_answers);
 		Context::set('allowed_accept', $task->allowed_extensions ? '.' . str_replace(',', ',.', $task->allowed_extensions) : '');
 		Context::set('show_deadline_banner', false);
 		Context::set('my_submission', $my_submission);

@@ -37,8 +37,27 @@ class Homework extends ModuleObject
 
 	public static function getAnswerFields($task)
 	{
-		$fields = json_decode($task->answer_fields ?? '', true);
-		return is_array($fields) ? $fields : array();
+		$data = json_decode($task->answer_fields ?? '', true);
+		if (!is_array($data)) return array();
+		return isset($data['version']) ? ($data['fields'] ?? array()) : $data;
+	}
+
+	public static function getPrimaryAnswerHeight($task)
+	{
+		$data = json_decode($task->answer_fields ?? '', true);
+		return isset($data['version']) ? max(120, min(900, (int)($data['primary_height'] ?? 270))) : 270;
+	}
+
+	public static function getQuestionPromptHtml($task, $field = null)
+	{
+		$data = json_decode($task->answer_fields ?? '', true);
+		if ($field !== null)
+		{
+			if (!empty($field['prompt_html'])) return $field['prompt_html'];
+			return nl2br(htmlspecialchars((string)($field['title'] ?? ''), ENT_QUOTES, 'UTF-8'));
+		}
+		if (isset($data['version'])) return (string)$task->description;
+		return nl2br(htmlspecialchars((string)$task->description, ENT_QUOTES, 'UTF-8'));
 	}
 
 	public static function getAnswers($submission)

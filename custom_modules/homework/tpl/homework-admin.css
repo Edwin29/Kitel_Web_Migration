@@ -83,6 +83,17 @@
 #hw-field-list { display: grid; gap: 16px; }
 .kitel-hw-admin__field { padding: 24px; }
 .kitel-hw-admin__field .js-remove-field { justify-self: end; }
+.kitel-hw-admin__field-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.kitel-hw-admin__field-heading h3 { margin: 0; font-size: 22px; font-weight: 500; }
+.kitel-hw-admin__prompt-editor { min-height: 140px; padding: 16px; border: 1px solid var(--hw-border); border-radius: 5px; background: #fff; line-height: 1.6; overflow-wrap: anywhere; }
+.kitel-hw-admin__prompt-editor:empty::before { content: attr(data-placeholder); color: #9299a2; pointer-events: none; }
+.kitel-hw-admin__prompt-editor img { display: block; max-width: 100%; height: auto; margin: 12px 0; }
+.kitel-hw-admin__prompt-editor.is-dragover { border-color: var(--hw-primary); background: #eef1fb; }
+.kitel-hw-admin__prompt-editor:focus-visible { outline: 2px solid var(--hw-primary); outline-offset: 3px; }
+.kitel-hw-admin__image-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.kitel-hw-admin__image-tools span { color: #626262; font-size: 14px; }
+.kitel-hw-admin__image-tools input[hidden], .kitel-hw-admin__field textarea[hidden] { display: none; }
+.kitel-hw-admin__field .js-field-preview { min-height: 120px; resize: vertical; }
 .kitel-hw-admin__form-actions { display: flex; gap: 12px; }
 .kitel-hw-admin__pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 32px; padding-bottom: 40px; }
 .kitel-hw-admin__pagination > * { display: inline-flex; min-width: 36px; min-height: 36px; align-items: center; justify-content: center; padding: 5px 9px; border: 1px solid var(--hw-border); border-radius: 4px; font-size: 14px; text-decoration: none; }

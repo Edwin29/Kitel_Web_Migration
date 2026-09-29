@@ -51,7 +51,28 @@ class HomeworkAdminView extends Homework
 			}
 		}
 		Context::set('task', $task);
-		Context::set('answer_fields', $task ? self::getAnswerFields($task) : array());
+		$questions = array(array(
+			'id' => 'primary',
+			'prompt_html' => $task ? self::getQuestionPromptHtml($task) : '',
+			'height' => $task ? self::getPrimaryAnswerHeight($task) : 270,
+		));
+		if ($task && $task->description_image)
+		{
+			$url = getNotEncodedUrl('', 'act', 'procHomeworkTaskImage', 'mid', Context::get('mid'), 'task_srl', $task->task_srl);
+			$questions[0]['prompt_html'] .= '<p><img src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" alt="과제 설명 이미지"></p>';
+		}
+		if ($task)
+		{
+			foreach (self::getAnswerFields($task) as $field)
+			{
+				$questions[] = array(
+					'id' => $field['id'],
+					'prompt_html' => self::getQuestionPromptHtml($task, $field),
+					'height' => $field['height'] ?? 180,
+				);
+			}
+		}
+		Context::set('author_questions', $questions);
 		$this->setTemplateFile('task_form');
 	}
 

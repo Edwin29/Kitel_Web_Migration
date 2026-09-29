@@ -144,12 +144,40 @@ class HomeworkController extends Homework
 	function procHomeworkTaskImage()
 	{
 		$task = getModel('homework')->getTask((int)Context::get('task_srl'));
-		if (!$task || (int)$task->module_srl !== (int)$this->module_info->module_srl || !$task->description_image || basename($task->description_image) !== $task->description_image)
+		if (!$task || (int)$task->module_srl !== (int)$this->module_info->module_srl)
 		{
 			throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		}
 		if (($task->is_visible ?? 'Y') === 'N' && !($this->grant->create ?? false)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
-		$path = FileHandler::getRealPath($this->getStorageDir() . 'task-images/' . $task->description_image);
+		$filename = (string)Context::get('image');
+		if ($filename === '') $filename = (string)$task->description_image;
+		if ($filename === '' || basename($filename) !== $filename) throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		$referenced = $filename === (string)$task->description_image;
+		if (!$referenced)
+		{
+			$prompts = array((string)$task->description);
+			foreach (self::getAnswerFields($task) as $field) $prompts[] = (string)($field['prompt_html'] ?? '');
+			foreach ($prompts as $prompt)
+			{
+				$dom = new DOMDocument('1.0', 'UTF-8');
+				$previous = libxml_use_internal_errors(true);
+				$dom->loadHTML('<?xml encoding="UTF-8">' . $prompt, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+				libxml_clear_errors();
+				libxml_use_internal_errors($previous);
+				foreach ($dom->getElementsByTagName('img') as $image)
+				{
+					$query = array();
+					parse_str((string)parse_url(html_entity_decode($image->getAttribute('src'), ENT_QUOTES, 'UTF-8'), PHP_URL_QUERY), $query);
+					if (($query['act'] ?? '') === 'procHomeworkTaskImage' && (int)($query['task_srl'] ?? 0) === (int)$task->task_srl && ($query['image'] ?? '') === $filename)
+					{
+						$referenced = true;
+						break 2;
+					}
+				}
+			}
+		}
+		if (!$referenced) throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		$path = FileHandler::getRealPath($this->getStorageDir() . 'task-images/' . $filename);
 		if (!Rhymix\Framework\Storage::isFile($path)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		$mime = (new finfo(FILEINFO_MIME_TYPE))->file($path);
 		if (!in_array($mime, array('image/jpeg', 'image/png', 'image/webp', 'image/gif'), true)) throw new Rhymix\Framework\Exceptions\TargetNotFound;

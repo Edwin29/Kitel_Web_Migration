@@ -7,6 +7,39 @@ class Homework extends ModuleObject
 {
 	const JUNIOR_GROUP_SRL = 3; // 준회원
 
+	/** Submission files must never be placed under a web-served document root. */
+	public static function getSubmissionStorageDir($module_srl)
+	{
+		$root = getenv('KITEL_HOMEWORK_PRIVATE_ROOT') ?: dirname(rtrim(RX_BASEDIR, '/\\'), 2) . '/kitel-homework-private';
+		if (!preg_match('~^(?:[a-zA-Z]:[/\\\\]|/)~', $root)) throw new RuntimeException('Homework private storage path must be absolute.');
+		if (!is_dir($root) && !mkdir($root, 0700, true) && !is_dir($root)) throw new RuntimeException('Cannot create Homework private storage.');
+		$real_root = realpath($root);
+		if (!$real_root) throw new RuntimeException('Cannot resolve Homework private storage.');
+		$real_root = str_replace('\\', '/', $real_root);
+		foreach (array(RX_BASEDIR, $_SERVER['DOCUMENT_ROOT'] ?? '') as $public)
+		{
+			$real_public = $public ? realpath($public) : false;
+			if (!$real_public) continue;
+			$real_public = rtrim(str_replace('\\', '/', $real_public), '/');
+			if (strcasecmp($real_root, $real_public) === 0 || stripos($real_root . '/', $real_public . '/') === 0) throw new RuntimeException('Homework storage must be outside the document root.');
+		}
+		$path = $real_root . '/' . (int)$module_srl;
+		if (!is_dir($path) && !mkdir($path, 0700, true) && !is_dir($path)) throw new RuntimeException('Cannot create Homework module storage.');
+		$real_path = str_replace('\\', '/', realpath($path));
+		if (stripos($real_path . '/', rtrim($real_root, '/') . '/') !== 0) throw new RuntimeException('Unsafe Homework storage symlink.');
+		return rtrim($real_path, '/') . '/';
+	}
+
+	public static function getTaskImageStorageDir($module_srl)
+	{
+		$parent = self::getSubmissionStorageDir($module_srl);
+		$path = $parent . 'task-images';
+		if (!is_dir($path) && !mkdir($path, 0700, true) && !is_dir($path)) throw new RuntimeException('Cannot create Homework image storage.');
+		$real_path = str_replace('\\', '/', realpath($path));
+		if (is_link($path) || stripos($real_path . '/', $parent) !== 0) throw new RuntimeException('Unsafe Homework image storage symlink.');
+		return rtrim($real_path, '/') . '/';
+	}
+
 	function moduleInstall()
 	{
 		$config = new stdClass;

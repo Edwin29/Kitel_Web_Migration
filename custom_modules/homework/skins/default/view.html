@@ -1,3 +1,4 @@
+<config autoescape="on" />
 <load target="./homework.css" />
 <article class="kitel-homework kitel-homework--detail">
     <div cond="$show_deadline_banner" class="kitel-homework__hero"><span class="kitel-homework__countdown" cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></span><span class="kitel-homework__countdown" cond="$days_remaining === null">과제</span><h1>{$task->title}</h1><a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '수정하기' : '제출하기'}</a></div>

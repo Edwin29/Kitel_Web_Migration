@@ -1,3 +1,4 @@
+<config autoescape="on" />
 <include target="./header.html" />
 <load target="./homework-admin.css" />
 
@@ -37,7 +38,7 @@
                 <input type="hidden" name="act" value="dispHomeworkAdminDashboard" />
                 <input type="hidden" name="task_srl" value="{$selected_task->task_srl ?? ''}" />
                 <label class="kitel-filter-search__label" for="kitel-hw-matrix-keyword">현황 검색어</label>
-                <input id="kitel-hw-matrix-keyword" type="search" name="matrix_keyword" value="{escape($matrix_keyword, false)}" placeholder="검색어" />
+                <input id="kitel-hw-matrix-keyword" type="search" name="matrix_keyword" value="{$matrix_keyword}" placeholder="검색어" />
                 <select name="matrix_search_target" aria-label="검색 대상"><option value="nickname" selected="selected"|cond="$matrix_search_target === 'nickname'">닉네임</option><option value="task" selected="selected"|cond="$matrix_search_target === 'task'">과제명</option></select>
                 <button type="submit" aria-label="검색"></button>
             </form>

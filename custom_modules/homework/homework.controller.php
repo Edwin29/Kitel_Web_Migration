@@ -11,7 +11,7 @@ class HomeworkController extends Homework
 
 	private function getStorageDir()
 	{
-		return './files/attach/homework/' . $this->module_info->module_srl . '/';
+		return self::getSubmissionStorageDir($this->module_info->module_srl);
 	}
 
 	private function deleteStoredFile($filename)
@@ -20,8 +20,8 @@ class HomeworkController extends Homework
 		{
 			return;
 		}
-		$path = FileHandler::getRealPath($this->getStorageDir() . $filename);
-		if (Rhymix\Framework\Storage::isFile($path))
+		$path = $this->getStorageDir() . $filename;
+		if (is_file($path) && !is_link($path))
 		{
 			Rhymix\Framework\Storage::delete($path);
 		}
@@ -77,9 +77,7 @@ class HomeworkController extends Homework
 			$stored_filename = $submission_srl_for_file . '_' . $safe_name;
 
 			$storage_dir = $this->getStorageDir();
-			FileHandler::makeDir($storage_dir);
-
-			$target = FileHandler::getRealPath($storage_dir . $stored_filename);
+			$target = $storage_dir . $stored_filename;
 			if (move_uploaded_file($file_info['tmp_name'], $target))
 			{
 				$source_filename = $file_info['name'];
@@ -177,7 +175,7 @@ class HomeworkController extends Homework
 			}
 		}
 		if (!$referenced) throw new Rhymix\Framework\Exceptions\TargetNotFound;
-		$path = FileHandler::getRealPath($this->getStorageDir() . 'task-images/' . $filename);
+		$path = self::getTaskImageStorageDir($this->module_info->module_srl) . $filename;
 		if (!Rhymix\Framework\Storage::isFile($path)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		$mime = (new finfo(FILEINFO_MIME_TYPE))->file($path);
 		if (!in_array($mime, array('image/jpeg', 'image/png', 'image/webp', 'image/gif'), true)) throw new Rhymix\Framework\Exceptions\TargetNotFound;
@@ -210,8 +208,9 @@ class HomeworkController extends Homework
 			throw new Rhymix\Framework\Exceptions\NotPermitted;
 		}
 
-		$path = FileHandler::getRealPath($this->getStorageDir() . $submission->stored_filename);
-		if (!Rhymix\Framework\Storage::isFile($path))
+		if (basename($submission->stored_filename) !== $submission->stored_filename) throw new Rhymix\Framework\Exceptions\TargetNotFound;
+		$path = $this->getStorageDir() . $submission->stored_filename;
+		if (!is_file($path) || is_link($path))
 		{
 			throw new Rhymix\Framework\Exceptions\TargetNotFound;
 		}

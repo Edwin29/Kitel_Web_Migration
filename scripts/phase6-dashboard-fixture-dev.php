@@ -16,8 +16,13 @@ $pdo = new PDO(
     sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $db['host'], $db['port'], $db['database']),
     $db['user'], $db['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 );
-$storageDir = $root . '/files/attach/homework/149';
-if (!is_dir($storageDir) || is_link($storageDir) || strcasecmp(str_replace('\\', '/', realpath($storageDir)), str_replace('\\', '/', $storageDir)) !== 0) {
+$privateRoot = getenv('KITEL_HOMEWORK_PRIVATE_ROOT') ?: dirname(dirname($root)) . '/kitel-homework-private';
+if (!preg_match('~^(?:[a-zA-Z]:[/\\\\]|/)~', $privateRoot)) throw new RuntimeException('Private root must be absolute.');
+$storageDir = rtrim($privateRoot, '/\\') . '/149';
+if (!is_dir($storageDir) && $apply && !mkdir($storageDir, 0700, true)) {
+    throw new RuntimeException('Cannot create private Homework storage.');
+}
+if ($apply && (!is_dir($storageDir) || is_link($storageDir) || strcasecmp(str_replace('\\', '/', realpath($storageDir)), str_replace('\\', '/', $storageDir)) !== 0 || str_starts_with(str_replace('\\', '/', $storageDir) . '/', str_replace('\\', '/', $root) . '/'))) {
     throw new RuntimeException('Refusing an unexpected homework attachment directory.');
 }
 

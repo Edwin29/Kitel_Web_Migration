@@ -69,14 +69,13 @@ class HomeworkAdminController extends Homework
         // Legacy artwork is migrated into the first rich prompt when the task is edited.
         $args->description_image = '';
 
-        $dir = './files/attach/homework/' . $this->module_info->module_srl . '/task-images/';
-        if ($pending) FileHandler::makeDir($dir);
+        $dir = self::getTaskImageStorageDir($this->module_info->module_srl);
         $written = array();
         foreach ($pending as $filename => $bytes)
         {
-            if (file_put_contents(FileHandler::getRealPath($dir . $filename), $bytes, LOCK_EX) === false)
-            {
-                foreach ($written as $name) Rhymix\Framework\Storage::delete(FileHandler::getRealPath($dir . $name));
+            if (file_put_contents($dir . $filename, $bytes, LOCK_EX) === false)
+			{
+				foreach ($written as $name) Rhymix\Framework\Storage::delete($dir . $name);
                 throw new Rhymix\Framework\Exceptions\InvalidRequest('이미지를 저장하지 못했습니다.');
             }
             $written[] = $filename;
@@ -84,7 +83,7 @@ class HomeworkAdminController extends Homework
         $output = $task_srl ? executeQuery('homework.updateTask', $args) : executeQuery('homework.insertTask', $args);
         if (!$output->toBool())
         {
-            foreach ($written as $name) Rhymix\Framework\Storage::delete(FileHandler::getRealPath($dir . $name));
+            foreach ($written as $name) Rhymix\Framework\Storage::delete($dir . $name);
             return $output;
         }
         $this->setMessage('success_registed');
@@ -121,7 +120,7 @@ class HomeworkAdminController extends Homework
                 $filename = (string)($query['image'] ?? ($existing->description_image ?? ''));
                 $is_current_file = preg_match('/^' . preg_quote((string)$task_srl, '/') . '_[a-f0-9]{16}\.(?:jpg|png|webp|gif)$/', $filename);
                 if (($query['act'] ?? '') !== 'procHomeworkTaskImage' || (int)($query['task_srl'] ?? 0) !== (int)$task_srl || !$existing || (!$is_current_file && $filename !== ($existing->description_image ?? ''))) throw new Rhymix\Framework\Exceptions\InvalidRequest('이 과제에 속하지 않은 이미지입니다.');
-                $path = FileHandler::getRealPath('./files/attach/homework/' . $this->module_info->module_srl . '/task-images/' . $filename);
+                $path = self::getTaskImageStorageDir($this->module_info->module_srl) . $filename;
                 if (basename($filename) !== $filename || !Rhymix\Framework\Storage::isFile($path)) throw new Rhymix\Framework\Exceptions\InvalidRequest;
             }
             $url = getNotEncodedUrl('', 'act', 'procHomeworkTaskImage', 'mid', Context::get('mid'), 'task_srl', $task_srl, 'image', $filename);

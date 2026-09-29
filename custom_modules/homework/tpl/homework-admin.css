@@ -29,20 +29,30 @@
 .kitel-hw-admin__member { position: sticky; left: 0; z-index: 1; min-width: 130px; background: #fff; }
 .kitel-hw-admin__matrix thead .kitel-hw-admin__member { background: var(--hw-subtle); }
 .kitel-hw-admin__empty { padding: 32px; background: var(--hw-subtle); color: #626262; }
-.kitel-hw-admin__task-table { width: 100%; min-width: 680px; border-collapse: collapse; }
+.kitel-hw-admin__task-table { width: 100%; min-width: 720px; border-collapse: collapse; }
 .kitel-hw-admin__toolbar { display: flex; justify-content: flex-end; margin-bottom: 16px; }
 .kitel-hw-admin__task-table th, .kitel-hw-admin__task-table td { padding: 14px 16px; border-bottom: 1px solid var(--hw-border); text-align: left; }
 .kitel-hw-admin__task-table th { background: var(--hw-subtle); font-weight: 500; }
 .kitel-hw-admin__task-table a { color: var(--hw-primary); }
 .kitel-hw-admin__task-table .x_btn-link { padding: 0; border: 0; background: none; color: var(--hw-primary); font: inherit; cursor: pointer; }
-.kitel-hw-admin__task-actions { display: flex; align-items: center; gap: 16px; }
-.kitel-hw-admin__task-actions form { margin: 0; }
-.kitel-hw-admin__visibility { display: inline-flex; width: 76px; height: 30px; align-items: center; justify-content: flex-start; gap: 5px; padding: 3px 5px; border: 1px solid #72a9e4; border-radius: 16px; background: rgba(106, 174, 244, .26); color: #244d7c; font: 600 13px var(--kitel-font, Pretendard, sans-serif); cursor: pointer; }
-.kitel-hw-admin__visibility.is-off { flex-direction: row-reverse; border-color: #c7cbd1; background: #e8e9eb; color: #62676f; }
-.kitel-hw-admin__visibility-knob { width: 20px; height: 20px; flex: none; border-radius: 50%; background: #528fd2; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
-.kitel-hw-admin__visibility.is-off .kitel-hw-admin__visibility-knob { background: #858b93; }
+.kitel-hw-admin__task-table .kitel-hw-admin__edit-column { width: 88px; padding-right: 22px; }
+.kitel-hw-admin__task-table .kitel-hw-admin__visibility-column { width: 128px; padding-left: 22px; }
+.kitel-hw-admin__visibility-form { margin: 0; }
+.kitel-hw-admin__visibility { position: relative; display: inline-block; width: 52px; height: 26px; padding: 0; border: 1px solid #72a9e4; border-radius: 16px; background: rgba(106, 174, 244, .26); color: #244d7c; font: 600 10px var(--kitel-font, Pretendard, sans-serif); cursor: pointer; vertical-align: middle; transition: background-color .24s ease, border-color .24s ease, color .24s ease; }
+.kitel-hw-admin__visibility.is-off { border-color: #c7cbd1; background: #e8e9eb; color: #62676f; }
+.kitel-hw-admin__visibility-knob { position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: 50%; background: #528fd2; box-shadow: 0 1px 2px rgba(0,0,0,.18); transition: transform .24s ease, background-color .24s ease; }
+.kitel-hw-admin__visibility.is-off .kitel-hw-admin__visibility-knob { transform: translateX(26px); background: #858b93; }
+.kitel-hw-admin__visibility-on, .kitel-hw-admin__visibility-off { position: absolute; top: 0; line-height: 24px; transition: opacity .18s ease, transform .24s ease; }
+.kitel-hw-admin__visibility-on { right: 5px; }
+.kitel-hw-admin__visibility-off { left: 4px; opacity: 0; transform: translateX(3px); }
+.kitel-hw-admin__visibility.is-off .kitel-hw-admin__visibility-on { opacity: 0; transform: translateX(-3px); }
+.kitel-hw-admin__visibility.is-off .kitel-hw-admin__visibility-off { opacity: 1; transform: translateX(0); }
+.kitel-hw-admin__visibility:disabled { cursor: progress; }
+.kitel-hw-admin__visibility-error { display: block; max-width: 110px; color: #aa3030; font-size: 11px; }
+.kitel-hw-admin__visibility-error:empty { display: none; }
 .kitel-hw-admin__visibility:hover { filter: brightness(.96); }
 .kitel-hw-admin__visibility:focus-visible { outline: 2px solid var(--hw-primary); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .kitel-hw-admin__visibility, .kitel-hw-admin__visibility-knob, .kitel-hw-admin__visibility-on, .kitel-hw-admin__visibility-off { transition: none; } }
 .kitel-hw-admin__task-form .x_table { width: 100%; border-collapse: collapse; }
 .kitel-hw-admin__task-form .x_table th, .kitel-hw-admin__task-form .x_table td { padding: 16px; border-bottom: 1px solid var(--hw-border); text-align: left; }
 .kitel-hw-admin__task-form .x_table th { width: 170px; background: var(--hw-subtle); font-weight: 500; }

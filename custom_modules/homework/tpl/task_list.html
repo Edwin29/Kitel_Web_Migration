@@ -1,4 +1,5 @@
 <include target="./header.html" />
+<load target="./task-list.js" />
 <div class="kitel-hw-admin kitel-hw-admin--list kitel-list-surface">
 
 <div class="kitel-hw-admin__toolbar">
@@ -11,29 +12,29 @@
 			<th>제목</th>
 			<th>마감일</th>
 			<th>출제일</th>
-			<th style="width:190px">관리</th>
+			<th scope="col" class="kitel-hw-admin__edit-column">관리</th>
+			<th scope="col" class="kitel-hw-admin__visibility-column">미표시/표시</th>
 		</tr>
 	</thead>
 	<tbody cond="!$tasks">
-		<tr><td colspan="4" style="text-align:center">출제된 과제가 없습니다.</td></tr>
+		<tr><td colspan="5" style="text-align:center">출제된 과제가 없습니다.</td></tr>
 	</tbody>
 	<tbody cond="$tasks">
 		<tr loop="$tasks=>$idx,$task">
 			<td>{$task->title}</td>
 			<td>{substr($task->deadline,0,4)}-{substr($task->deadline,4,2)}-{substr($task->deadline,6,2)}</td>
 			<td>{substr($task->regdate,0,4)}-{substr($task->regdate,4,2)}-{substr($task->regdate,6,2)}</td>
-			<td><div class="kitel-hw-admin__task-actions">
-				<a href="{getUrl('act','dispHomeworkAdminForm','task_srl',$task->task_srl)}">수정</a>
-				<form action="./" method="post">
+			<td class="kitel-hw-admin__edit-column"><a href="{getUrl('act','dispHomeworkAdminForm','task_srl',$task->task_srl)}">수정</a></td>
+			<td class="kitel-hw-admin__visibility-column"><form class="kitel-hw-admin__visibility-form" action="./" method="post">
 					<input type="hidden" name="module" value="admin" />
 					<input type="hidden" name="act" value="procHomeworkAdminSetVisibility" />
 					<input type="hidden" name="mid" value="{$mid}" />
 					<input type="hidden" name="task_srl" value="{$task->task_srl}" />
 					<input type="hidden" name="page" value="{$page}" />
 					<input type="hidden" name="is_visible" value="{$task->is_visible === 'N' ? 'Y' : 'N'}" />
-					<button type="submit" class="kitel-hw-admin__visibility {$task->is_visible === 'N' ? 'is-off' : 'is-on'}" role="switch" aria-checked="{$task->is_visible === 'N' ? 'false' : 'true'}" aria-label="{$task->title} 표시 여부"><span class="kitel-hw-admin__visibility-knob" aria-hidden="true"></span><span aria-hidden="true">{$task->is_visible === 'N' ? 'OFF' : 'ON'}</span></button>
+					<button type="submit" class="kitel-hw-admin__visibility {$task->is_visible === 'N' ? 'is-off' : 'is-on'}" role="switch" aria-checked="{$task->is_visible === 'N' ? 'false' : 'true'}" aria-label="{$task->title} 표시 여부"><span class="kitel-hw-admin__visibility-knob" aria-hidden="true"></span><span class="kitel-hw-admin__visibility-on" aria-hidden="true">ON</span><span class="kitel-hw-admin__visibility-off" aria-hidden="true">OFF</span></button>
 				</form>
-			</div></td>
+				<span class="kitel-hw-admin__visibility-error" role="alert"></span></td>
 		</tr>
 	</tbody>
 </table></div>

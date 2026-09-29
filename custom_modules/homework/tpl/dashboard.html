@@ -9,27 +9,52 @@
     <section cond="$selected_task" aria-labelledby="kitel-hw-selected-title">
         <div cond="$show_deadline_banner" class="kitel-hw-admin__hero"><strong cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></strong><strong cond="$days_remaining === null">과제</strong><h2 id="kitel-hw-selected-title">{$selected_task->title}</h2></div>
         <h2 cond="!$show_deadline_banner" id="kitel-hw-selected-title" class="kitel-hw-admin__selected-title">{$selected_task->title}</h2>
-        <div class="kitel-hw-admin__summary"><div><span>제출 인원</span><strong>{$submitted_count}</strong></div><div><span>미제출 인원</span><strong>{$missing_count}</strong></div></div>
-        <h3>제출 과제 목록</h3>
+        <div class="kitel-hw-admin__summary" aria-label="과제별 제출 상태">
+            <a class="{$status_filter === 'submitted' ? 'is-active' : ''}" href="{getUrl('task_srl',$selected_task->task_srl,'member_status','submitted')}" aria-current="true"|cond="$status_filter === 'submitted'"><span>제출 인원</span><strong>{$status_counts['submitted']}</strong></a>
+            <a class="{$status_filter === 'missing' ? 'is-active' : ''}" href="{getUrl('task_srl',$selected_task->task_srl,'member_status','missing')}" aria-current="true"|cond="$status_filter === 'missing'"><span>미제출 인원</span><strong>{$status_counts['missing']}</strong></a>
+            <a class="{$status_filter === 'late' ? 'is-active' : ''}" href="{getUrl('task_srl',$selected_task->task_srl,'member_status','late')}" aria-current="true"|cond="$status_filter === 'late'"><span>지각 제출 인원</span><strong>{$status_counts['late']}</strong></a>
+        </div>
+        <div class="kitel-hw-admin__list-heading"><h3>회원별 제출현황</h3><a cond="$status_filter !== 'all'" href="{getUrl('task_srl',$selected_task->task_srl,'member_status','')}">전체 보기</a></div>
         <p cond="!$rows" class="kitel-hw-admin__empty">준회원 그룹에 속한 회원이 없습니다.</p>
-        <div cond="$rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
-            <thead><tr><th scope="col">준회원</th><th scope="col">제출 상태</th><th scope="col">제출일</th><th scope="col">내용</th><th scope="col">첨부</th></tr></thead>
+        <p cond="$rows && !$selected_rows" class="kitel-hw-admin__empty">선택한 상태의 준회원이 없습니다.</p>
+        <div cond="$selected_rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
+            <thead><tr><th scope="col">준회원 닉네임</th><th scope="col">과제 제목</th><th scope="col">제출 상태</th><th scope="col">제출 시각</th><th scope="col">첨부파일</th></tr></thead>
             <tbody><tr loop="$selected_rows=>$index,$selected_row">
                 <td>{$selected_row->member->nick_name}</td>
-                <td><span cond="!$selected_row->submission">미제출</span><span cond="$selected_row->submission">{$selected_row->submission->is_late === 'Y' ? '지각 제출' : '제출'}</span></td>
+                <td>{$selected_task->title}</td>
+                <td>{$selected_row->status === 'missing' ? '미제출' : ($selected_row->status === 'late' ? '제출(지각)' : '제출')}</td>
                 <td><span cond="$selected_row->submission">{substr($selected_row->submission->regdate,0,4)}.{substr($selected_row->submission->regdate,4,2)}.{substr($selected_row->submission->regdate,6,2)} {substr($selected_row->submission->regdate,8,2)}:{substr($selected_row->submission->regdate,10,2)}</span><span cond="!$selected_row->submission">—</span></td>
-                <td class="kitel-hw-admin__content">{$selected_row->submission ? $selected_row->submission->display_content : '—'}</td>
-                <td><a cond="$selected_row->submission && $selected_row->submission->source_filename" href="{getUrl('module','','act','procHomeworkDownloadSubmission','mid',$mid,'submission_srl',$selected_row->submission->submission_srl)}">{$selected_row->submission->source_filename}</a><span cond="!$selected_row->submission || !$selected_row->submission->source_filename">—</span></td>
+                <td><a cond="$selected_row->submission && $selected_row->submission->source_filename" href="{getUrl('module','','act','procHomeworkDownloadSubmission','mid',$mid,'submission_srl',$selected_row->submission->submission_srl)}">{$selected_row->submission->source_filename} 다운로드</a><span cond="!$selected_row->submission || !$selected_row->submission->source_filename">—</span></td>
             </tr></tbody>
         </table></div>
     </section>
 
     <section class="kitel-hw-admin__matrix" aria-labelledby="kitel-hw-matrix-title">
-        <h3 id="kitel-hw-matrix-title">전체 과제 × 준회원 제출현황</h3>
+        <div class="kitel-hw-admin__matrix-heading"><h3 id="kitel-hw-matrix-title">전체 과제 × 준회원 제출현황</h3>
+            <form action="{getUrl()}" method="get" class="kitel-filter-search kitel-hw-admin__matrix-search" rx-autoform="false" role="search" aria-label="전체 제출현황 검색">
+                <input type="hidden" name="module" value="admin" />
+                <input type="hidden" name="mid" value="{$mid}" />
+                <input type="hidden" name="act" value="dispHomeworkAdminDashboard" />
+                <input type="hidden" name="task_srl" value="{$selected_task->task_srl ?? ''}" />
+                <label class="kitel-filter-search__label" for="kitel-hw-matrix-keyword">현황 검색어</label>
+                <input id="kitel-hw-matrix-keyword" type="search" name="matrix_keyword" value="{escape($matrix_keyword, false)}" placeholder="검색어" />
+                <select name="matrix_search_target" aria-label="검색 대상"><option value="nickname" selected="selected"|cond="$matrix_search_target === 'nickname'">닉네임</option><option value="task" selected="selected"|cond="$matrix_search_target === 'task'">과제명</option></select>
+                <button type="submit" aria-label="검색"></button>
+            </form>
+        </div>
+        <a cond="$matrix_keyword !== ''" class="kitel-hw-admin__search-reset" href="{getUrl('matrix_keyword','','matrix_search_target','','matrix_page',1)}">검색 초기화</a>
         <p cond="!$tasks || !$rows" class="kitel-hw-admin__empty">표시할 과제 또는 준회원이 없습니다.</p>
-        <div cond="$tasks && $rows" class="kitel-hw-admin__scroll"><table class="kitel-hw-admin__table">
-            <thead><tr><th scope="col" class="kitel-hw-admin__member">준회원</th><th scope="col" loop="$tasks=>$tidx,$task">{$task->title}</th></tr></thead>
-            <tbody><tr loop="$rows=>$ridx,$row"><th scope="row" class="kitel-hw-admin__member">{$row->member->nick_name}</th><block loop="$row->cells=>$cidx,$cell"><td cond="!$cell">미제출</td><td cond="$cell">{$cell->is_late === 'Y' ? '지각' : '제출'}<br>{substr($cell->regdate,0,4)}.{substr($cell->regdate,4,2)}.{substr($cell->regdate,6,2)} {substr($cell->regdate,8,2)}:{substr($cell->regdate,10,2)}</td></block></tr></tbody>
+        <p cond="$tasks && $rows && !$matrix_total_rows" class="kitel-hw-admin__empty">검색 결과가 없습니다.</p>
+        <div cond="$matrix_total_rows" class="kitel-hw-admin__scroll kitel-hw-admin__matrix-window"><table class="kitel-hw-admin__table">
+            <thead><tr><th scope="col" class="kitel-hw-admin__member">준회원 닉네임</th><th scope="col" loop="$matrix_tasks=>$tidx,$task">{$task->title}</th></tr></thead>
+            <tbody><tr loop="$matrix_rows=>$ridx,$row"><th scope="row" class="kitel-hw-admin__member">{$row->member->nick_name}</th><block loop="$row->cells=>$cidx,$cell"><td cond="!$cell">미제출</td><td cond="$cell">{$cell->dashboard_status === 'late' ? '제출(지각)' : '제출'}<br>{substr($cell->regdate,0,4)}.{substr($cell->regdate,4,2)}.{substr($cell->regdate,6,2)} {substr($cell->regdate,8,2)}:{substr($cell->regdate,10,2)}</td></block></tr></tbody>
         </table></div>
+        <nav cond="$matrix_total_rows" class="kitel-hw-admin__pagination kitel-hw-admin__matrix-pagination" aria-label="전체 제출현황 페이지">
+            <a cond="$matrix_page > 1" href="{getUrl('matrix_page',1)}" aria-label="첫 페이지">처음</a><span cond="$matrix_page <= 1" aria-disabled="true">처음</span>
+            <a cond="$matrix_page > 1" href="{getUrl('matrix_page',$matrix_page-1)}" aria-label="이전 페이지">이전</a><span cond="$matrix_page <= 1" aria-disabled="true">이전</span>
+            <block loop="$matrix_page_numbers=>$page_no"><strong cond="$matrix_page == $page_no" aria-current="page">{$page_no}</strong><a cond="$matrix_page != $page_no" href="{getUrl('matrix_page',$page_no)}">{$page_no}</a></block>
+            <a cond="$matrix_page < $matrix_page_count" href="{getUrl('matrix_page',$matrix_page+1)}" aria-label="다음 페이지">다음</a><span cond="$matrix_page >= $matrix_page_count" aria-disabled="true">다음</span>
+            <a cond="$matrix_page < $matrix_page_count" href="{getUrl('matrix_page',$matrix_page_count)}" aria-label="마지막 페이지">마지막</a><span cond="$matrix_page >= $matrix_page_count" aria-disabled="true">마지막</span>
+        </nav>
     </section>
 </div>

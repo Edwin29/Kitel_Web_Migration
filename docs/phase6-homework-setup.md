@@ -49,7 +49,7 @@ The task list now displays **제출현황 대시보드** when the viewer has `cr
 
 The submitted/missing summary cards are scaled to about 75% of their previous desktop width and height, with their label and number sizes reduced proportionally. On a narrow viewport the cards retain a fluid width and stack as before.
 
-`scripts/phase6-dashboard-fixture-dev.php` creates local development data only. It checks the exact `D:/rhymix_dev/www/rhymix` root, `rhymix_dev` database on loopback port 3307, homework module 149, and 준회원 group 3. Dry-run is the default. The fixture adds one **hidden** `[P6DEMO] 과제 제출 시연` task, four marked junior accounts with random undisclosed passwords, and two example submissions to that task. The other two accounts remain unsubmitted. Existing tasks and submissions are not modified. Hidden status keeps the demo task off the member-facing assignment list while it remains available in the technical dashboard. The demo accounts are intended for visual QA, not login.
+`scripts/phase6-dashboard-fixture-dev.php` creates local development data only. It checks the exact `D:/rhymix_dev/www/rhymix` root, `rhymix_dev` database on loopback port 3307, homework module 149, and 준회원 group 3. Dry-run is the default. The fixture adds one **hidden** `[P6DEMO] 과제 제출 시연` task, eight marked junior accounts with `99기_데모*` nicknames and random undisclosed passwords, two on-time submissions, and two late submissions. One on-time submission has a downloadable sample text attachment. The other four accounts remain unsubmitted. Existing tasks and submissions are not modified. Hidden status keeps the demo task off the member-facing assignment list while it remains available in the technical dashboard. The demo accounts are intended for visual QA, not login.
 
 ```powershell
 D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php
@@ -58,4 +58,10 @@ D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php --cleanup
 D:/rhymix_dev/php/php.exe scripts/phase6-dashboard-fixture-dev.php --cleanup --apply
 ```
 
-Cleanup checks the exact fixture markers and refuses to remove the demo task if another account has submitted to it. As of this local preview, the fixture is installed: the default dashboard shows **2 submitted / 2 missing**. To remove it, preview and apply the cleanup commands above. The repository contains the repeatable script, not user data or database exports.
+Cleanup checks the exact fixture markers and refuses to remove the demo task if another account has submitted to it. As of this local preview, the fixture is installed: the default dashboard shows **2 submitted / 4 missing / 2 late**. To remove it, preview and apply the cleanup commands above. The repository contains the repeatable script, not user data or database exports.
+
+## Dashboard matrix and status filtering
+
+The three summary cards share the full 1160px content width and filter the member list to on-time, missing, or late rows. Each row shows the member's stored Rhymix `nick_name`, task title, status, last submission time, and an attachment download link when one exists. The username is never substituted for the nickname; existing accounts are not renamed by this feature. A submission's `regdate` is rewritten on every save, so the dashboard compares that last edit timestamp with the selected task's deadline at render time. If no deadline exists, a submitted row is on time. The stored `is_late` value is retained for backend compatibility but is not the dashboard's status source.
+
+The all-task matrix displays six junior members per page in a fixed-height, horizontally scrollable region with pagination below it. Pagination is based on the filtered member rows, while the nickname search filters rows and the task-title search filters columns. Its search form uses the same shared pill-shaped search component as the generic board skin. The dashboard fetches every page of the Rhymix junior-group query before building counts and matrix pages; the default Rhymix group query otherwise returns only its first page.

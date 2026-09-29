@@ -75,11 +75,15 @@ class HomeworkAdminView extends Homework
 		}
 		$members = $oHomeworkModel->getJuniorMembers();
 		$submissions = $oHomeworkModel->getSubmissionsByModule($module_srl);
+		$task_map = array();
+		foreach ($tasks as $task) $task_map[(int)$task->task_srl] = $task;
 
 		// Index submissions by "task_srl:member_srl" for O(1) lookup while building the grid
 		$submission_map = array();
 		foreach ($submissions as $submission)
 		{
+			if (!isset($task_map[(int)$submission->task_srl])) continue;
+			$submission->dashboard_status = self::getDashboardSubmissionStatus($submission, $task_map[(int)$submission->task_srl]);
 			$key = $submission->task_srl . ':' . $submission->member_srl;
 			$submission_map[$key] = $submission;
 		}
@@ -101,38 +105,68 @@ class HomeworkAdminView extends Homework
 		Context::set('tasks', $tasks);
 		Context::set('rows', $rows);
 		$selected_rows = array();
-		$submitted_count = 0;
+		$status_counts = array('submitted' => 0, 'missing' => 0, 'late' => 0);
 		foreach ($rows as $row)
 		{
 			foreach ($tasks as $index => $task)
 			{
 				if ($selected_task && (int) $task->task_srl === (int) $selected_task->task_srl)
 				{
-					$selected_rows[] = (object) array('member' => $row->member, 'submission' => $row->cells[$index]);
-					if ($row->cells[$index])
-					{
-						$submitted_count++;
-					}
+					$submission = $row->cells[$index];
+					$status = $submission ? $submission->dashboard_status : 'missing';
+					$selected_rows[] = (object) array('member' => $row->member, 'submission' => $submission, 'status' => $status);
+					$status_counts[$status]++;
 					break;
 				}
 			}
 		}
 		Context::set('selected_task', $selected_task);
-		$selected_fields = $selected_task ? self::getAnswerFields($selected_task) : array();
+		$status_filter = (string)Context::get('member_status');
+		if (!in_array($status_filter, array('submitted', 'missing', 'late'), true)) $status_filter = 'all';
+		$filtered_selected_rows = array();
 		foreach ($selected_rows as $selected_row)
 		{
-			if (!$selected_row->submission) continue;
-			$answers = self::getAnswers($selected_row->submission);
-			$parts = array($selected_row->submission->content);
-			foreach ($selected_fields as $field)
-			{
-				if (isset($answers[$field['id']])) $parts[] = $field['title'] . ': ' . $answers[$field['id']];
-			}
-			$selected_row->submission->display_content = trim(implode("\n", $parts));
+			if ($status_filter === 'all' || $selected_row->status === $status_filter) $filtered_selected_rows[] = $selected_row;
 		}
-		Context::set('selected_rows', $selected_rows);
-		Context::set('submitted_count', $submitted_count);
-		Context::set('missing_count', count($rows) - $submitted_count);
+		Context::set('selected_rows', $filtered_selected_rows);
+		Context::set('status_filter', $status_filter);
+		Context::set('status_counts', $status_counts);
+
+		$matrix_search_target = Context::get('matrix_search_target') === 'task' ? 'task' : 'nickname';
+		$matrix_keyword = mb_substr(trim((string)Context::get('matrix_keyword')), 0, 100);
+		$matrix_tasks = array();
+		$matrix_task_indexes = array();
+		foreach ($tasks as $index => $task)
+		{
+			if ($matrix_keyword !== '' && $matrix_search_target === 'task' && mb_stripos($task->title, $matrix_keyword) === false) continue;
+			$matrix_tasks[] = $task;
+			$matrix_task_indexes[] = $index;
+		}
+		$matrix_rows = array();
+		if ($matrix_tasks)
+		{
+			foreach ($rows as $row)
+			{
+				if ($matrix_keyword !== '' && $matrix_search_target === 'nickname' && mb_stripos($row->member->nick_name, $matrix_keyword) === false) continue;
+				$matrix_row = new stdClass;
+				$matrix_row->member = $row->member;
+				$matrix_row->cells = array();
+				foreach ($matrix_task_indexes as $index) $matrix_row->cells[] = $row->cells[$index];
+				$matrix_rows[] = $matrix_row;
+			}
+		}
+		$matrix_page_count = max(1, (int)ceil(count($matrix_rows) / 6));
+		$matrix_page = min($matrix_page_count, max(1, (int)Context::get('matrix_page')));
+		$matrix_page_start = max(1, min($matrix_page - 2, $matrix_page_count - 4));
+		$matrix_page_numbers = range($matrix_page_start, min($matrix_page_count, $matrix_page_start + 4));
+		Context::set('matrix_tasks', $matrix_tasks);
+		Context::set('matrix_rows', array_slice($matrix_rows, ($matrix_page - 1) * 6, 6));
+		Context::set('matrix_total_rows', count($matrix_rows));
+		Context::set('matrix_page', $matrix_page);
+		Context::set('matrix_page_count', $matrix_page_count);
+		Context::set('matrix_page_numbers', $matrix_page_numbers);
+		Context::set('matrix_search_target', $matrix_search_target);
+		Context::set('matrix_keyword', $matrix_keyword);
 		Context::set('days_remaining', $selected_task && $selected_task->deadline ? (int) (new DateTimeImmutable(substr($selected_task->deadline, 0, 8)))->diff(new DateTimeImmutable('today'))->format('%r%a') * -1 : null);
 		Context::set('show_deadline_banner', false);
 		$this->setTemplateFile('dashboard');

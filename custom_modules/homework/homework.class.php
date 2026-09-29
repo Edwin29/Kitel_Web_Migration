@@ -46,5 +46,12 @@ class Homework extends ModuleObject
 		$answers = json_decode($submission->answers ?? '', true);
 		return is_array($answers) ? $answers : array();
 	}
+
+	/** The submission regdate is updated on every resubmission, so it is the last edit time. */
+	public static function getDashboardSubmissionStatus($submission, $task)
+	{
+		if (!$submission) return 'missing';
+		return $task->deadline && strcmp((string)$submission->regdate, (string)$task->deadline) > 0 ? 'late' : 'submitted';
+	}
 }
 /* End of file homework.class.php */

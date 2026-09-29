@@ -29,10 +29,6 @@
 .kitel-board__write, .kitel-board__comment-form button[type=submit] { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 18px; border: 0; border-radius: 20px; color: #fff !important; background: var(--kb-primary); font-size: 18px; font-weight: 600; cursor: pointer; }
 .kitel-board__toolbar .kitel-board__write { min-height: var(--kitel-space-4, 32px); gap: 4px; padding-inline: 14px; font-size: var(--kitel-text-sm, 16px); }
 .kitel-board__toolbar .kitel-board__write img { display: block; width: 16px; height: 16px; }
-.kitel-board__search { display: flex; align-items: center; width: 220px; height: var(--kitel-space-4, 32px); padding-inline: 10px; border: 1px solid var(--kb-muted); border-radius: 16px; background: #fff; }
-.kitel-board__search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: var(--kitel-text-sm, 16px); }
-.kitel-board__search select { max-width: 80px; border: 0; color: var(--kb-muted); background: transparent; font-size: 14px; }
-.kitel-board__search button { flex: none; width: 20px; height: 20px; border: 0; background: transparent url('../../../../layouts/kitel_site/img/search.svg') center / 18px 18px no-repeat; cursor: pointer; }
 .kitel-board__management { display: flex; justify-content: flex-end; gap: var(--kitel-space-2, 16px); text-align: right; font-size: 14px; }
 .kitel-board__table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .kitel-board__table th { height: 51px; padding: 0 16px; background: #eef1fb; color: #222; font-size: 16px; font-weight: 500; text-align: left; }

@@ -19,7 +19,7 @@
             </div>
             <div class="kitel-board__toolbar">
                 <a cond="$grant->write_document" class="kitel-board__write kitel-write-action" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">{$lang->cmd_write}</a>
-                <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
+                <form action="{getUrl()}" method="get" class="kitel-board__search kitel-filter-search" rx-autoform="false" role="search">
                     <input type="hidden" name="mid" value="{$mid}" />
                     <input type="hidden" name="category" value="{$category}" />
                     <label class="kitel-board__sr-only" for="kitel-board-keyword">{$lang->cmd_search}</label>

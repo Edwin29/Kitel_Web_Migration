@@ -77,11 +77,19 @@ class HomeworkModel extends Homework
 	 */
 	function getJuniorMembers()
 	{
-		$args = new stdClass;
-		$args->selected_group_srl = array(self::JUNIOR_GROUP_SRL);
-
-		$output = executeQueryArray('member.getMemberListWithinGroup', $args);
-		return (is_array($output->data)) ? $output->data : array();
+		$members = array();
+		for ($page = 1; $page <= 1000; $page++)
+		{
+			$args = new stdClass;
+			$args->selected_group_srl = array(self::JUNIOR_GROUP_SRL);
+			$args->page = $page;
+			$args->list_count = 100;
+			$output = executeQueryArray('member.getMemberListWithinGroup', $args);
+			if (!$output->toBool() || !is_array($output->data) || !$output->data) break;
+			$members = array_merge($members, $output->data);
+			if (count($output->data) < 100 || ($output->page_navigation && $page >= $output->page_navigation->last_page)) break;
+		}
+		return $members;
 	}
 }
 /* End of file homework.model.php */

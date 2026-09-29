@@ -21,6 +21,12 @@
 .kitel-site .kitel-write-action::before { display: block; width: 16px; height: 16px; background: url('../img/write.svg') center / contain no-repeat; content: ''; }
 .kitel-site .kitel-write-action:hover { background: #111155; color: #fff; }
 .kitel-site .kitel-write-action:focus-visible { outline: 2px solid var(--kitel-primary); outline-offset: 3px; }
+.kitel-site .kitel-filter-search { display: flex; align-items: center; width: 220px; height: var(--kitel-space-4, 32px); padding-inline: 10px; border: 1px solid var(--kb-muted, #a9aeb3); border-radius: 16px; background: #fff; }
+.kitel-site .kitel-filter-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: var(--kitel-text-sm, 16px); }
+.kitel-site .kitel-filter-search select { max-width: 80px; border: 0; color: var(--kb-muted, #a9aeb3); background: transparent; font-size: 14px; }
+.kitel-site .kitel-filter-search button { flex: none; width: 20px; height: 20px; border: 0; background: transparent url('../img/search.svg') center / 18px 18px no-repeat; cursor: pointer; }
+.kitel-site .kitel-filter-search:focus-within { outline: 2px solid var(--kitel-primary); outline-offset: 2px; }
+.kitel-filter-search__label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .kitel-site .kitel-button:focus-visible,
 .kitel-site .kitel-input:focus-visible,
 :where(.kitel-chrome a, .kitel-chrome button, .kitel-chrome input, .kitel-chrome summary, a.kitel-chrome):focus-visible {

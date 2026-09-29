@@ -4,28 +4,41 @@
 <section class="kitel-cal" aria-labelledby="kitel-cal-title">
     <h1 id="kitel-cal-title" class="kitel-cal__title">일정</h1>
 
-    <div class="kitel-cal__controls">
-        <form class="kitel-cal__picker" action="./" method="get" aria-label="표시할 월 선택">
-            <input type="hidden" name="mid" value="{$mid}" />
-            <input type="hidden" name="act" value="dispCalendarIndex" />
-            <label><span class="kitel-cal__sr-only">연도</span><select name="cal_year" aria-label="연도" onchange="this.form.submit()"><option loop="$year_options=>$key,$option" value="{$option}" selected="selected"|cond="$option == $cur_year">{$option}년</option></select></label>
-            <label><span class="kitel-cal__sr-only">월</span><select name="cal_month" aria-label="월" onchange="this.form.submit()"><option loop="$month_options=>$key,$option" value="{$option}" selected="selected"|cond="$option == $cur_month">{$option}월</option></select></label>
-            <span class="kitel-cal__view-label" aria-current="true">월간</span>
-            <button class="kitel-cal__sr-only" type="submit">달력 이동</button>
-        </form>
-        <div class="kitel-cal__actions" cond="$is_manager">
-            <a class="kitel-cal__manage" href="{getUrl('module','admin','act','dispCalendarAdminContent','mid',$mid)}">일정 관리</a>
-        </div>
-    </div>
-
-    <div class="kitel-cal__month-heading">
-        <h2>{$cur_year}.{$cur_month}</h2>
-        <div class="kitel-cal__month-actions">
-            <nav aria-label="월 이동">
-                <a href="{getUrl('act','dispCalendarIndex','cal_year',$prev_year,'cal_month',$prev_month)}" aria-label="이전 달"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></a>
-                <a href="{getUrl('act','dispCalendarIndex','cal_year',$next_year,'cal_month',$next_month)}" aria-label="다음 달"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></a>
+    <div class="kitel-cal__toolbar">
+        <div class="kitel-cal__period-row">
+            <nav class="kitel-cal__period-nav" aria-label="기간 이동">
+                <a class="kitel-cal__step" href="{getUrl('act','dispCalendarIndex','cal_year',$prev_year,'cal_month',$prev_month)}" aria-label="이전 달"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></a>
+                <div class="kitel-cal__period-picker">
+                    <button id="kitel-cal-period-trigger" class="kitel-cal__period-trigger" type="button" aria-label="기간 선택: {$cur_year}년 {$cur_month}월" aria-controls="kitel-cal-period-popover" aria-expanded="false" aria-haspopup="dialog">{$cur_year}년 {$cur_month}월 <span aria-hidden="true">⌄</span></button>
+                    <div id="kitel-cal-period-popover" class="kitel-cal__popover" role="dialog" aria-label="연월 선택" hidden>
+                        <div class="kitel-cal__year-nav">
+                            <button class="kitel-cal__year-prev" type="button" aria-label="이전 연도"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></button>
+                            <strong class="kitel-cal__popover-year" aria-live="polite">{$cur_year}년</strong>
+                            <button class="kitel-cal__year-next" type="button" aria-label="다음 연도"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></button>
+                        </div>
+                        <form class="kitel-cal__jump" action="./" method="get" rx-autoform="false" aria-label="연월 바로 이동" data-current-year="{$cur_year}" data-current-month="{$cur_month}" data-today-year="{$today_year}" data-today-month="{$today_month}">
+                            <input type="hidden" name="mid" value="{$mid}" />
+                            <input type="hidden" name="act" value="dispCalendarIndex" />
+                            <input type="hidden" name="cal_year" value="{$cur_year}" />
+                            <button loop="$month_options=>$key,$option" type="submit" name="cal_month" value="{$option}" class="{$option == $cur_month ? 'is-selected' : ''} {$cur_year == $today_year && $option == $today_month ? 'is-today' : ''}" aria-current="{$option == $cur_month ? 'date' : 'false'}">{$option}월</button>
+                        </form>
+                        <a class="kitel-cal__popover-today" href="{getUrl('act','dispCalendarIndex','cal_year',$today_year,'cal_month',$today_month)}">오늘로 이동</a>
+                    </div>
+                </div>
+                <a class="kitel-cal__step kitel-cal__step--next" href="{getUrl('act','dispCalendarIndex','cal_year',$next_year,'cal_month',$next_month)}" aria-label="다음 달"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></a>
             </nav>
-            <a cond="$is_manager" class="kitel-cal__add" href="{getUrl('module','admin','act','dispCalendarAdminForm','mid',$mid)}"><img src="./assets/plus.svg" width="24" height="24" alt="" /> 추가</a>
+            <a class="kitel-cal__today-link {$cur_year == $today_year && $cur_month == $today_month ? 'is-current' : ''}" href="{getUrl('act','dispCalendarIndex','cal_year',$today_year,'cal_month',$today_month)}" aria-label="오늘로 이동">오늘</a>
+        </div>
+        <div class="kitel-cal__toolbar-bottom">
+            <div class="kitel-cal__view-switch" role="group" aria-label="달력 보기 방식" aria-describedby="kitel-cal-week-note">
+                <span class="is-active" aria-current="page">월간</span>
+                <button type="button" disabled aria-describedby="kitel-cal-week-note" title="주간 보기는 준비 중입니다.">주간</button>
+                <span id="kitel-cal-week-note" class="kitel-cal__sr-only">주간 보기는 준비 중입니다.</span>
+            </div>
+            <div class="kitel-cal__actions" cond="$is_manager">
+                <a class="kitel-cal__manage" href="{getUrl('module','admin','act','dispCalendarAdminContent','mid',$mid)}">일정 관리</a>
+                <a class="kitel-cal__add" href="{getUrl('module','admin','act','dispCalendarAdminForm','mid',$mid)}"><img src="./assets/plus.svg" width="24" height="24" alt="" /> 추가</a>
+            </div>
         </div>
     </div>
 

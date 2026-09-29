@@ -82,9 +82,10 @@ class CalendarView extends Calendar
 
 		Context::set('cur_year', $year);
 		Context::set('cur_month', $month);
-		Context::set('year_options', range($year - 2, $year + 2));
 		Context::set('month_options', range(1, 12));
 		Context::set('month_title', sprintf('%04d년 %02d월', $year, $month));
+		Context::set('today_year', (int) date('Y'));
+		Context::set('today_month', (int) date('n'));
 		Context::set('prev_year', (int) date('Y', $prevTs));
 		Context::set('prev_month', (int) date('n', $prevTs));
 		Context::set('next_year', (int) date('Y', $nextTs));

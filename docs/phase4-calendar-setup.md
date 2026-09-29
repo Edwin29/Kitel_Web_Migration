@@ -5,12 +5,12 @@ The public `schedule` page uses the existing `calendar` module, its `default` sk
 ## Implemented scope
 
 - Monthly grid from `CalendarModel::getEventList()`, including today, empty month, and events spanning several days or months.
-- Previous/next month links and year/month selectors use `cal_year` and `cal_month`. The old `y`/`m` query names did not reach the module reliably in local Rhymix.
+- Previous/next month links, the current-period popover, and Today use `cal_year` and `cal_month`. The old `y`/`m` query names did not reach the module reliably in local Rhymix. The popover changes only its candidate year in JavaScript; selecting a month submits the existing server route.
 - Event bars link to the matching details in the monthly summary. The summary shows dates, location, category, and description from the existing event fields.
 - The add, edit, and management links are shown only when the module's `manage` grant is present. Rhymix grants protect the admin routes. Update and delete queries are also scoped to the current calendar `module_srl`.
 - The admin form keeps the existing fields and POST action. Its obsolete `procFilter(this)` submit handler was removed because it raised `filter_func is not a function` in the current runtime; the existing controller/ruleset and native required fields remain.
 
-The Figma reference shows a weekly view, but the current public backend provides only the monthly grid. No weekly selector or sample weekly data is presented as working functionality. A real weekly view requires a separate Calendar backend extension and product decision.
+The Figma reference shows a weekly view, but the current public backend provides only the monthly grid. The monthly/weekly segmented control presents weekly as disabled with an accessible "준비 중" explanation. No weekly dates or sample data are presented as working functionality. A real weekly view requires a separate Calendar backend extension and product decision.
 
 ## Local verification
 

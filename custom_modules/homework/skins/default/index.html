@@ -2,8 +2,11 @@
 
 <section class="kitel-homework" aria-labelledby="homework-title">
     <header class="kitel-homework__heading">
-        <h1 id="homework-title">과제 게시판</h1>
-        <p>진행 중인 과제와 제출 상태를 확인하세요.</p>
+        <div>
+            <h1 id="homework-title">과제 게시판</h1>
+            <p>진행 중인 과제와 제출 상태를 확인하세요.</p>
+        </div>
+        <a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl','')}">제출현황 대시보드</a>
     </header>
     <div class="kitel-homework__table-wrap">
         <table class="kitel-homework__table">

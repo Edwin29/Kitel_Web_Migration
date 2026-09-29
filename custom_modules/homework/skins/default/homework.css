@@ -1,8 +1,10 @@
 .kitel-homework { width: min(var(--kitel-content-width, 1160px), calc(100% - 48px)); min-width: 0; margin-inline: auto; padding-bottom: var(--kitel-space-8, 80px); color: var(--kitel-text, #1c1f25); font-family: var(--kitel-font, Pretendard, sans-serif); }
 .kitel-homework *, .kitel-homework *::before, .kitel-homework *::after { box-sizing: border-box; }
-.kitel-homework__heading { margin-bottom: var(--kitel-space-4, 32px); }
+.kitel-homework__heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--kitel-space-2, 16px); margin-bottom: var(--kitel-space-4, 32px); }
 .kitel-homework__heading h1 { margin: 0; font-size: var(--kitel-density-page-title, 32px); font-weight: 500; letter-spacing: var(--kitel-heading-tracking, -.03em); }
 .kitel-homework__heading p { margin: var(--kitel-space-2, 16px) 0 0; color: var(--kitel-text-muted, #a9aeb3); font-size: var(--kitel-density-description, 16px); }
+.kitel-homework__dashboard-link { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 8px 16px; border-radius: var(--kitel-radius-pill, 20px); background: var(--kitel-primary-soft, #eef1fb); color: var(--kitel-primary, #191970); font-size: var(--kitel-text-sm, 16px); font-weight: 500; text-decoration: none; white-space: nowrap; }
+.kitel-homework__dashboard-link:hover { background: var(--kitel-primary, #191970); color: #fff; }
 .kitel-homework__table-wrap { max-width: 100%; overflow-x: auto; }
 .kitel-homework__table { width: 100%; min-width: 540px; border-collapse: collapse; }
 .kitel-homework__table th { padding: 15px 16px; background: var(--kitel-surface-subtle, #f5f5f5); border-block: 1px solid var(--kitel-border-row, #e2e8f0); font-size: var(--kitel-text-xs, 14px); font-weight: 500; text-align: left; }
@@ -22,6 +24,7 @@
 .kitel-homework__jump { flex: none; margin-left: auto; padding: 14px 25px; border-radius: var(--kitel-radius-pill, 20px); background: var(--kitel-surface-subtle, #f5f5f5); color: inherit; text-decoration: none; }
 .kitel-homework__jump:hover { background: var(--kitel-primary-soft, #eef1fb); color: var(--kitel-primary, #191970); }
 .kitel-homework__meta { display: flex; flex-wrap: wrap; gap: 16px; margin: 14px 0 var(--kitel-space-5, 40px); color: var(--kitel-text-secondary, #626262); font-size: var(--kitel-text-sm, 16px); }
+.kitel-homework__meta .kitel-homework__dashboard-link { margin-left: auto; }
 .kitel-homework__late { color: #835400; }
 .kitel-homework__brief { margin-bottom: var(--kitel-space-5, 40px); }
 .kitel-homework__brief h2, .kitel-homework__submit h2, .kitel-homework__submissions h2 { margin: 0 0 var(--kitel-space-3, 24px); font-size: var(--kitel-text-lg, 24px); font-weight: 500; }

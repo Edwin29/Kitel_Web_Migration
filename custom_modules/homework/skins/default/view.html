@@ -7,7 +7,7 @@
         <h1>{$task->title}</h1>
         <a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '다시 제출하기' : '제출하기'}</a>
     </div>
-    <div class="kitel-homework__meta"><span cond="$task->deadline">마감 {substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)} 23:59</span><span cond="!$task->deadline">마감 기한 없음</span><span cond="$is_past_deadline" class="kitel-homework__late">마감일 경과 · 지각 제출 가능</span></div>
+    <div class="kitel-homework__meta"><span cond="$task->deadline">마감 {substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)} 23:59</span><span cond="!$task->deadline">마감 기한 없음</span><span cond="$is_past_deadline" class="kitel-homework__late">마감일 경과 · 지각 제출 가능</span><a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl',$task->task_srl)}">이 과제 제출현황</a></div>
     <section class="kitel-homework__brief" aria-labelledby="homework-brief-title"><h2 id="homework-brief-title">과제 내용</h2><div class="kitel-homework__description">{$task->description}</div></section>
     <section cond="$is_submitter" id="homework-submission" class="kitel-homework__submit" aria-labelledby="homework-submit-title">
         <h2 id="homework-submit-title">과제 제출</h2>

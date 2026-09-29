@@ -33,6 +33,7 @@ class HomeworkView extends Homework
 		Context::set('tasks', $tasks);
 		Context::set('is_submitter', $this->grant->submit ?? false);
 		Context::set('can_view_all', $this->grant->view_all ?? false);
+		Context::set('can_manage', $this->grant->create ?? false);
 
 		$this->setTemplateFile('index');
 	}
@@ -73,6 +74,7 @@ class HomeworkView extends Homework
 		Context::set('all_submissions', $all_submissions);
 		Context::set('is_submitter', $this->grant->submit ?? false);
 		Context::set('can_view_all', $this->grant->view_all ?? false);
+		Context::set('can_manage', $this->grant->create ?? false);
 		Context::set('is_past_deadline', $task->deadline && $task->deadline < date('YmdHis'));
 		$days_remaining = $task->deadline ? (int) (new DateTimeImmutable(substr($task->deadline, 0, 8)))->diff(new DateTimeImmutable('today'))->format('%r%a') * -1 : null;
 		Context::set('days_remaining', $days_remaining);

@@ -12,6 +12,7 @@ html, body { margin: 0; }
     --kitel-density-page-title: var(--kitel-text-page);
     --kitel-density-description: var(--kitel-text-lg);
     --kitel-density-heading-gap: 50px;
+    --kitel-density-title-description-gap: var(--kitel-space-1);
     --kitel-density-list-min-height: 950px;
     --kitel-community-band-height: var(--kitel-space-8);
     --kitel-community-intro-space: 72px;
@@ -141,7 +142,8 @@ html, body { margin: 0; }
     --kitel-content-space: var(--kitel-space-4);
     --kitel-density-page-title: var(--kitel-text-page-productive);
     --kitel-density-description: var(--kitel-text-description-productive);
-    --kitel-density-heading-gap: var(--kitel-space-4);
+    --kitel-density-heading-gap: var(--kitel-space-2);
+    --kitel-density-title-description-gap: var(--kitel-space-2);
     --kitel-density-list-min-height: 640px;
     --kitel-community-band-height: var(--kitel-space-7);
     --kitel-community-intro-space: var(--kitel-space-4);

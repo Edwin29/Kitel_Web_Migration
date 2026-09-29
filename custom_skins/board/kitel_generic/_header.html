@@ -13,6 +13,10 @@
             <p cond="$kitel_board_description">{$kitel_board_description}</p>
         </div>
         <div cond="!empty($kitel_board_show_list_actions)" class="kitel-board__heading-actions">
+            <div cond="$grant->manager" class="kitel-board__management">
+                <a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a>
+                <a class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
+            </div>
             <div class="kitel-board__toolbar">
                 <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
                 <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
@@ -25,10 +29,6 @@
                     </select>
                     <button type="submit" aria-label="{$lang->cmd_search}"></button>
                 </form>
-            </div>
-            <div cond="$grant->manager" class="kitel-board__management">
-                <a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a>
-                <a class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
             </div>
         </div>
         <a cond="$grant->manager && empty($kitel_board_show_list_actions)" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>

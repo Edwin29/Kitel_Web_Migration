@@ -1,12 +1,12 @@
 .kitel-community { --kc-bg: #f2f3f5; --kc-muted: #777e89; }
 .kitel-community__band { width: 100vw; margin-left: calc(50% - 50vw); background: var(--kb-primary); color: #fff; }
-.kitel-community__band-inner { display: flex; width: min(1160px, calc(100% - 48px)); min-height: 80px; margin-inline: auto; align-items: center; justify-content: space-between; gap: 24px; }
+.kitel-community__band-inner { display: flex; width: min(1160px, calc(100% - 48px)); min-height: var(--kitel-community-band-height, 80px); margin-inline: auto; align-items: center; justify-content: space-between; gap: 24px; }
 .kitel-community__band h1 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 600; }
 .kitel-community__search { display: flex; width: min(330px, 100%); height: 40px; align-items: center; padding: 0 12px; border-radius: 22px; background: #fff; }
 .kitel-community__search input { min-width: 0; flex: 1; border: 0; outline: 0; font: inherit; color: var(--kb-text); }
 .kitel-community__search select { max-width: 75px; border: 0; background: transparent; color: var(--kc-muted); font-size: 12px; }
 .kitel-community__search button { width: 26px; height: 26px; flex: none; border: 0; background: transparent url('../../../../layouts/kitel_site/img/search.svg') center / 24px 24px no-repeat; cursor: pointer; }
-.kitel-community__intro { display: flex; width: min(964px, 100%); min-height: 125px; align-items: center; gap: 20px; margin: 72px auto 70px; padding: 20px 28px; border-radius: 6px; background: var(--kc-bg); }
+.kitel-community__intro { display: flex; width: min(964px, 100%); min-height: 125px; align-items: center; gap: 20px; margin: var(--kitel-community-intro-space, 72px) auto; padding: var(--kitel-community-intro-padding, 20px 28px); border-radius: 6px; background: var(--kc-bg); }
 .kitel-community__avatar { display: grid; width: 68px; height: 68px; flex: none; place-items: center; border-radius: 50%; background: #fff; color: var(--kb-primary); font-size: 27px; font-weight: 700; }
 .kitel-community__intro-copy { min-width: 0; flex: 1; }
 .kitel-community__intro-copy strong { font-size: 21px; font-weight: 600; }

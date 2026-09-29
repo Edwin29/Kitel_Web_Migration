@@ -1,0 +1,254 @@
+{
+  "stage": "after",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "pages": {
+    "news": {
+      "status": 200,
+      "header": {
+        "top": 0,
+        "bottom": 80,
+        "height": 80,
+        "left": 0,
+        "width": 1920
+      },
+      "section": {
+        "top": 80,
+        "bottom": 145,
+        "height": 65,
+        "left": 380,
+        "width": 1160
+      },
+      "sectionTitle": {
+        "top": 104,
+        "bottom": 128,
+        "height": 24,
+        "left": 767,
+        "width": 42
+      },
+      "sectionLinks": {
+        "top": 107,
+        "bottom": 126,
+        "height": 19,
+        "left": 832,
+        "width": 321
+      },
+      "pageHeading": {
+        "top": 177,
+        "bottom": 247,
+        "height": 70,
+        "left": 380,
+        "width": 1160
+      },
+      "pageTitle": {
+        "top": 177,
+        "bottom": 217,
+        "height": 40,
+        "left": 380,
+        "width": 1160
+      },
+      "pageDescription": {
+        "top": 225,
+        "bottom": 247,
+        "height": 22,
+        "left": 380,
+        "width": 1160
+      },
+      "toolbar": {
+        "top": 279,
+        "bottom": 319,
+        "height": 40,
+        "left": 380,
+        "width": 1160
+      },
+      "tableHead": {
+        "top": 365,
+        "bottom": 416,
+        "height": 51,
+        "left": 380,
+        "width": 1160
+      },
+      "firstRow": {
+        "top": 416,
+        "bottom": 491,
+        "height": 75
+      },
+      "visibleRows": 6,
+      "totalRows": 6,
+      "titleFont": "32px",
+      "descriptionFont": "16px",
+      "sectionFont": "16px",
+      "scrollWidth": 1920
+    },
+    "seminar": {
+      "status": 200,
+      "header": {
+        "top": 0,
+        "bottom": 80,
+        "height": 80,
+        "left": 0,
+        "width": 1920
+      },
+      "section": {
+        "top": 80,
+        "bottom": 145,
+        "height": 65,
+        "left": 380,
+        "width": 1160
+      },
+      "sectionTitle": {
+        "top": 104,
+        "bottom": 128,
+        "height": 24,
+        "left": 686,
+        "width": 44
+      },
+      "sectionLinks": {
+        "top": 107,
+        "bottom": 126,
+        "height": 19,
+        "left": 753,
+        "width": 481
+      },
+      "pageHeading": {
+        "top": 177,
+        "bottom": 247,
+        "height": 70,
+        "left": 380,
+        "width": 1160
+      },
+      "pageTitle": {
+        "top": 177,
+        "bottom": 217,
+        "height": 40,
+        "left": 380,
+        "width": 1160
+      },
+      "pageDescription": {
+        "top": 225,
+        "bottom": 247,
+        "height": 22,
+        "left": 380,
+        "width": 1160
+      },
+      "toolbar": {
+        "top": 279,
+        "bottom": 319,
+        "height": 40,
+        "left": 380,
+        "width": 1160
+      },
+      "tableHead": {
+        "top": 365,
+        "bottom": 416,
+        "height": 51,
+        "left": 380,
+        "width": 1160
+      },
+      "firstRow": {
+        "top": 416,
+        "bottom": 491,
+        "height": 75
+      },
+      "visibleRows": 6,
+      "totalRows": 6,
+      "titleFont": "32px",
+      "descriptionFont": "16px",
+      "sectionFont": "16px",
+      "scrollWidth": 1920
+    },
+    "sharing": {
+      "status": 200,
+      "header": {
+        "top": 0,
+        "bottom": 80,
+        "height": 80,
+        "left": 0,
+        "width": 1920
+      },
+      "section": {
+        "top": 80,
+        "bottom": 145,
+        "height": 65,
+        "left": 380,
+        "width": 1160
+      },
+      "sectionTitle": {
+        "top": 104,
+        "bottom": 128,
+        "height": 24,
+        "left": 686,
+        "width": 44
+      },
+      "sectionLinks": {
+        "top": 107,
+        "bottom": 126,
+        "height": 19,
+        "left": 753,
+        "width": 481
+      },
+      "pageHeading": null,
+      "pageTitle": {
+        "top": 191,
+        "bottom": 227,
+        "height": 36,
+        "left": 380,
+        "width": 137
+      },
+      "pageDescription": null,
+      "toolbar": {
+        "top": 189,
+        "bottom": 229,
+        "height": 40,
+        "left": 1210,
+        "width": 330
+      },
+      "tableHead": null,
+      "firstRow": {
+        "top": 458,
+        "bottom": 552,
+        "height": 95
+      },
+      "visibleRows": 6,
+      "totalRows": 6,
+      "titleFont": "30px",
+      "descriptionFont": null,
+      "sectionFont": "16px",
+      "scrollWidth": 1920
+    },
+    "about": {
+      "status": 200,
+      "header": {
+        "top": 0,
+        "bottom": 80,
+        "height": 80,
+        "left": 0,
+        "width": 1920
+      },
+      "section": {
+        "top": 180,
+        "bottom": 260,
+        "height": 80,
+        "left": 0,
+        "width": 1920
+      },
+      "sectionTitle": null,
+      "sectionLinks": null,
+      "pageHeading": null,
+      "pageTitle": null,
+      "pageDescription": null,
+      "toolbar": null,
+      "tableHead": null,
+      "firstRow": null,
+      "visibleRows": 0,
+      "totalRows": 0,
+      "titleFont": null,
+      "descriptionFont": null,
+      "sectionFont": "24px",
+      "scrollWidth": 1920
+    }
+  },
+  "errors": []
+}

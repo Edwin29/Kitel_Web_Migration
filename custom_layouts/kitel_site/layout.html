@@ -11,7 +11,8 @@
 {@ $nav_current_section = null; }
 <block loop="$nav_items=>$nav_key,$nav_item" cond="$nav_has_active_page && $nav_item['selected'] && $nav_item['list']">{@ $nav_current_section = $nav_item; }</block>
 {@ $nav_vertical_section = $nav_current_section && in_array($nav_current_section['url'], array('about', 'etc')); $nav_section_label = $nav_current_section && in_array($nav_current_section['link'], array('Else', '기타')) ? '지원' : ($nav_current_section['link'] ?? ''); $nav_section_heading = $nav_current_section && $nav_current_section['url'] === 'news' ? 'News' : $nav_section_label; }
-<div class="kitel-site" data-section="{$nav_current_section['url'] ?? ''}">
+{@ $density_productive = in_array($nav_rendered_module, array('archive', 'homework', 'member', 'integration_search')) || ($nav_rendered_module === 'board' && ($current_module_info->skin ?? '') !== 'kitel_gallery'); }
+<div class="kitel-site {$density_productive ? 'density-productive' : 'density-expressive'}" data-section="{$nav_current_section['url'] ?? ''}">
     <a class="kitel-skip kitel-chrome" href="#kitel-content">본문으로 건너뛰기</a>
     <header class="kitel-header kitel-chrome">
         <div class="kitel-header__inner">

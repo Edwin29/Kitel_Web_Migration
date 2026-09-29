@@ -9,7 +9,7 @@
             <nav class="kitel-cal__period-nav" aria-label="기간 이동">
                 <a class="kitel-cal__step" href="{getUrl('act','dispCalendarIndex','cal_year',$prev_year,'cal_month',$prev_month)}" aria-label="이전 달"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></a>
                 <div class="kitel-cal__period-picker">
-                    <button id="kitel-cal-period-trigger" class="kitel-cal__period-trigger" type="button" aria-label="기간 선택: {$cur_year}년 {$cur_month}월" aria-controls="kitel-cal-period-popover" aria-expanded="false" aria-haspopup="dialog">{$cur_year}년 {$cur_month}월 <span aria-hidden="true">⌄</span></button>
+                    <button id="kitel-cal-period-trigger" class="kitel-cal__period-trigger" type="button" aria-label="기간 선택: {$cur_year}년 {$cur_month}월" aria-controls="kitel-cal-period-popover" aria-expanded="false" aria-haspopup="dialog">{$cur_year}년 {$cur_month}월 <span class="kitel-cal__period-caret" aria-hidden="true"></span></button>
                     <div id="kitel-cal-period-popover" class="kitel-cal__popover" role="dialog" aria-label="연월 선택" hidden>
                         <div class="kitel-cal__year-nav">
                             <button class="kitel-cal__year-prev" type="button" aria-label="이전 연도"><img src="./assets/arrow.svg" width="24" height="24" alt="" /></button>

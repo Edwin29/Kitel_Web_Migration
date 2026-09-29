@@ -8,9 +8,30 @@
 <div class="board kitel-board">
     <div cond="$module_info->header_text" class="kitel-board__intro">{$module_info->header_text}</div>
     <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && $mid !== 'sharing' && (!$oDocument || !$oDocument->isExists())">
-        <h1>{$kitel_board_title}</h1>
-        <p cond="$kitel_board_description">{$kitel_board_description}</p>
-        <a cond="$grant->manager" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
+        <div class="kitel-board__heading-copy">
+            <h1>{$kitel_board_title}</h1>
+            <p cond="$kitel_board_description">{$kitel_board_description}</p>
+        </div>
+        <div cond="!empty($kitel_board_show_list_actions)" class="kitel-board__heading-actions">
+            <div class="kitel-board__toolbar">
+                <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
+                <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
+                    <input type="hidden" name="mid" value="{$mid}" />
+                    <input type="hidden" name="category" value="{$category}" />
+                    <label class="kitel-board__sr-only" for="kitel-board-keyword">{$lang->cmd_search}</label>
+                    <input id="kitel-board-keyword" type="search" name="search_keyword" value="{escape($search_keyword ?? '', false)}" />
+                    <select name="search_target" aria-label="검색 대상">
+                        <option loop="$search_option=>$key,$val" value="{$key}" selected="selected"|cond="$search_target==$key">{$val}</option>
+                    </select>
+                    <button type="submit" aria-label="{$lang->cmd_search}"></button>
+                </form>
+            </div>
+            <div cond="$grant->manager" class="kitel-board__management">
+                <a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a>
+                <a class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
+            </div>
+        </div>
+        <a cond="$grant->manager && empty($kitel_board_show_list_actions)" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
     </div>
     <nav cond="$mid !== 'news' && $module_info->use_category=='Y' && count($category_list)" class="kitel-board__categories" aria-label="게시판 분류">
         <a href="{getUrl('category','','page','')}" class="is-active"|cond="!$category">{$lang->total}</a>

@@ -1,22 +1,9 @@
+{@ $kitel_board_show_list_actions = !$oDocument->isExists() && $mid !== 'sharing'; }
 <include target="_header.html" />
 <include cond="$oDocument->isExists()" target="_read.html" />
 <include cond="!$oDocument->isExists() && $mid === 'sharing'" target="_community_list.html" />
 <block cond="!$oDocument->isExists() && $mid !== 'sharing'">
 <div class="kitel-board__list" id="board_list">
-    <div class="kitel-board__toolbar">
-        <a cond="$grant->write_document" class="kitel-board__write" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}"><img src="./write-icon.svg" width="20" height="20" alt="" />{$lang->cmd_write}</a>
-        <form action="{getUrl()}" method="get" class="kitel-board__search" rx-autoform="false" role="search">
-            <input type="hidden" name="mid" value="{$mid}" />
-            <input type="hidden" name="category" value="{$category}" />
-            <label class="kitel-board__sr-only" for="kitel-board-keyword">{$lang->cmd_search}</label>
-            <input id="kitel-board-keyword" type="search" name="search_keyword" value="{escape($search_keyword ?? '', false)}" />
-            <select name="search_target" aria-label="검색 대상">
-                <option loop="$search_option=>$key,$val" value="{$key}" selected="selected"|cond="$search_target==$key">{$val}</option>
-            </select>
-            <button type="submit" aria-label="{$lang->cmd_search}"></button>
-        </form>
-    </div>
-    <div cond="$grant->manager" class="kitel-board__management"><a href="{getUrl('','mid',$mid,'act','dispDocumentManageDocument')}" onclick="popopen(this.href,'manageDocument'); return false;">{$lang->cmd_manage_document}</a></div>
     <table cond="$document_list || $notice_list" class="kitel-board__table">
         <thead><tr><th scope="col">{$lang->title}</th><th scope="col">{$lang->date}</th><th scope="col">{$lang->readed_count}</th><th scope="col">{$lang->category}</th></tr></thead>
         <tbody>

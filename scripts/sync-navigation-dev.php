@@ -46,7 +46,9 @@ foreach (['about', 'news', 'study'] as $url) {
 }
 $about = ['kitelinfo', 'staff', 'schedule', 'rule'];
 $study = ['storage', 'homework', 'exhibition', 'seminar', 'sharing'];
-$newsTitles = ['동아리 내 경사', '최근 진행 행사 보고', '일정 공고'];
+$activityRenamed = (count($categories) > 1 && $categories[1]['title'] === 'KITEL 활동') ||
+    (count($children[(int)$byUrl['news']['menu_item_srl']] ?? []) > 1 && ($children[(int)$byUrl['news']['menu_item_srl']][1]['name'] ?? '') === 'KITEL 활동');
+$newsTitles = ['동아리 내 경사', $activityRenamed ? 'KITEL 활동' : '최근 진행 행사 보고', '일정 공고'];
 foreach (['about' => $about, 'study' => $study] as $parent => $expected) {
     $actual = array_column($children[(int)$byUrl[$parent]['menu_item_srl']] ?? [], 'url');
     if (count($actual) !== count($expected) || array_diff($actual, $expected)) {

@@ -115,7 +115,7 @@ XE의 메일 발송(`mail()` → ssmtp → Gmail SMTP)이 **개인 Gmail 계정�
 |---|---|---|
 | 히어로 배너 위젯 | ✅ Phase 9 적용 | `custom_widgets/hero_banner`, 관리자 편집값 유지. 첫 화면을 채우는 높이와 스크롤 이동 적용 |
 | 다가오는 일정 위젯 | ✅ Phase 9 적용 | `custom_widgets/upcoming_events`, 캘린더 연동 및 Home 카드 스타일 적용 |
-| 최신소식/과제현황/작품전시회 하이라이트 | ✅ Phase 9 적용 | `custom_widgets/home_dashboard`가 기존 모듈의 live 데이터와 권한을 재사용. [적용 기록](phase9-home-setup.md) |
+| 최신소식/과제현황/KITEL 활동/작품전시회 하이라이트 | ✅ Phase 9 적용 | `custom_widgets/home_dashboard`가 기존 모듈의 live 데이터와 권한을 재사용. [적용 기록](phase9-home-setup.md), [활동 확장](phase9-activity-extension.md) |
 | 스크롤 리빌 애니메이션 | ⬜ | 순수 프론트엔드 영역, 디자이너 퍼블리싱과 함께 처리 예정 |
 
 ### 데이터 마이그레이션

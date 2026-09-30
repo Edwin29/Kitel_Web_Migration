@@ -2,6 +2,7 @@
 <module>
     <actions>
         <action name="procKitelboardguardImage" type="controller" method="GET" />
+        <action name="procKitelboardguardActivityImage" type="controller" method="GET" />
         <action name="procKitelboardguardSetExhibitionVisibility" type="controller" method="POST" />
     </actions>
 </module>

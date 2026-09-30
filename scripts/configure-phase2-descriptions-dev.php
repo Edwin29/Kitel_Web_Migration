@@ -15,7 +15,7 @@ $targets = [
 ];
 $newsCategories = [
     169 => ['동아리 내 경사', '동아리 내 경사를 알려드립니다'],
-    170 => ['최근 진행 행사 보고', '최근 진행 행사에 관한 게시글이 올라옵니다'],
+    170 => ['KITEL 활동', '키텔의 활동 소식을 전합니다'],
     171 => ['일정 공고', '일정공고는 이 곳에서 알려드립니다'],
 ];
 $find = $pdo->prepare('SELECT module_srl, mid, module, description FROM ' . $db['prefix'] . 'modules WHERE module_srl = ?');
@@ -31,6 +31,11 @@ $findCategory = $pdo->prepare('SELECT module_srl, title, description FROM ' . $d
 foreach ($newsCategories as $srl => [$title, $description]) {
     $findCategory->execute([$srl]);
     $row = $findCategory->fetch(PDO::FETCH_ASSOC);
+    if ($srl === 170 && $row && $row['title'] === '최근 진행 행사 보고') {
+        $title = '최근 진행 행사 보고';
+        $description = '최근 진행 행사에 관한 게시글이 올라옵니다';
+        $newsCategories[$srl] = [$title, $description];
+    }
     if (!$row || (int)$row['module_srl'] !== 115 || $row['title'] !== $title) {
         throw new RuntimeException("Unexpected News category identity for {$srl}; no change made.");
     }

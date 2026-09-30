@@ -1,0 +1,15 @@
+{@ $ka_thumbnail_srl = (int)$document->getExtraEidValue('activity_thumbnail'); }
+{@ $ka_thumbnail_file = $ka_thumbnail_srl ? FileModel::getFile($ka_thumbnail_srl) : null; $ka_photo = $ka_thumbnail_file && (int)$ka_thumbnail_file->upload_target_srl === (int)$document->document_srl && ($ka_thumbnail_file->upload_target_type ?? '') === 'ev:doc' && in_array((string)($ka_thumbnail_file->mime_type ?? ''), ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true); }
+{@ $ka_teaser = $document->getExtraEidValue('activity_teaser'); $ka_can_read = $grant->view && $document->isAccessible(); $ka_full_document = !$ka_teaser && $ka_can_read ? new DocumentItem($document->document_srl) : null; }
+<a class="kitel-activity__link" href="{getUrl('document_srl', $document->document_srl, 'cpage', '')}">
+    <span class="kitel-activity__thumb">
+        <img cond="$ka_photo" src="{getUrl('', 'module', 'kitelboardguard', 'act', 'procKitelboardguardActivityImage', 'file_srl', $ka_thumbnail_srl)}" alt="" loading="lazy" />
+        <span cond="!$ka_photo" aria-hidden="true">KITEL</span>
+    </span>
+    <span class="kitel-activity__copy">
+        <strong>{$document->getTitle()}</strong>
+        <span cond="$ka_teaser" class="kitel-activity__excerpt">{escape($ka_teaser, false)}</span>
+        <span cond="!$ka_teaser && $ka_can_read" class="kitel-activity__excerpt">{$ka_full_document->getContentPlainText(180)}</span>
+        <span cond="!$ka_teaser && !$ka_can_read" class="kitel-activity__excerpt">로그인 후 활동 내용을 확인할 수 있습니다.</span>
+    </span>
+</a>

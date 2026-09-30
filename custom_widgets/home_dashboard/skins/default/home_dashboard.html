@@ -26,6 +26,17 @@
             </section>
         </div>
 
+        <section class="kitel-home-dashboard__activity" aria-labelledby="home-activity-title">
+            <div class="kitel-home-dashboard__section-heading"><div><p class="kitel-home-dashboard__eyebrow">KITEL NEWS</p><h2 id="home-activity-title">KITEL 활동</h2></div><a href="{getUrl('', 'mid', 'news', 'category', Kitelboardguard::ACTIVITY_CATEGORY_SRL)}">활동 전체 보기 <span aria-hidden="true">→</span></a></div>
+            <div class="kitel-home-dashboard__activity-list" cond="count($home_activity)">
+                <a class="kitel-home-dashboard__activity-card" loop="$home_activity=>$i,$item" href="{getUrl('', 'mid', 'news', 'document_srl', $item['document']->document_srl)}">
+                    <span class="kitel-home-dashboard__activity-media"><img cond="$item['photo']" src="{getUrl('', 'module', 'kitelboardguard', 'act', 'procKitelboardguardActivityImage', 'file_srl', $item['photo']->file_srl)}" alt="" loading="lazy" /><span cond="!$item['photo']" aria-hidden="true">KITEL</span></span>
+                    <span class="kitel-home-dashboard__activity-copy"><strong>{$item['document']->getTitle(100)}</strong><span cond="$item['teaser']">{$item['teaser']}</span><span cond="!$item['teaser']">로그인 후 활동 내용을 확인할 수 있습니다.</span></span>
+                </a>
+            </div>
+            <p cond="!count($home_activity)" class="kitel-home-dashboard__empty-work">등록된 KITEL 활동이 없습니다.</p>
+        </section>
+
         <section class="kitel-home-dashboard__exhibition" aria-labelledby="home-exhibition-title">
             <div class="kitel-home-dashboard__section-heading"><div><p class="kitel-home-dashboard__eyebrow">MADE BY KITEL</p><h2 id="home-exhibition-title">새로운 작품</h2></div><a href="{getUrl('', 'mid', 'exhibition')}">작품전시회 보기 <span aria-hidden="true">→</span></a></div>
             <div class="kitel-home-dashboard__work-grid" cond="count($home_exhibition)">

@@ -1,0 +1,15 @@
+<section class="kitel-activity kitel-list-surface" id="board_list" aria-label="KITEL 활동 게시글">
+    <ul cond="$document_list || $notice_list" class="kitel-activity__items">
+        <li loop="$notice_list=>$no,$document" class="kitel-activity__item"><include target="_activity_row.html" /></li>
+        <li loop="$document_list=>$no,$document" class="kitel-activity__item"><include target="_activity_row.html" /></li>
+    </ul>
+    <div cond="!$document_list && !$notice_list && !$search_keyword" class="kitel-board__state">
+        <p>등록된 활동이 없습니다.</p>
+        <a cond="$grant->write_document" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category)}">첫 글 작성</a>
+    </div>
+    <div cond="!$document_list && $search_keyword" class="kitel-board__state">
+        <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
+        <a href="{getUrl('', 'mid', $mid, 'category', $category)}">검색 초기화</a>
+    </div>
+    <include target="_pagination.html" />
+</section>

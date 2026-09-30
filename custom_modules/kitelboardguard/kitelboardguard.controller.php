@@ -81,6 +81,45 @@ class KitelboardguardController extends Kitelboardguard
         exit;
     }
 
+    /** Serve only the cover image explicitly selected for a public KITEL activity. */
+    public function procKitelboardguardActivityImage()
+    {
+        $file = FileModel::getFile((int)Context::get('file_srl'));
+        if (!$file || !$file->file_srl || ($file->upload_target_type ?? '') !== 'ev:doc')
+        {
+            throw new Rhymix\Framework\Exceptions\TargetNotFound;
+        }
+        $module = ModuleModel::getModuleInfoByModuleSrl((int)$file->module_srl);
+        $document = DocumentModel::getDocument((int)$file->upload_target_srl);
+        if (!$module || $module->mid !== 'news' || $module->module !== 'board' || $module->skin !== 'kitel_generic' ||
+            !$document->isExists() || (int)$document->get('module_srl') !== (int)$module->module_srl ||
+            (int)$document->get('category_srl') !== self::ACTIVITY_CATEGORY_SRL ||
+            $document->get('status') !== DocumentModel::getConfigStatus('public') || !$document->isAccessible() ||
+            (int)$document->getExtraEidValue('activity_thumbnail') !== (int)$file->file_srl)
+        {
+            throw new Rhymix\Framework\Exceptions\TargetNotFound;
+        }
+        $path = realpath(FileHandler::getRealPath($file->uploaded_filename));
+        $attachRoot = realpath(RX_BASEDIR . 'files/attach');
+        if (!$path || !$attachRoot || !str_starts_with($path, $attachRoot . DIRECTORY_SEPARATOR))
+        {
+            throw new Rhymix\Framework\Exceptions\TargetNotFound;
+        }
+        $image = @getimagesize($path);
+        if (!$image || !in_array($image['mime'] ?? '', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true))
+        {
+            throw new Rhymix\Framework\Exceptions\TargetNotFound;
+        }
+        header('Content-Type: ' . $image['mime']);
+        header('Content-Disposition: inline');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: public, max-age=300');
+        header('Content-Length: ' . filesize($path));
+        Context::close();
+        readfile($path);
+        exit;
+    }
+
     /** Preserve the same visibility contract for a file URL as for its post or comment. */
     public function triggerBeforeDownload($file)
     {

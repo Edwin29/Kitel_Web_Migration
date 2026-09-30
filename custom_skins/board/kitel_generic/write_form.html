@@ -23,7 +23,7 @@
                     <option value="Y" selected="selected"|cond="$oDocument->get('is_notice') === 'Y'">{$lang->notice}</option>
                     <option value="A" selected="selected"|cond="$oDocument->get('is_notice') === 'A'">{$lang->notice_all}</option>
                 </select>
-                <div cond="count($extra_keys)" class="kitel-board__write-extras"><div loop="$extra_keys=>$key,$val"><label>{$val->name}<em cond="$val->is_required=='Y'"> *</em></label>{$val->getFormHTML()}</div></div>
+                <div cond="count($extra_keys)" class="kitel-board__write-extras" data-kitel-activity-category="{Kitelboardguard::ACTIVITY_CATEGORY_SRL}"|cond="$mid === 'news'"><div loop="$extra_keys=>$key,$val"><label>{$val->name}<em cond="$val->is_required=='Y'"> *</em></label>{$val->getFormHTML()}</div></div>
             </div>
             <div class="kitel-board__write-editor">{$oDocument->getEditor()}</div>
             <div cond="!$is_logged" class="kitel-board__write-guest">

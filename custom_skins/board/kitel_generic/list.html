@@ -8,7 +8,8 @@
 <div cond="$kitel_suggestion_staff_denied" class="kitel-suggestion kitel-suggestion__notice" role="alert">이 페이지는 담당 운영진만 확인할 수 있습니다. <a href="{getUrl('', 'mid', 'suggestion', 'suggestion_view', '')}">내 건의로 돌아가기</a></div>
 {@ $kitel_suggestion_staff_denied ? http_response_code(403) : null; }
 <block cond="!$oDocument->isExists() && $mid !== 'sharing' && ($mid !== 'suggestion' || $kitel_suggestion_staff_view)">
-<div class="kitel-board__list kitel-list-surface" id="board_list">
+<include cond="$mid === 'news' && (int)($category ?? 0) === Kitelboardguard::ACTIVITY_CATEGORY_SRL" target="_activity_list.html" />
+<div cond="!($mid === 'news' && (int)($category ?? 0) === Kitelboardguard::ACTIVITY_CATEGORY_SRL)" class="kitel-board__list kitel-list-surface" id="board_list">
     <table cond="$document_list || $notice_list" class="kitel-board__table">
         <thead><tr><th scope="col">{$lang->title}</th><th scope="col">{$lang->date}</th><th scope="col">{$lang->readed_count}</th><th scope="col">{$lang->category}</th></tr></thead>
         <tbody>

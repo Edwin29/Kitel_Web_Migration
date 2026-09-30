@@ -3,6 +3,8 @@
 <load target="kitel-board.css" />
 <load cond="$mid === 'sharing'" target="kitel-community.css" />
 <load cond="$mid === 'suggestion'" target="kitel-suggestion.css" />
+<load cond="$mid === 'news' && (int)($category ?? 0) === Kitelboardguard::ACTIVITY_CATEGORY_SRL" target="kitel-activity.css" />
+<load cond="$mid === 'news' && $act === 'dispBoardWrite'" target="kitel-activity-write.js" type="body" />
 {@ $category_list = $category_list ?? array(); $search_option = $search_option ?? array(); }
 {@ $kitel_board_title = $mid === 'news' && !empty($category) && isset($category_list[$category]) ? $category_list[$category]->title : ($module_info->browser_title ?: $module_info->mid); }
 {@ $kitel_board_description = !empty($category) && isset($category_list[$category]) && !empty($category_list[$category]->description) ? $category_list[$category]->description : $module_info->description; }

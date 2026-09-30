@@ -1,6 +1,7 @@
 <?php
 class Kitelboardguard extends ModuleObject
 {
+    public const ACTIVITY_CATEGORY_SRL = 170;
     private const TRIGGERS = [
         ['file.downloadFile', 'kitelboardguard', 'controller', 'triggerBeforeDownload', 'before'],
         ['document.insertDocument', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionSave', 'before'],

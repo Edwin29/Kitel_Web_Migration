@@ -8,7 +8,7 @@ class home_dashboard extends WidgetHandler
         return $module && $module->mid === $mid && $module->module === $type ? $module : null;
     }
 
-    private function documents($module_srl, $limit)
+    private function documents($module_srl, $limit, $category_srl = null)
     {
         $query = (object)[
             'module_srl' => (int)$module_srl,
@@ -19,6 +19,7 @@ class home_dashboard extends WidgetHandler
             'sort_index' => 'list_order',
             'order_type' => 'asc',
         ];
+        if ($category_srl) $query->category_srl = is_array($category_srl) ? array_map('intval', $category_srl) : (int)$category_srl;
         $result = DocumentModel::getDocumentList($query, false, true);
         return $result->toBool() && is_array($result->data) ? $result->data : [];
     }
@@ -29,11 +30,29 @@ class home_dashboard extends WidgetHandler
         $homework = $this->module($args->homework_module_srl ?? 0, 'homework', 'homework');
         $exhibition = $this->module($args->exhibition_module_srl ?? 0, 'exhibition', 'board');
 
-        $news_list = $news ? $this->documents($news->module_srl, 4) : [];
         $news_categories = $news ? DocumentModel::getCategoryList($news->module_srl) : [];
+        $notice_categories = array_values(array_filter(array_keys($news_categories), static fn($id) => (int)$id !== Kitelboardguard::ACTIVITY_CATEGORY_SRL));
+        $news_list = $news && $notice_categories ? $this->documents($news->module_srl, 4, $notice_categories) : [];
+        $activity_list = [];
+        $member = Context::get('logged_info');
+        $news_grant = $news && $member ? ModuleModel::getGrant($news, $member) : null;
+        if ($news && isset($news_categories[Kitelboardguard::ACTIVITY_CATEGORY_SRL]))
+        {
+            foreach ($this->documents($news->module_srl, 3, Kitelboardguard::ACTIVITY_CATEGORY_SRL) as $document)
+            {
+                if ((int)$document->get('category_srl') !== Kitelboardguard::ACTIVITY_CATEGORY_SRL || !$document->isAccessible()) continue;
+                $file_srl = (int)$document->getExtraEidValue('activity_thumbnail');
+                $file = $file_srl ? FileModel::getFile($file_srl) : null;
+                $photo = $file && (int)$file->upload_target_srl === (int)$document->document_srl &&
+                    ($file->upload_target_type ?? '') === 'ev:doc' &&
+                    str_starts_with((string)($file->mime_type ?? ''), 'image/') ? $file : null;
+                $teaser = (string)$document->getExtraEidValue('activity_teaser');
+                if (!$teaser && $news_grant && !empty($news_grant->view)) $teaser = html_entity_decode($document->getContentPlainText(140), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $activity_list[] = ['document' => $document, 'photo' => $photo, 'teaser' => $teaser];
+            }
+        }
 
         $homework_list = [];
-        $member = Context::get('logged_info');
         $homework_access = false;
         if ($homework && $member && (int)($member->member_srl ?? 0) > 0)
         {
@@ -71,6 +90,7 @@ class home_dashboard extends WidgetHandler
 
         Context::set('home_news', $news_list);
         Context::set('home_news_categories', $news_categories ?: []);
+        Context::set('home_activity', $activity_list);
         Context::set('home_homework', $homework_list);
         Context::set('home_homework_access', $homework_access);
         Context::set('home_exhibition', $exhibition_list);

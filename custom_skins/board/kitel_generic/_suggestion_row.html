@@ -1,0 +1,4 @@
+<td><span class="kitel-suggestion__category">{$module_info->use_category === 'Y' && isset($category_list[$document->get('category_srl')]) ? $category_list[$document->get('category_srl')]->title : '건의'}</span></td>
+<td class="kitel-suggestion__title"><a href="{getUrl('document_srl',$document->document_srl,'page',$page)}">{$document->getTitle(80)}</a></td>
+<td><time datetime="{$document->getRegdate('Y-m-d')}">{$document->getRegdate('Y.m.d')}</time></td>
+<td><span class="kitel-suggestion__status is-answered"|cond="$document->getCommentCount() > 0">{$document->getCommentCount() > 0 ? '답변완료' : '답변대기'}</span></td>

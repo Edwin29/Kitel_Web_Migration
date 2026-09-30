@@ -1,0 +1,33 @@
+<section class="kitel-suggestion" aria-labelledby="kitel-suggestion-page-title">
+    <header class="kitel-suggestion__heading">
+        <h1 id="kitel-suggestion-page-title">건의사항</h1>
+        <p>운영진에게 의견을 전달할 수 있습니다. 작성한 건의는 본인과 담당 운영진만 확인합니다.</p>
+        <a cond="$grant->manager || $grant->consultation_read" class="kitel-suggestion__staff-link" href="{getUrl('', 'mid', 'suggestion', 'suggestion_view', 'staff', 'member_srl', '')}">전체 건의 보기</a>
+    </header>
+    <include cond="$grant->write_document" target="_suggestion_composer.html" />
+    <div cond="!$grant->write_document" class="kitel-suggestion__notice">건의 작성은 정회원부터 가능합니다.</div>
+
+    <section class="kitel-suggestion__history" aria-labelledby="kitel-suggestion-history-title">
+        {@ $kitel_own_args = (object)['module_srl' => $module_info->module_srl, 'member_srl' => $logged_info->member_srl, 'page' => (int)$page ?: 1, 'list_count' => 20, 'page_count' => 10, 'sort_index' => 'list_order', 'order_type' => 'asc']; }
+        {@ $kitel_own_result = ($grant->manager || $grant->consultation_read) ? DocumentModel::getDocumentList($kitel_own_args, false, true) : null; }
+        {@ $document_list = $kitel_own_result ? ($kitel_own_result->data ?? []) : $document_list; }
+        {@ $notice_list = $kitel_own_result ? [] : $notice_list; }
+        {@ $page_navigation = $kitel_own_result ? $kitel_own_result->page_navigation : $page_navigation; }
+        <div class="kitel-suggestion__history-heading">
+            <h2 id="kitel-suggestion-history-title">내가 한 건의</h2>
+            <p>답변 상태는 담당 운영진의 댓글을 기준으로 표시됩니다.</p>
+        </div>
+        <div class="kitel-suggestion__table-wrap" cond="$document_list || $notice_list">
+            <table class="kitel-suggestion__table">
+                <thead><tr><th scope="col">분류</th><th scope="col">제목</th><th scope="col">날짜</th><th scope="col">답변여부</th></tr></thead>
+                <tbody>
+                    <tr loop="$notice_list=>$no,$document"><include target="_suggestion_row.html" /></tr>
+                    <tr loop="$document_list=>$no,$document"><include target="_suggestion_row.html" /></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="kitel-suggestion__empty" cond="!$document_list && !$notice_list && !$search_keyword">아직 등록된 건의가 없습니다.</div>
+        <div class="kitel-suggestion__empty" cond="!$document_list && !$notice_list && $search_keyword">검색 결과가 없습니다.</div>
+        <include target="_pagination.html" />
+    </section>
+</section>

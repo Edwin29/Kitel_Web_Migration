@@ -1,0 +1,22 @@
+{@ DocumentController::getInstance()->addXmlJsFilter($module_info->module_srl); }
+{@ Context::addJsFilter(RX_BASEDIR . 'modules/board/tpl/filter', 'insert.xml'); }
+<section class="kitel-suggestion__compose" aria-labelledby="kitel-suggestion-compose-title">
+    <h2 id="kitel-suggestion-compose-title">{$oDocument->isExists() ? '건의 수정' : '건의 작성'}</h2>
+    <form action="./" method="post" onsubmit="return procFilter(this, window.insert)" class="kitel-suggestion__form kitel-form-surface">
+        <input type="hidden" name="mid" value="{$mid}" />
+        <input type="hidden" name="content" value="{$oDocument->getContentText()}" />
+        <input type="hidden" name="document_srl" value="{$oDocument->document_srl}" />
+        <input type="hidden" name="comment_status" value="ALLOW" />
+        <div class="kitel-suggestion__fields">
+            <label cond="$module_info->use_category === 'Y' && count($category_list)" for="kitel-suggestion-category">분류</label>
+            <select cond="$module_info->use_category === 'Y' && count($category_list)" id="kitel-suggestion-category" name="category_srl" required>
+                <option value="">분류 선택</option>
+                <option loop="$category_list=>$key,$item" value="{$item->category_srl}" disabled="disabled"|cond="!$item->grant" selected="selected"|cond="$oDocument->get('category_srl') == $item->category_srl">{$item->title}</option>
+            </select>
+            <label for="kitel-suggestion-title">제목</label>
+            <input id="kitel-suggestion-title" type="text" name="title" value="{escape($oDocument->getTitleText(), false)}" placeholder="제목을 입력해주세요" required />
+        </div>
+        <div class="kitel-suggestion__editor">{$oDocument->getEditor()}</div>
+        <button type="submit">{$oDocument->isExists() ? '수정 완료' : '등록'}</button>
+    </form>
+</section>

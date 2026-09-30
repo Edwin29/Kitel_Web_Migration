@@ -121,8 +121,18 @@ class KitelboardguardController extends Kitelboardguard
         {
             return new BaseObject(-1, 'msg_not_permitted_download');
         }
+        if ($module->mid === 'suggestion')
+        {
+            $member = Context::get('logged_info');
+            $owner = $member && (int)$member->member_srl > 0 && abs((int)$document->get('member_srl')) === (int)$member->member_srl;
+            if (!$grant->manager && !$grant->consultation_read && !$owner)
+            {
+                return new BaseObject(-1, 'msg_not_permitted_download');
+            }
+        }
         return new BaseObject();
     }
+
 
     /** Every exhibition document follows the single board-wide release state. */
     public function triggerBeforeExhibitionSave($document)
@@ -140,6 +150,20 @@ class KitelboardguardController extends Kitelboardguard
         return new BaseObject();
     }
 
+    /** Suggestions always allow staff replies and have no trackback or public-status choice. */
+    public function triggerBeforeSuggestionSave($document)
+    {
+        $module = ModuleModel::getModuleInfoByModuleSrl((int)($document->module_srl ?? 0));
+        if ($module && $module->module === 'board' && $module->mid === 'suggestion' && $module->skin === 'kitel_generic')
+        {
+            $document->status = DocumentModel::getConfigStatus('public');
+            $document->comment_status = 'ALLOW';
+            $document->commentStatus = 'ALLOW';
+            $document->allow_trackback = 'N';
+        }
+        return new BaseObject();
+    }
+
     public function triggerBeforeExhibitionComment($comment)
     {
         $module = ModuleModel::getModuleInfoByModuleSrl((int)($comment->module_srl ?? 0));
@@ -150,18 +174,21 @@ class KitelboardguardController extends Kitelboardguard
         return new BaseObject();
     }
 
-    /** Move a completed Rhymix upload to private storage before returning the upload response. */
+    /** Move sensitive board uploads outside the web root before returning the upload response. */
     public function triggerAfterExhibitionUpload($file)
     {
         $module = ModuleModel::getModuleInfoByModuleSrl((int)($file->module_srl ?? 0));
-        if (!$module || $module->module !== 'board' || $module->mid !== 'exhibition' || $module->skin !== 'kitel_gallery')
+        $isExhibition = $module && $module->module === 'board' && $module->mid === 'exhibition' && $module->skin === 'kitel_gallery';
+        $isSuggestion = $module && $module->module === 'board' && $module->mid === 'suggestion' && $module->skin === 'kitel_generic';
+        if (!$isExhibition && !$isSuggestion)
         {
             return new BaseObject();
         }
-        $privateRoot = self::exhibitionPrivateRoot();
+        $folder = $isExhibition ? 'exhibition' : 'suggestion';
+        $privateRoot = $isExhibition ? self::exhibitionPrivateRoot() : self::suggestionPrivateRoot();
         if (!is_dir($privateRoot) && !mkdir($privateRoot, 0700, true))
         {
-            throw new RuntimeException('Cannot create private exhibition storage.');
+            throw new RuntimeException('Cannot create private board storage.');
         }
         $attachRoot = realpath(RX_BASEDIR . 'files/attach');
         $moves = [];
@@ -171,16 +198,16 @@ class KitelboardguardController extends Kitelboardguard
             $source = realpath(FileHandler::getRealPath($file->$field));
             if (!$source || !$attachRoot || !str_starts_with($source, $attachRoot . DIRECTORY_SEPARATOR))
             {
-                throw new RuntimeException('Unexpected exhibition upload location.');
+                throw new RuntimeException('Unexpected private board upload location.');
             }
             $name = bin2hex(random_bytes(20));
-            $moves[$field] = [$source, $privateRoot . $name, './../../kitel-private/exhibition/' . $name];
+            $moves[$field] = [$source, $privateRoot . $name, './../../kitel-private/' . $folder . '/' . $name];
         }
         try
         {
             foreach ($moves as $field => $move)
             {
-                if (!rename($move[0], $move[1])) throw new RuntimeException('Cannot privatize exhibition upload.');
+                if (!rename($move[0], $move[1])) throw new RuntimeException('Cannot privatize board upload.');
                 $file->$field = $move[2];
             }
             $update = (object)[
@@ -191,7 +218,7 @@ class KitelboardguardController extends Kitelboardguard
                 'direct_download' => 'N',
             ];
             $result = executeQuery('kitelboardguard.updateExhibitionFilePath', $update);
-            if (!$result->toBool()) throw new RuntimeException('Cannot update exhibition upload path.');
+            if (!$result->toBool()) throw new RuntimeException('Cannot update private board upload path.');
             $file->direct_download = 'N';
         }
         catch (Throwable $error)

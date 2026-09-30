@@ -5,6 +5,8 @@ class Kitelboardguard extends ModuleObject
         ['file.downloadFile', 'kitelboardguard', 'controller', 'triggerBeforeDownload', 'before'],
         ['document.insertDocument', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionSave', 'before'],
         ['document.updateDocument', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionSave', 'before'],
+        ['document.insertDocument', 'kitelboardguard', 'controller', 'triggerBeforeSuggestionSave', 'before'],
+        ['document.updateDocument', 'kitelboardguard', 'controller', 'triggerBeforeSuggestionSave', 'before'],
         ['comment.insertComment', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionComment', 'before'],
         ['file.insertFile', 'kitelboardguard', 'controller', 'triggerAfterExhibitionUpload', 'after'],
     ];
@@ -12,6 +14,11 @@ class Kitelboardguard extends ModuleObject
     public static function exhibitionPrivateRoot()
     {
         return RX_BASEDIR . '../../kitel-private/exhibition/';
+    }
+
+    public static function suggestionPrivateRoot()
+    {
+        return RX_BASEDIR . '../../kitel-private/suggestion/';
     }
 
     public static function exhibitionIsPublic($moduleSrl)

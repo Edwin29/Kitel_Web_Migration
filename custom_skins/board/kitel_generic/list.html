@@ -1,8 +1,13 @@
-{@ $kitel_board_show_list_actions = !$oDocument->isExists() && $mid !== 'sharing'; }
+{@ $kitel_suggestion_staff_view = $mid === 'suggestion' && Context::get('suggestion_view') === 'staff' && ($grant->manager || $grant->consultation_read); }
+{@ $kitel_suggestion_staff_denied = $mid === 'suggestion' && Context::get('suggestion_view') === 'staff' && !$kitel_suggestion_staff_view; }
+{@ $kitel_board_show_list_actions = !$oDocument->isExists() && ($mid !== 'sharing') && ($mid !== 'suggestion' || $kitel_suggestion_staff_view); }
 <include target="_header.html" />
 <include cond="$oDocument->isExists()" target="_read.html" />
 <include cond="!$oDocument->isExists() && $mid === 'sharing'" target="_community_list.html" />
-<block cond="!$oDocument->isExists() && $mid !== 'sharing'">
+<include cond="!$oDocument->isExists() && $mid === 'suggestion' && !$kitel_suggestion_staff_view && !$kitel_suggestion_staff_denied" target="_suggestion_list.html" />
+<div cond="$kitel_suggestion_staff_denied" class="kitel-suggestion kitel-suggestion__notice" role="alert">이 페이지는 담당 운영진만 확인할 수 있습니다. <a href="{getUrl('', 'mid', 'suggestion', 'suggestion_view', '')}">내 건의로 돌아가기</a></div>
+{@ $kitel_suggestion_staff_denied ? http_response_code(403) : null; }
+<block cond="!$oDocument->isExists() && $mid !== 'sharing' && ($mid !== 'suggestion' || $kitel_suggestion_staff_view)">
 <div class="kitel-board__list kitel-list-surface" id="board_list">
     <table cond="$document_list || $notice_list" class="kitel-board__table">
         <thead><tr><th scope="col">{$lang->title}</th><th scope="col">{$lang->date}</th><th scope="col">{$lang->readed_count}</th><th scope="col">{$lang->category}</th></tr></thead>
@@ -17,7 +22,7 @@
     </div>
     <div cond="!$document_list && $search_keyword" class="kitel-board__state">
         <p>검색 결과가 없습니다. 검색어를 변경해보세요.</p>
-        <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null)}">검색 초기화</a>
+        <a href="{getUrl('', 'mid', $mid, 'category', $category ?? null, 'suggestion_view', $kitel_suggestion_staff_view ? 'staff' : null)}">검색 초기화</a>
     </div>
     <include target="_pagination.html" />
 </div>

@@ -2,15 +2,17 @@
 <load target="board.default.js" type="body" />
 <load target="kitel-board.css" />
 <load cond="$mid === 'sharing'" target="kitel-community.css" />
+<load cond="$mid === 'suggestion'" target="kitel-suggestion.css" />
 {@ $category_list = $category_list ?? array(); $search_option = $search_option ?? array(); }
 {@ $kitel_board_title = $mid === 'news' && !empty($category) && isset($category_list[$category]) ? $category_list[$category]->title : ($module_info->browser_title ?: $module_info->mid); }
 {@ $kitel_board_description = !empty($category) && isset($category_list[$category]) && !empty($category_list[$category]->description) ? $category_list[$category]->description : $module_info->description; }
 <div class="board kitel-board">
     <div cond="$module_info->header_text" class="kitel-board__intro">{$module_info->header_text}</div>
-    <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && $mid !== 'sharing' && (!$oDocument || !$oDocument->isExists())">
+    <div class="kitel-board__heading" cond="$act !== 'dispBoardWrite' && $mid !== 'sharing' && ($mid !== 'suggestion' || !empty($kitel_suggestion_staff_view)) && (!$oDocument || !$oDocument->isExists())">
         <div class="kitel-board__heading-copy">
-            <h1>{$kitel_board_title}</h1>
-            <p cond="$kitel_board_description">{$kitel_board_description}</p>
+            <h1>{$mid === 'suggestion' ? '전체 건의' : $kitel_board_title}</h1>
+            <p cond="$kitel_board_description && $mid !== 'suggestion'">{$kitel_board_description}</p>
+            <p cond="$mid === 'suggestion'">담당 운영진이 접수된 건의를 확인하고 답변합니다.</p>
         </div>
         <div cond="!empty($kitel_board_show_list_actions)" class="kitel-board__heading-actions">
             <div cond="$grant->manager" class="kitel-board__management">
@@ -18,9 +20,11 @@
                 <a class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
             </div>
             <div class="kitel-board__toolbar">
-                <a cond="$grant->write_document" class="kitel-board__write kitel-write-action" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">{$lang->cmd_write}</a>
+                <a cond="$grant->write_document && $mid !== 'suggestion'" class="kitel-board__write kitel-write-action" href="{getUrl('', 'mid', $mid, 'act', 'dispBoardWrite', 'category', $category ?? null)}">{$lang->cmd_write}</a>
+                <a cond="$mid === 'suggestion'" class="kitel-board__write kitel-write-action" href="{getUrl('', 'mid', 'suggestion', 'suggestion_view', '')}">작성 화면</a>
                 <form action="{getUrl()}" method="get" class="kitel-board__search kitel-filter-search" rx-autoform="false" role="search">
                     <input type="hidden" name="mid" value="{$mid}" />
+                    <input cond="$mid === 'suggestion'" type="hidden" name="suggestion_view" value="staff" />
                     <input type="hidden" name="category" value="{$category}" />
                     <label class="kitel-board__sr-only" for="kitel-board-keyword">{$lang->cmd_search}</label>
                     <input id="kitel-board-keyword" type="search" name="search_keyword" value="{escape($search_keyword ?? '', false)}" />
@@ -33,7 +37,7 @@
         </div>
         <a cond="$grant->manager && empty($kitel_board_show_list_actions)" class="kitel-board__setup" href="{getUrl('act','dispBoardAdminBoardInfo')}">{$lang->cmd_setup}</a>
     </div>
-    <nav cond="$mid !== 'news' && $module_info->use_category=='Y' && count($category_list)" class="kitel-board__categories" aria-label="게시판 분류">
+    <nav cond="!in_array($mid, ['news', 'suggestion'], true) && $module_info->use_category=='Y' && count($category_list)" class="kitel-board__categories" aria-label="게시판 분류">
         <a href="{getUrl('category','','page','')}" class="is-active"|cond="!$category">{$lang->total}</a>
         <a loop="$category_list=>$key,$item" href="{getUrl('category',$item->category_srl,'document_srl','','page','')}" class="is-active"|cond="(int)$category === (int)$item->category_srl">{$item->title}</a>
     </nav>

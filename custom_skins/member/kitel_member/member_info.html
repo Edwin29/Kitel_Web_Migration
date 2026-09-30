@@ -5,7 +5,7 @@
     <img class="kitel-member__success-icon" src="/modules/member/skins/kitel_member/css/signup-success.svg" alt="" width="150" height="150" />
     <h2>{$memberInfo['nick_name']}님<br />회원가입이 완료되었습니다</h2>
     <p>회원 승인 후 이용 가능한 기능이 달라질 수 있습니다.</p>
-    <div class="kitel-member__success-actions"><a class="kitel-member__button" href="{getUrl('', 'mid', 'home', 'act', '')}">Home</a><a class="kitel-member__button" href="{getUrl('act', 'dispMemberInfo', 'signup_complete', '')}">My Page</a></div>
+    <div class="kitel-member__success-actions"><a class="kitel-member__button" href="{getUrl('', 'mid', 'index')}">Home</a><a class="kitel-member__button" href="{getUrl('act', 'dispMemberInfo', 'signup_complete', '')}">My Page</a></div>
 </div>
 <div cond="Context::get('signup_complete') !== '1' || $memberInfo['member_srl'] != $logged_info->member_srl">
     <section class="kitel-member__section" aria-labelledby="kitel-profile-title">

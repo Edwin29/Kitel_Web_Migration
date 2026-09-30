@@ -1,5 +1,7 @@
 # Phase 10 — KITEL Account skin
 
+상태: **CLOSED — final correction 및 기능 QA 완료** (2026-10-01). 모바일 세부 시각 조정은 Phase 11, SMS 인증과 회원 필드 운영 정책은 별도 결정으로 남긴다.
+
 ## 범위와 데이터 원칙
 
 Rhymix `member` 모듈의 인증, 가입, CSRF, ruleset, 수정, 비밀번호 재확인, 탈퇴, 회원 메뉴를 그대로 사용한다. `custom_skins/member/kitel_member`는 기본 스킨의 모든 보조 화면을 보존하고 Login, Signup, Signup Complete, My Page와 관련 편집 화면에 KITEL 표현을 적용한다. 별도 인증 컨트롤러나 계정 데이터 사본은 없다. `scripts/sync-dev.ps1`이 이 스킨을 로컬 Rhymix `modules/member/skins/kitel_member`로 동기화한다.
@@ -47,3 +49,12 @@ Figma 기준은 Login `19:166`, Signup `148:897`, Signup Complete `46:842`, My P
 - 로컬 임시 계정으로 국내 번호를 입력하여 가입·완료 화면·마이페이지 저장 표시를 확인했다. 해당 임시 계정은 Rhymix 회원 탈퇴 경로로 정리했다.
 - Rhymix 코어는 국내 전화번호 형식을 서버에서도 검사한다. 형식에 맞지 않는 번호는 가입되지 않았다. 문자 발송과 소유자 인증은 현재 구현 범위가 아니므로, 저장된 번호를 인증된 번호로 취급하지 않는다.
 - 실제 Android 모바일 UA의 390px 화면에서도 KITEL 모바일 공통 헤더·푸터와 계정 스킨이 렌더되며 가로 overflow가 없음을 확인했다. 세부 모바일 시각 조정은 Phase 11 범위다.
+
+## Final correction / verification (2026-10-01)
+
+- 가입 완료의 Home 링크를 실제 Home인 `index`로 수정했다. 기존 `home` mid는 404였고 수정 후 실제 링크는 HTTP 200이었다.
+- 로그인 템플릿은 사용자 문자열의 autoescape를 유지하면서 Rhymix 코어가 생성하는 CAPTCHA 마크업만 `noescape`로 출력한다. 실제 `login_form.html`을 Rhymix 템플릿 엔진으로 컴파일·렌더하여 CAPTCHA 대체 객체의 HTML 요소가 escape되지 않는 것을 확인했다. 현재 개발 설정에서 외부 CAPTCHA 서비스 인증은 활성화하지 않았으며, 실제 서비스 토큰 검증은 이 QA에 포함하지 않았다.
+- 로컬 임시 계정으로 가입 완료·최근 글 empty state, 비밀번호 재확인 후 정보 수정, 닉네임/기수 저장·재조회, 잘못된 전화번호 거부 및 기존 번호 보존을 확인했다.
+- 잘못된 현재 비밀번호와 새 비밀번호 확인 불일치를 거부했다. 정상 비밀번호 변경 후 로그아웃하면 이전 비밀번호는 실패하고 새 비밀번호는 로그인에 성공했다.
+- 이미 존재하는 아이디로 중복 가입이 거부됐다. 비로그인 Homework 진입 후 로그인하면 원래 `mid=homework`로 복귀하고 로그인 상태가 유지됐다. 가입대기 계정의 추가 권한은 부여하지 않았다.
+- 위 브라우저 기능 QA에서 페이지 JavaScript 오류가 없었다. 임시 계정은 Rhymix 탈퇴 경로로 정리했으며 별도 DB 조회로 남은 QA 계정 0건을 확인했다.

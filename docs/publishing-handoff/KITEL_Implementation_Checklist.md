@@ -112,14 +112,16 @@
 - [ ] Placeholder-only sections not mistaken for backend features
 
 ## L. Account
-- [ ] Login core action preserved
-- [ ] Login error state
-- [ ] Signup current fields inspected
-- [ ] Signup styling
-- [ ] Signup complete approval-aware copy
-- [ ] My Page
-- [ ] Password change safe
-- [ ] Recent posts
+- [x] Login core action preserved
+- [x] Login error state
+- [x] Signup current fields inspected
+- [x] Signup styling
+- [x] Signup complete approval-aware copy
+- [x] My Page
+- [x] Password change safe
+- [x] Recent posts
+
+Phase 10 final correction 및 기능 QA: `docs/phase10-account-setup.md` (2026-10-01). SMS 인증·필드 운영 정책과 Phase 11 세부 반응형은 별도 범위다.
 
 ## M. Responsive
 - [ ] 390

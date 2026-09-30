@@ -1,6 +1,6 @@
 # Phase 11 새 세션 핸드오프 — 반응형 구현
 
-기준일: 2026-09-30. 기준 구현: `codex/kitel-publishing-phase10`의 `eb58931`. 새 세션은 먼저 Git 상태와 원격 최신 커밋을 확인한다. 이 문서는 Phase 11 시작을 위한 현재 상태 요약이며, Phase 11 구현이나 QA 완료 기록이 아니다.
+기준일: 2026-10-01. 기준 구현: `codex/kitel-publishing-phase10` 최신 커밋(초기 구현 `eb58931` 이후 final correction 포함). Phase 10의 완료 기록은 `docs/phase10-account-setup.md`를 확인한다. 같은 세션 또는 새 세션에서 먼저 Git 상태와 원격 최신 커밋을 확인한다. 이 문서는 Phase 11 시작을 위한 현재 상태 요약이며, Phase 11 구현이나 QA 완료 기록이 아니다.
 
 ## 문서 우선순위
 

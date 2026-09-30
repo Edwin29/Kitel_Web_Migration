@@ -25,7 +25,6 @@
         <div class="kitel-gallery__editor">{$oDocument->getEditor()}</div>
         <p class="kitel-gallery__field-help">카드의 흰색 오버레이에는 ‘작품 한 줄 소개’가 표시됩니다.</p>
     </div>
-    <p class="kitel-gallery__review-note">작품별 심사·평가 없이 기술부가 게시판의 전체 공개 상태를 전환합니다.</p>
     <div cond="isset($captcha) && $captcha && $captcha->isTargetAction('document')">{$captcha}</div>
     <div class="kitel-gallery__write-actions">
         <button type="submit">{$lang->cmd_registration}</button>

@@ -33,22 +33,37 @@ class home_dashboard extends WidgetHandler
         $news_categories = $news ? DocumentModel::getCategoryList($news->module_srl) : [];
         $notice_categories = array_values(array_filter(array_keys($news_categories), static fn($id) => (int)$id !== Kitelboardguard::ACTIVITY_CATEGORY_SRL));
         $news_list = $news && $notice_categories ? $this->documents($news->module_srl, 4, $notice_categories) : [];
-        $activity_list = [];
+        $activity_candidates = [];
+        $activity_featured = null;
+        $activity_recent = [];
         $member = Context::get('logged_info');
         $news_grant = $news && $member ? ModuleModel::getGrant($news, $member) : null;
         if ($news && isset($news_categories[Kitelboardguard::ACTIVITY_CATEGORY_SRL]))
         {
-            foreach ($this->documents($news->module_srl, 3, Kitelboardguard::ACTIVITY_CATEGORY_SRL) as $document)
+            foreach ($this->documents($news->module_srl, 8, Kitelboardguard::ACTIVITY_CATEGORY_SRL) as $document)
             {
                 if ((int)$document->get('category_srl') !== Kitelboardguard::ACTIVITY_CATEGORY_SRL || !$document->isAccessible()) continue;
                 $file_srl = (int)$document->getExtraEidValue('activity_thumbnail');
                 $file = $file_srl ? FileModel::getFile($file_srl) : null;
                 $photo = $file && (int)$file->upload_target_srl === (int)$document->document_srl &&
                     ($file->upload_target_type ?? '') === 'ev:doc' &&
-                    str_starts_with((string)($file->mime_type ?? ''), 'image/') ? $file : null;
+                    in_array((string)($file->mime_type ?? ''), ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true) ? $file : null;
+                $activity_candidates[] = ['document' => $document, 'photo' => $photo];
+            }
+            $featured_index = 0;
+            foreach ($activity_candidates as $index => $candidate)
+            {
+                if ($candidate['photo']) { $featured_index = $index; break; }
+            }
+            if ($activity_candidates)
+            {
+                $activity_featured = $activity_candidates[$featured_index];
+                $document = $activity_featured['document'];
                 $teaser = (string)$document->getExtraEidValue('activity_teaser');
-                if (!$teaser && $news_grant && !empty($news_grant->view)) $teaser = html_entity_decode($document->getContentPlainText(140), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                $activity_list[] = ['document' => $document, 'photo' => $photo, 'teaser' => $teaser];
+                if (!$teaser && $news_grant && !empty($news_grant->view)) $teaser = html_entity_decode($document->getContentPlainText(180), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $activity_featured['teaser'] = $teaser;
+                unset($activity_candidates[$featured_index]);
+                $activity_recent = array_slice(array_values($activity_candidates), 0, 3);
             }
         }
 
@@ -90,7 +105,8 @@ class home_dashboard extends WidgetHandler
 
         Context::set('home_news', $news_list);
         Context::set('home_news_categories', $news_categories ?: []);
-        Context::set('home_activity', $activity_list);
+        Context::set('home_activity_featured', $activity_featured);
+        Context::set('home_activity_recent', $activity_recent);
         Context::set('home_homework', $homework_list);
         Context::set('home_homework_access', $homework_access);
         Context::set('home_exhibition', $exhibition_list);

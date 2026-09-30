@@ -28,13 +28,25 @@
 
         <section class="kitel-home-dashboard__activity" aria-labelledby="home-activity-title">
             <div class="kitel-home-dashboard__section-heading"><div><p class="kitel-home-dashboard__eyebrow">KITEL NEWS</p><h2 id="home-activity-title">KITEL 활동</h2></div><a href="{getUrl('', 'mid', 'news', 'category', Kitelboardguard::ACTIVITY_CATEGORY_SRL)}">활동 전체 보기 <span aria-hidden="true">→</span></a></div>
-            <div class="kitel-home-dashboard__activity-list" cond="count($home_activity)">
-                <a class="kitel-home-dashboard__activity-card" loop="$home_activity=>$i,$item" href="{getUrl('', 'mid', 'news', 'document_srl', $item['document']->document_srl)}">
-                    <span class="kitel-home-dashboard__activity-media"><img cond="$item['photo']" src="{getUrl('', 'module', 'kitelboardguard', 'act', 'procKitelboardguardActivityImage', 'file_srl', $item['photo']->file_srl)}" alt="" loading="lazy" /><span cond="!$item['photo']" aria-hidden="true">KITEL</span></span>
-                    <span class="kitel-home-dashboard__activity-copy"><strong>{$item['document']->getTitle(100)}</strong><span cond="$item['teaser']">{$item['teaser']}</span><span cond="!$item['teaser']">로그인 후 활동 내용을 확인할 수 있습니다.</span></span>
+            <div class="kitel-home-dashboard__activity-editorial" cond="$home_activity_featured">
+                <a class="kitel-home-dashboard__activity-feature-image" href="{getUrl('', 'mid', 'news', 'document_srl', $home_activity_featured['document']->document_srl)}" aria-label="{$home_activity_featured['document']->getTitleText()} 활동 글 보기">
+                    <img cond="$home_activity_featured['photo']" src="{getUrl('', 'module', 'kitelboardguard', 'act', 'procKitelboardguardActivityImage', 'file_srl', $home_activity_featured['photo']->file_srl)}" alt="{$home_activity_featured['document']->getTitleText()} 활동 사진" loading="lazy" />
+                    <span cond="!$home_activity_featured['photo']" aria-hidden="true">KITEL<br />ACTIVITY</span>
                 </a>
+                <div class="kitel-home-dashboard__activity-side">
+                    <a class="kitel-home-dashboard__activity-feature-copy" href="{getUrl('', 'mid', 'news', 'document_srl', $home_activity_featured['document']->document_srl)}">
+                        <span class="kitel-home-dashboard__activity-meta"><time datetime="{$home_activity_featured['document']->getRegdate('Y-m-d')}">{$home_activity_featured['document']->getRegdate('Y.m.d')}</time><span aria-hidden="true">·</span><span>{$home_news_categories[$home_activity_featured['document']->get('category_srl')]->title}</span></span>
+                        <h3>{$home_activity_featured['document']->getTitleText()}</h3>
+                        <p cond="$home_activity_featured['teaser']">{$home_activity_featured['teaser']}</p>
+                        <p cond="!$home_activity_featured['teaser']">로그인 후 활동 내용을 확인할 수 있습니다.</p>
+                        <span class="kitel-home-dashboard__activity-more">자세히 보기 <span aria-hidden="true">→</span></span>
+                    </a>
+                    <ul class="kitel-home-dashboard__activity-recent" cond="count($home_activity_recent)">
+                        <li loop="$home_activity_recent=>$i,$item"><a href="{getUrl('', 'mid', 'news', 'document_srl', $item['document']->document_srl)}"><span>{$item['document']->getTitleText()}</span><time datetime="{$item['document']->getRegdate('Y-m-d')}">{$item['document']->getRegdate('m.d')}</time></a></li>
+                    </ul>
+                </div>
             </div>
-            <p cond="!count($home_activity)" class="kitel-home-dashboard__empty-work">등록된 KITEL 활동이 없습니다.</p>
+            <p cond="!$home_activity_featured" class="kitel-home-dashboard__empty-work">등록된 KITEL 활동이 없습니다.</p>
         </section>
 
         <section class="kitel-home-dashboard__exhibition" aria-labelledby="home-exhibition-title">

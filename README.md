@@ -4,7 +4,9 @@
 
 ## 📍 전체 진행 현황
 
-**[docs/roadmap.md](docs/roadmap.md)** — 게시판/기능별 상세 작업 현황, 매크로 단계, 리스크와 다음 우선순위를 한 곳에 정리한 문서. 프로젝트 상태를 파악하려면 여기부터 보면 됨.
+**[docs/roadmap.md](docs/roadmap.md)** — 게시판/기능별 로드맵과 마이그레이션 배경. 퍼블리싱의 현재 상태는 아래 Phase 11 핸드오프와 각 Phase 적용 기록을 우선한다.
+
+Phase 11 반응형 작업을 새 세션에서 시작할 때는 **[docs/phase11-session-handoff.md](docs/phase11-session-handoff.md)**에서 현재 구현 기준점과 문서 우선순위를 먼저 확인한다. 초기 roadmap의 퍼블리싱 상태 설명보다 Phase별 최신 적용 기록을 우선한다.
 
 ## 문서 구성 (`docs/`)
 

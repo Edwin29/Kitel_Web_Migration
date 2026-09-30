@@ -54,8 +54,13 @@ html, body { margin: 0; }
     min-width: 0;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
     font-size: var(--kitel-text-md);
     white-space: nowrap;
+    cursor: pointer;
 }
 .kitel-nav__link::after {
     position: absolute;

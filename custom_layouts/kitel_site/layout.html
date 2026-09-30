@@ -12,7 +12,7 @@
 {@ $nav_current_section = null; }
 <block loop="$nav_items=>$nav_key,$nav_item" cond="$nav_has_active_page && $nav_item['selected'] && $nav_item['list']">{@ $nav_current_section = $nav_item; }</block>
 {@ $nav_vertical_section = $nav_current_section && in_array($nav_current_section['url'], array('about', 'etc')); $nav_section_label = $nav_current_section && in_array($nav_current_section['link'], array('Else', '기타')) ? '지원' : ($nav_current_section['link'] ?? ''); $nav_section_heading = $nav_current_section && $nav_current_section['url'] === 'news' ? 'News' : $nav_section_label; }
-{@ $density_productive = in_array($nav_rendered_module, array('archive', 'homework', 'member', 'integration_search')) || ($nav_rendered_module === 'board' && ($current_module_info->skin ?? '') !== 'kitel_gallery'); }
+{@ $density_productive = in_array($nav_rendered_module, array('archive', 'homework', 'member', 'integration_search', 'board')); }
 <div class="kitel-site {$density_productive ? 'density-productive' : 'density-expressive'}" data-section="{$nav_current_section['url'] ?? ''}">
     <a class="kitel-skip kitel-chrome" href="#kitel-content">본문으로 건너뛰기</a>
     <header class="kitel-header kitel-chrome">
@@ -24,7 +24,7 @@
             <nav class="kitel-nav" aria-label="전체 메뉴" cond="$nav_items">
                 <block loop="$nav_items=>$key1,$item1">
                     {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
-                    <a class="kitel-nav__link {$nav_has_active_page && $item1['selected'] ? 'is-active' : ''}" href="{$item1['href']}" target="_blank"|cond="$item1['open_window'] == 'Y'" rel="noopener noreferrer" aria-controls="kitel-mega-menu" aria-expanded="false">{$label1}</a>
+                    <button class="kitel-nav__link {$nav_has_active_page && $item1['selected'] ? 'is-active' : ''}" type="button" aria-controls="kitel-mega-menu" aria-expanded="false">{$label1}</button>
                 </block>
             </nav>
 
@@ -75,7 +75,6 @@
                     {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
                     <details>
                         <summary>{$label1}</summary>
-                        <a class="kitel-mobile__all" href="{$item1['href']}">{$label1} 전체 보기</a>
                         <ul cond="$item1['list']">
                             <li loop="$item1['list']=>$key2,$item2"><a href="{$item2['href']}">{$item2['link']}</a></li>
                         </ul>
@@ -101,7 +100,7 @@
     </div>
 
     <nav class="kitel-chrome kitel-section-nav kitel-section-nav--horizontal kitel-container" aria-label="현재 섹션" cond="$nav_current_section && !$nav_vertical_section">
-        <a class="kitel-section-nav__title" href="{$nav_current_section['href']}">{$nav_section_heading}</a>
+        <span class="kitel-section-nav__title">{$nav_section_heading}</span>
         <ul class="kitel-section-nav__links">
             <li loop="$nav_current_section['list']=>$key2,$item2">
                 {@ $nav_child_query = array(); parse_str(parse_url(html_entity_decode($item2['href'], ENT_QUOTES | ENT_HTML5, 'UTF-8'), PHP_URL_QUERY) ?? '', $nav_child_query); $nav_child_active = $nav_has_active_page && ($item2['selected'] || ($nav_category && ($nav_child_query['mid'] ?? '') === $nav_rendered_mid && (string)($nav_child_query['category'] ?? '') === (string)$nav_category)); }
@@ -112,7 +111,7 @@
 
     <div class="kitel-content-shell {$nav_vertical_section ? 'has-sidebar' : ''} {$nav_current_section && !$nav_vertical_section ? 'has-horizontal-nav' : ''}">
         <nav class="kitel-chrome kitel-section-nav kitel-section-nav--vertical" aria-label="현재 섹션" cond="$nav_vertical_section">
-            <a class="kitel-section-nav__title" href="{$nav_current_section['href']}">{$nav_section_label}</a>
+            <span class="kitel-section-nav__title">{$nav_section_label}</span>
             <ul class="kitel-section-nav__links">
                 <li loop="$nav_current_section['list']=>$key2,$item2"><a class="{$nav_has_active_page && $item2['selected'] ? 'is-active' : ''}" href="{$item2['href']}">{$item2['link']}</a></li>
             </ul>
@@ -126,7 +125,7 @@
         <div class="kitel-footer__sitemap kitel-container">
             <div class="kitel-footer__column" loop="$nav_items=>$key1,$item1">
                 {@ $label1 = in_array($item1['link'], array('Else', '기타')) ? '지원' : $item1['link'] }
-                <a class="kitel-footer__title" href="{$item1['href']}">{$label1}</a>
+                <span class="kitel-footer__title">{$label1}</span>
                 <ul cond="$item1['list']">
                     <li loop="$item1['list']=>$key2,$item2">
                         {@ $nav_child_query = array(); parse_str(parse_url(html_entity_decode($item2['href'], ENT_QUOTES | ENT_HTML5, 'UTF-8'), PHP_URL_QUERY) ?? '', $nav_child_query); $nav_child_active = $nav_has_active_page && ($item2['selected'] || ($nav_category && ($nav_child_query['mid'] ?? '') === $nav_rendered_mid && (string)($nav_child_query['category'] ?? '') === (string)$nav_category)); }

@@ -21,7 +21,7 @@
         if (returningFocus) return;
         megaTrigger = link;
         mega.hidden = false;
-        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (item) { item.setAttribute('aria-expanded', 'true'); });
+        if (nav) nav.querySelectorAll('[aria-expanded]').forEach(function (item) { item.setAttribute('aria-expanded', item === link ? 'true' : 'false'); });
     }
     function closeMobile() {
         if (mobile) mobile.hidden = true;
@@ -36,6 +36,10 @@
             if (link && nav.contains(link)) openMega(link);
         });
         nav.addEventListener('focusin', function (event) {
+            var link = event.target.closest('.kitel-nav__link');
+            if (link && nav.contains(link)) openMega(link);
+        });
+        nav.addEventListener('click', function (event) {
             var link = event.target.closest('.kitel-nav__link');
             if (link && nav.contains(link)) openMega(link);
         });

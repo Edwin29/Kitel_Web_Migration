@@ -1,0 +1,47 @@
+<config autoescape="on" />
+<load target="home_dashboard.css" />
+<div class="kitel-home-dashboard">
+    <div class="kitel-home-dashboard__inner">
+        <div class="kitel-home-dashboard__overview">
+            <section class="kitel-home-dashboard__panel" aria-labelledby="home-news-title">
+                <div class="kitel-home-dashboard__panel-heading"><h2 id="home-news-title">공지사항</h2><a href="{getUrl('', 'mid', 'news')}" aria-label="Kitel News 전체 보기">+</a></div>
+                <ul class="kitel-home-dashboard__news" cond="count($home_news)">
+                    <li loop="$home_news=>$i,$document">
+                        <a href="{getUrl('', 'mid', 'news', 'document_srl', $document->document_srl)}">
+                            <span class="kitel-home-dashboard__badge" cond="isset($home_news_categories[$document->get('category_srl')])">{$home_news_categories[$document->get('category_srl')]->title}</span>
+                            <span class="kitel-home-dashboard__row-title">{$document->getTitle(55)}</span>
+                            <time datetime="{$document->getRegdate('Y-m-d')}">{$document->getRegdate('Y.m.d')}</time>
+                        </a>
+                    </li>
+                </ul>
+                <p class="kitel-home-dashboard__empty" cond="!count($home_news)">등록된 소식이 없습니다.</p>
+            </section>
+            <section class="kitel-home-dashboard__panel" aria-labelledby="home-homework-title">
+                <div class="kitel-home-dashboard__panel-heading"><h2 id="home-homework-title">과제현황</h2><a href="{getUrl('', 'mid', 'homework')}" aria-label="과제게시판 전체 보기">+</a></div>
+                <ul class="kitel-home-dashboard__tasks" cond="$home_homework_access && count($home_homework)">
+                    <li loop="$home_homework=>$i,$task"><a href="{getUrl('', 'mid', 'homework', 'task_srl', $task->task_srl)}"><span class="kitel-home-dashboard__row-title">{$task->title}</span><span class="kitel-home-dashboard__task-state" cond="isset($task->home_submitted)">{$task->home_submitted ? '제출완료' : '미제출'}</span><span class="kitel-home-dashboard__task-date">{$task->deadline ? substr($task->deadline, 0, 4) . '.' . substr($task->deadline, 4, 2) . '.' . substr($task->deadline, 6, 2) : '기한 없음'}</span></a></li>
+                </ul>
+                <p class="kitel-home-dashboard__empty" cond="$home_homework_access && !count($home_homework)">현재 표시 중인 과제가 없습니다.</p>
+                <p class="kitel-home-dashboard__empty" cond="!$home_homework_access">회원에게 공개된 과제 현황을 확인할 수 있습니다.</p>
+            </section>
+        </div>
+
+        <section class="kitel-home-dashboard__exhibition" aria-labelledby="home-exhibition-title">
+            <div class="kitel-home-dashboard__section-heading"><div><p class="kitel-home-dashboard__eyebrow">MADE BY KITEL</p><h2 id="home-exhibition-title">새로운 작품</h2></div><a href="{getUrl('', 'mid', 'exhibition')}">작품전시회 보기 <span aria-hidden="true">→</span></a></div>
+            <div class="kitel-home-dashboard__work-grid" cond="count($home_exhibition)">
+                <a class="kitel-home-dashboard__work" loop="$home_exhibition=>$i,$item" href="{getUrl('', 'mid', 'exhibition', 'document_srl', $item['document']->document_srl)}">
+                    <div class="kitel-home-dashboard__work-media">
+                        <img cond="$item['photo']" src="{getUrl('', 'module', 'kitelboardguard', 'act', 'procKitelboardguardImage', 'file_srl', $item['photo']->file_srl)}" alt="" loading="lazy" />
+                        <span cond="!$item['photo']" aria-hidden="true">KITEL</span>
+                    </div>
+                    <div class="kitel-home-dashboard__work-copy"><h3>{$item['document']->getTitle(80)}</h3><p>{$item['document']->getExtraEidValue('project_info') ?: $item['document']->getContentPlainText(100)}</p><span>자세히 보기 →</span></div>
+                </a>
+            </div>
+            <div class="kitel-home-dashboard__empty-work" cond="!count($home_exhibition)"><p>공개된 작품이 준비 중입니다.</p><a href="{getUrl('', 'mid', 'exhibition')}">작품전시회로 이동 →</a></div>
+        </section>
+    </div>
+
+    <section class="kitel-home-dashboard__band" aria-label="KITEL 바로가기">
+        <div class="kitel-home-dashboard__band-inner"><h2>함께 살펴보기</h2><div class="kitel-home-dashboard__shortcuts"><a href="{getUrl('', 'mid', 'schedule')}"><strong>일정</strong><span>진행 예정인 행사를 확인하세요</span></a><a href="{getUrl('', 'mid', 'seminar')}"><strong>세미나</strong><span>함께 공부한 내용을 만나보세요</span></a><a href="{getUrl('', 'mid', 'sharing')}"><strong>공유</strong><span>회원들이 나눈 이야기를 읽어보세요</span></a></div></div>
+    </section>
+</div>

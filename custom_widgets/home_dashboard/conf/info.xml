@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget version="0.2">
+    <title xml:lang="ko">KITEL 홈 미리보기</title>
+    <title xml:lang="en">KITEL Home Dashboard</title>
+    <description xml:lang="ko">News, 과제, 공개 작품을 기존 모듈에서 읽어 Home에 표시합니다.</description>
+    <version>1.0</version>
+    <date>2026-09-30</date>
+    <author email_address="dev@kitel.local" link="https://kitel.kw.ac.kr"><name xml:lang="ko">KITEL</name></author>
+    <extra_vars>
+        <group>
+            <title xml:lang="ko">데이터 대상</title>
+            <var id="news_module_srl"><type>module_srl_list</type><name xml:lang="ko">Kitel News</name></var>
+            <var id="homework_module_srl"><type>module_srl_list</type><name xml:lang="ko">과제게시판</name></var>
+            <var id="exhibition_module_srl"><type>module_srl_list</type><name xml:lang="ko">작품전시회</name></var>
+        </group>
+    </extra_vars>
+</widget>

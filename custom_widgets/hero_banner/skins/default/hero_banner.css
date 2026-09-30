@@ -1,0 +1,16 @@
+.kitel-hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: calc(100vh - 80px); min-height: calc(100dvh - var(--kitel-hero-top, 80px)); width: 100%; overflow: hidden; padding: 80px 24px 110px; box-sizing: border-box; color: #fff; background: #07143d; font-family: var(--kitel-font, Pretendard, sans-serif); }
+.kitel-hero::before { position: absolute; z-index: -2; inset: 0; background: radial-gradient(circle at 78% 33%, rgba(38, 156, 255, .5), transparent 26%), radial-gradient(circle at 10% 78%, rgba(31, 81, 185, .62), transparent 38%), linear-gradient(125deg, #051034 8%, #062f76 52%, #081642); content: ''; }
+.kitel-hero__media { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.kitel-hero__shade { position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(3, 12, 42, .68), rgba(4, 22, 66, .16) 75%), linear-gradient(0deg, rgba(3, 12, 42, .28), transparent 35%); }
+.kitel-hero__inner { width: 100%; }
+.kitel-hero__copy { max-width: 720px; }
+.kitel-hero__headline { margin: 0 0 20px; font-size: clamp(44px, 5vw, 80px); font-weight: 300; line-height: 1.12; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.kitel-hero__subtext { max-width: 580px; margin: 0; font-size: clamp(16px, 1.35vw, 20px); line-height: 1.55; white-space: pre-line; }
+.kitel-hero__cta { display: inline-flex; align-items: center; gap: 22px; margin-top: 32px; padding: 12px 20px; border: 1px solid rgba(255,255,255,.8); border-radius: var(--kitel-radius-pill, 20px); color: #fff; text-decoration: none; font-size: 16px; transition: background-color .2s ease; }
+.kitel-hero__cta:hover { background: rgba(255,255,255,.16); }
+.kitel-hero__scroll { position: absolute; bottom: 18px; left: 50%; display: grid; width: 50px; height: 50px; place-items: center; transform: translateX(-50%); }
+.kitel-hero__scroll img { display: block; width: 50px; height: 50px; }
+.kitel-hero :is(a):focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.kitel-hero__empty { margin: 0; color: rgba(255,255,255,.8); }
+@media (max-width: 700px) { .kitel-hero { padding: 64px 24px 105px; }.kitel-hero__headline { font-size: clamp(40px, 11vw, 60px); }.kitel-hero__subtext { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .kitel-hero__cta { transition: none; } }

@@ -7,6 +7,10 @@ class hero_banner extends WidgetHandler
 {
 	function proc($args)
 	{
+		if ((Context::get('mid') ?: '') === 'index')
+		{
+			Context::setBrowserTitle(trim((string)($args->headline ?? '')) ?: 'KITEL');
+		}
 		Context::set('headline', $args->headline ?? '');
 		Context::set('subtext', $args->subtext ?? '');
 		Context::set('bg_image', $args->bg_image ?? '');

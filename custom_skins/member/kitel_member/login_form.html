@@ -1,0 +1,31 @@
+<config autoescape="on" />
+<include target="./common_header.html" />
+<div class="kitel-member__login-wrap">
+    <div class="kitel-member__login-card">
+        <h1>Login</h1>
+        <div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == 'modules/member/skins'" class="kitel-member__message {$XE_VALIDATOR_MESSAGE_TYPE}" role="alert">{$XE_VALIDATOR_MESSAGE}</div>
+        <form ruleset="@login" action="./" method="post" id="fo_member_login" class="rx_ajax kitel-member__login-form">
+            <input type="hidden" name="success_return_url" value="{$referer_url}" />
+            <input type="hidden" name="act" value="procMemberLogin" />
+            <input type="hidden" name="xe_validator_id" value="modules/member/skins" />
+            <div class="kitel-member__login-fields">
+                <label class="kitel-member__sr-only" for="uid">{$identifier == 'email_address' ? $lang->email_address : $lang->user_id}</label>
+                <input type="text" cond="$identifier != 'email_address'" name="user_id" id="uid" required placeholder="ID" autocomplete="username" />
+                <input type="email" cond="$identifier == 'email_address'" name="user_id" id="uid" required placeholder="{$lang->email_address}" autocomplete="username" />
+                <label class="kitel-member__sr-only" for="upw">{$lang->password}</label>
+                <input type="password" name="password" id="upw" required placeholder="PW" autocomplete="current-password" />
+            </div>
+            <div class="kitel-member__captcha" cond="isset($captcha) && $captcha && $captcha->isTargetAction('login')">{$captcha}</div>
+            <div class="kitel-member__login-options">
+                <label class="kitel-member__keep" for="keepid_opt"><input type="checkbox" name="keep_signed" id="keepid_opt" value="Y" />{$lang->keep_signed}</label>
+                <span class="kitel-member__login-links"><a href="{getUrl('act','dispMemberSignUpForm')}">회원가입</a><a href="{getUrl('act','dispMemberFindAccount')}">ID/PW 찾기</a></span>
+            </div>
+            <p class="kitel-member__keep-warning" id="warning" hidden>{$lang->about_keep_warning}</p>
+            <button type="submit" class="kitel-member__button kitel-member__login-submit">Login</button>
+        </form>
+    </div>
+</div>
+<script>
+jQuery(function($) { $('#keepid_opt').on('change', function() { $('#warning').prop('hidden', !this.checked); }); });
+</script>
+<include target="./common_footer.html" />

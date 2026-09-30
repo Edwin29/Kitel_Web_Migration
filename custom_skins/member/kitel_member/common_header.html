@@ -1,0 +1,10 @@
+<load target="css/member.css" />
+<load target="css/kitel-member.css" />
+<load target="js/member.js" />
+
+<section class="xm kitel-member">
+	<ul class="nav nav-tabs kitel-member__utility-nav" aria-label="회원 기능" cond="$is_logged && Context::get('signup_complete') !== '1' && $logged_info->menu_list && (!isset($member_srl) || !$member_srl || $member_srl == $logged_info->member_srl)">
+		<li loop="$logged_info->menu_list=>$key,$val" class="active"|cond="$key==$act">
+			<a href="{getUrl('', 'act', $key, 'mid', $mid)}">{lang($val)}</a>
+		</li>
+	</ul>

@@ -1,0 +1,39 @@
+<config autoescape="on" />
+<include target="./common_header.html" />
+<header class="kitel-member__banner"><img src="/layouts/kitel_site/img/kitel-mark.svg" alt="" /><h1>{Context::get('signup_complete') === '1' && $memberInfo['member_srl'] == $logged_info->member_srl ? '회원가입' : ($memberInfo['member_srl'] == $logged_info->member_srl ? '마이페이지' : '회원정보')}</h1></header>
+<div cond="Context::get('signup_complete') === '1' && $memberInfo['member_srl'] == $logged_info->member_srl" class="kitel-member__success">
+    <img class="kitel-member__success-icon" src="/modules/member/skins/kitel_member/css/signup-success.svg" alt="" width="150" height="150" />
+    <h2>{$memberInfo['nick_name']}님<br />회원가입이 완료되었습니다</h2>
+    <p>회원 승인 후 이용 가능한 기능이 달라질 수 있습니다.</p>
+    <div class="kitel-member__success-actions"><a class="kitel-member__button" href="{getUrl('', 'mid', 'home', 'act', '')}">Home</a><a class="kitel-member__button" href="{getUrl('act', 'dispMemberInfo', 'signup_complete', '')}">My Page</a></div>
+</div>
+<div cond="Context::get('signup_complete') !== '1' || $memberInfo['member_srl'] != $logged_info->member_srl">
+    <section class="kitel-member__section" aria-labelledby="kitel-profile-title">
+        <h2 class="kitel-member__section-title" id="kitel-profile-title">내 정보</h2>
+        <div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == 'modules/member/skins/default/1'" class="kitel-member__message {$XE_VALIDATOR_MESSAGE_TYPE}" role="status">{$XE_VALIDATOR_MESSAGE}</div>
+        <dl class="kitel-member__profile">
+            <div class="kitel-member__profile-row" loop="$displayDatas=>$item"><dt>{$item->title}</dt><dd>{$item->value ?: '—'}</dd></div>
+            <div class="kitel-member__profile-row"><dt>{$lang->member_group}</dt><dd>{implode(', ', $memberInfo['group_list'])}</dd></div>
+            <div class="kitel-member__profile-row"><dt>{$lang->signup_date}</dt><dd>{zdate($memberInfo['regdate'], 'Y.m.d')}</dd></div>
+            <div class="kitel-member__profile-row" cond="$memberInfo['member_srl'] == $logged_info->member_srl || $logged_info->is_admin == 'Y'"><dt>{$lang->last_login}</dt><dd>{zdate($memberInfo['last_login'], 'Y.m.d')}</dd></div>
+            <div class="kitel-member__profile-row"><dt>비밀번호</dt><dd>보안을 위해 표시하지 않습니다.</dd></div>
+        </dl>
+        <nav class="kitel-member__profile-actions" aria-label="회원정보 관리" cond="$memberInfo['member_srl'] == $logged_info->member_srl">
+            <a class="kitel-member__button kitel-member__button--subtle" href="{getUrl('act','dispMemberModifyInfo','member_srl','')}">정보 수정</a>
+            <a class="kitel-member__button kitel-member__button--subtle" href="{getUrl('act','dispMemberModifyPassword','member_srl','')}">비밀번호 변경</a>
+            <a class="kitel-member__button kitel-member__button--subtle" href="{getUrl('act','dispMemberModifyEmailAddress')}">이메일 변경</a>
+            <a class="kitel-member__button kitel-member__button--subtle" href="{getUrl('act','dispMemberLeave','member_srl','')}">탈퇴</a>
+        </nav>
+    </section>
+    <!--@if($memberInfo['member_srl'] == $logged_info->member_srl)-->
+    {@ $recent_args = (object)['member_srl' => [(int)$logged_info->member_srl, -(int)$logged_info->member_srl], 'statusList' => [DocumentModel::getConfigStatus('public')], 'page' => 1, 'list_count' => 5, 'page_count' => 1, 'sort_index' => 'list_order', 'order_type' => 'asc']; }
+    {@ $recent_result = DocumentModel::getDocumentList($recent_args, false, false); $recent_documents = $recent_result->toBool() && is_array($recent_result->data) ? $recent_result->data : []; }
+    <section class="kitel-member__recent" aria-labelledby="kitel-recent-title">
+        <h2 id="kitel-recent-title">최근에 쓴 글</h2>
+        <table cond="count($recent_documents)"><thead><tr><th scope="col">제목</th><th scope="col">날짜</th><th scope="col">조회수</th></tr></thead><tbody><tr loop="$recent_documents=>$i,$document"><td><a href="{getUrl('', 'document_srl', $document->document_srl)}">{$document->getTitleText()}</a></td><td>{$document->getRegdate('Y.m.d')}</td><td>{$document->get('readed_count')}</td></tr></tbody></table>
+        <p class="kitel-member__empty" cond="!count($recent_documents)">아직 작성한 글이 없습니다.</p>
+        <a href="{getUrl('act', 'dispMemberOwnDocument')}">내가 쓴 글 전체 보기 →</a>
+    </section>
+    <!--@end-->
+</div>
+<include target="./common_footer.html" />

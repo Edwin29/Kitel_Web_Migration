@@ -23,7 +23,7 @@
         <block loop="$page_no=$oDocument->comment_page_navigation->getNextPage()"><strong cond="$cpage==$page_no" aria-current="page">{$page_no}</strong><a cond="$cpage!=$page_no" href="{getUrl('cpage',$page_no)}#comment">{$page_no}</a></block>
         <a href="{getUrl('cpage',$oDocument->comment_page_navigation->last_page)}#comment">Last</a>
     </nav>
-    <form cond="$grant->write_comment && $oDocument->isEnableComment()" action="./" method="post" onsubmit="return procFilter(this, insert_comment)" class="kitel-board__comment-form" id="write_comment">
+    <form cond="$grant->write_comment && $oDocument->isEnableComment()" action="./" method="post" onsubmit="return procFilter(this, insert_comment)" class="kitel-board__comment-form kitel-form-surface" id="write_comment">
         <input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="document_srl" value="{$oDocument->document_srl}" /><input type="hidden" name="comment_srl" value="" /><input type="hidden" name="content" value="" />
         {$oDocument->getCommentEditor()}
         <div cond="!$is_logged"><label>{$lang->writer} <input type="text" name="nick_name" /></label><label>{$lang->password} <input type="password" name="password" /></label><label>{$lang->homepage} <input type="text" name="homepage" /></label></div>

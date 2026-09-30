@@ -1,6 +1,6 @@
 <config autoescape="on" />
 <load target="./homework.css" />
-<article class="kitel-homework kitel-homework--detail">
+<article class="kitel-homework kitel-homework--detail kitel-form-surface">
     <div cond="$show_deadline_banner" class="kitel-homework__hero"><span class="kitel-homework__countdown" cond="$days_remaining !== null"><block cond="$days_remaining > 0">D-{$days_remaining}</block><block cond="$days_remaining === 0">D-Day</block><block cond="$days_remaining < 0">마감</block></span><span class="kitel-homework__countdown" cond="$days_remaining === null">과제</span><h1>{$task->title}</h1><a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '수정하기' : '제출하기'}</a></div>
     <div cond="!$show_deadline_banner" class="kitel-homework__title-row"><h1>{$task->title}</h1><a cond="$is_submitter" class="kitel-homework__jump" href="#homework-submission">{$my_submission ? '수정하기' : '제출하기'}</a></div>
     <div class="kitel-homework__meta"><span cond="$task->deadline">마감 {substr($task->deadline,0,4)}.{substr($task->deadline,4,2)}.{substr($task->deadline,6,2)} 23:59</span><span cond="!$task->deadline">마감 기한 없음</span><a cond="$can_manage" class="kitel-homework__dashboard-link" href="{getUrl('module','admin','act','dispHomeworkAdminDashboard','mid',$mid,'task_srl',$task->task_srl)}">이 과제 제출현황</a></div>

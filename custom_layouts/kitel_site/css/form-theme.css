@@ -1,0 +1,16 @@
+/* Opt-in authoring surface. Never restyle arbitrary Rhymix $content. */
+.kitel-form-surface { color: var(--kitel-text, #1c1f25); font-family: var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); }
+.kitel-form-surface :is(label, legend) { color: var(--kitel-text, #1c1f25); font-family: var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif) !important; }
+.kitel-form-surface :is(input[type="text"], input[type="password"], input[type="date"], input[type="email"], select, textarea):not([hidden]):not([type="hidden"]) { max-width: 100%; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 8px; background: #f8f9fc; color: var(--kitel-text, #1c1f25); font-family: var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); box-shadow: none; }
+.kitel-form-surface :is(input[type="text"], input[type="password"], input[type="date"], input[type="email"], select, textarea):not([hidden]):focus { border-color: var(--kitel-primary, #191970); outline: 2px solid rgba(25,25,112,.18); outline-offset: 1px; background: #fff; }
+.kitel-form-surface input[type="file"]:not([hidden]) { max-width: 100%; padding: 10px 12px; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 8px; background: #f8f9fc; color: var(--kitel-text-secondary, #626262); font: 14px var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); cursor: pointer; }
+.kitel-form-surface input[type="file"]:not([hidden])::file-selector-button { margin-right: 16px; padding: 8px 16px; border: 1px solid var(--kitel-primary, #191970); border-radius: 20px; background: #fff; color: var(--kitel-primary, #191970); font: 500 14px var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); cursor: pointer; }
+.kitel-form-surface input[type="file"]:not([hidden]):hover::file-selector-button { background: var(--kitel-primary-soft, #eef1fb); }
+.kitel-form-surface input[type="file"]:focus-visible { outline: 2px solid var(--kitel-primary, #191970); outline-offset: 2px; }
+.kitel-form-surface .rx_ev_description { color: var(--kitel-text-muted, #a9aeb3); font-family: var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); }
+.kitel-form-surface .cke_chrome { overflow: hidden; border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 8px; box-shadow: none; }
+.kitel-form-surface :is(.cke_top, .cke_bottom) { border-color: var(--kitel-border-row, #e2e8f0); background: #f8f9fc !important; background-image: none !important; box-shadow: none; }
+.kitel-form-surface :is(.cke_toolgroup, .cke_combo_button) { border-color: var(--kitel-border-row, #e2e8f0); border-radius: 6px; background: #fff; background-image: none; box-shadow: none; }
+.kitel-form-surface .xefu-container { border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 8px; background: #f8f9fc; }
+.kitel-form-surface .xefu-dropzone { background: transparent; }
+.kitel-form-surface .xefu-btn { border: 1px solid var(--kitel-border-row, #e2e8f0); border-radius: 20px; background: #fff; color: var(--kitel-text, #1c1f25); font-family: var(--kitel-font, Pretendard, "Malgun Gothic", sans-serif); }

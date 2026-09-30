@@ -1,7 +1,7 @@
 <config autoescape="on" />
 <include target="./header.html" />
 <load target="./task-form.js" />
-<form action="./" method="post" class="kitel-hw-admin kitel-hw-admin__task-form" id="kitel-task-form">
+<form action="./" method="post" class="kitel-hw-admin kitel-hw-admin__task-form kitel-form-surface" id="kitel-task-form">
     <input type="hidden" name="module" value="admin" /><input type="hidden" name="act" value="procHomeworkAdminInsertTask" /><input type="hidden" name="mid" value="{$mid}" /><input type="hidden" name="task_srl" value="{$task->task_srl}"|cond="$task" />
     <div class="kitel-hw-admin__editor-card">
         <h2>{$task ? '과제 수정' : '과제 추가'}</h2>

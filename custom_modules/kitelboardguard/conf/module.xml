@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module><actions /></module>
+<module>
+    <actions>
+        <action name="procKitelboardguardImage" type="controller" method="GET" />
+        <action name="procKitelboardguardSetExhibitionVisibility" type="controller" method="POST" />
+    </actions>
+</module>

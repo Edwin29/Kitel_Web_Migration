@@ -1,20 +1,59 @@
 <?php
 class Kitelboardguard extends ModuleObject
 {
-    private const TRIGGER = ['file.downloadFile', 'kitelboardguard', 'controller', 'triggerBeforeDownload', 'before'];
+    private const TRIGGERS = [
+        ['file.downloadFile', 'kitelboardguard', 'controller', 'triggerBeforeDownload', 'before'],
+        ['document.insertDocument', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionSave', 'before'],
+        ['document.updateDocument', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionSave', 'before'],
+        ['comment.insertComment', 'kitelboardguard', 'controller', 'triggerBeforeExhibitionComment', 'before'],
+        ['file.insertFile', 'kitelboardguard', 'controller', 'triggerAfterExhibitionUpload', 'after'],
+    ];
+
+    public static function exhibitionPrivateRoot()
+    {
+        return RX_BASEDIR . '../../kitel-private/exhibition/';
+    }
+
+    public static function exhibitionIsPublic($moduleSrl)
+    {
+        $config = ModuleModel::getModulePartConfig('kitelboardguard', (int)$moduleSrl);
+        // Existing exhibitions remain visible until an owner explicitly closes them.
+        return !is_object($config) || ($config->is_public ?? 'Y') === 'Y';
+    }
+
+    public static function exhibitionDocumentAccessible($document)
+    {
+        return $document->isExists() && $document->isAccessible() &&
+            (self::exhibitionIsPublic($document->get('module_srl')) || $document->isGranted());
+    }
 
     public function moduleInstall()
     {
-        return ModuleController::getInstance()->insertTrigger(...self::TRIGGER);
+        foreach (self::TRIGGERS as $trigger)
+        {
+            ModuleController::getInstance()->insertTrigger(...$trigger);
+        }
+        return new BaseObject();
     }
 
     public function checkUpdate()
     {
-        return !ModuleModel::getInstance()->getTrigger(...self::TRIGGER);
+        foreach (self::TRIGGERS as $trigger)
+        {
+            if (!ModuleModel::getInstance()->getTrigger(...$trigger)) return true;
+        }
+        return false;
     }
 
     public function moduleUpdate()
     {
-        return ModuleController::getInstance()->insertTrigger(...self::TRIGGER);
+        foreach (self::TRIGGERS as $trigger)
+        {
+            if (!ModuleModel::getInstance()->getTrigger(...$trigger))
+            {
+                ModuleController::getInstance()->insertTrigger(...$trigger);
+            }
+        }
+        return new BaseObject();
     }
 }

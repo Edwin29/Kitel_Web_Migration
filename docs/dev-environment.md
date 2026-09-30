@@ -207,6 +207,8 @@ homework/
 
 ## 네 번째 커스텀 화면: 작품전시회 (2026-08-19)
 
+> 아래는 당시 작품별 승인 흐름의 검증 기록이다. Phase 7에서 제품 정책이 **기술부의 전시 전체 공개 전환**으로 변경되어 현재 동작 설명으로 사용하지 않는다. 현재 설정·권한·QA는 [phase7-exhibition-setup.md](phase7-exhibition-setup.md)를 참조한다.
+
 과제게시판과 반대로, 이번엔 **board 표준기능(비밀글 상태 + 관리권한)이 실제로 3단계 승인 워크플로우에 맞는지 먼저 검증한 뒤** 문제없음을 확인하고 커스텀 스킨만 얹는 방식으로 진행함. 대상: exhibition 게시판(module_srl=129), 스킨은 [custom_skins/board/kitel_gallery](../custom_skins/board/kitel_gallery)(배포 경로 `modules/board/skins/kitel_gallery`).
 
 ### 검증한 가설: board의 비밀글(SECRET) 상태 + 관리권한(manager grant)으로 "정회원 제출 → 기술부 검토 → admin 승인 → 공개" 워크플로우가 되는가

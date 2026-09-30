@@ -1,0 +1,14 @@
+<query id="updateExhibitionFilePath" action="update">
+    <tables>
+        <table name="files" />
+    </tables>
+    <columns>
+        <column name="uploaded_filename" var="uploaded_filename" notnull="notnull" />
+        <column name="thumbnail_filename" var="thumbnail_filename" />
+        <column name="direct_download" var="direct_download" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="file_srl" var="file_srl" filter="number" notnull="notnull" />
+        <condition operation="equal" column="module_srl" var="module_srl" filter="number" notnull="notnull" />
+    </conditions>
+</query>
